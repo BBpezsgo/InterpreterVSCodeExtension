@@ -1,0 +1,148 @@
+{
+  "name": "bb-code",
+  "description": "A VSCode extension to support some basic things in my BBCode programming language",
+  "author": "BB",
+  "version": "0.0.1",
+  "displayName": "BBCode",
+  "private": true,
+  "preview": true,
+  "engines": {
+    "vscode": "^1.8.0"
+  },
+  "publisher": "BB",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BBpezsgo/InterpreterVSCodeExtension"
+  },
+  "markdown": "github",
+  "icon": "icon.png",
+  "homepage": "https://github.com/BBpezsgo/InterpreterVSCodeExtension",
+  "galleryBanner": {
+    "color": "#cc0055",
+    "theme": "dark"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onLanguage:bbc"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "configuration": {
+      "title": "BBCode configuration",
+      "type": "object",
+      "properties": {
+        "bbcodeServer.maxNumberOfProblems": {
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server"
+        },
+        "bbcodeServer.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VSCode and the language server service"
+        },      
+        "bbcodeServer.runBbcIn": {
+          "type": "string",
+          "enum": [
+            "Terminal",
+            "External-cmd"
+          ],
+          "enumDescriptions": [
+            "Open the bbc files in the built-in VS Code terminal",
+            "Open the bbc files in an external cmd window"
+          ],
+          "default": "Terminal",
+          "description": "Where the bbc file should be executed",
+          "scope": "resource"
+        },
+        "bbcodeServer.cmdPath": {
+          "type": "string",
+          "default": "D:\\Program Files\\BBCodeProject\\BBCode\\bin\\Release\\net6.0\\BBCode.exe",
+          "description": "Path to where 'BBCode.exe' is located",
+          "scope": "machine"
+        }
+      }
+    },
+    "languages": [{
+      "id": "bbc",
+      "aliases": ["BBCode", "bbc"],
+      "extensions": [".bbc"],
+      "configuration": "./language-configuration.json",
+      "icon": {
+        "dark": "file-icon.svg",
+        "light": "file-icon.svg"
+      }
+    }],
+    "grammars": [{
+      "language": "bbc",
+      "scopeName": "source.bbc",
+      "path": "./syntax.json"
+    }],    
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "bb-code.runBbcFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbc && shellExecutionSupported"
+				}
+			],
+			"editor/title/context": [
+				{
+					"command": "bb-code.runBbcFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbc && shellExecutionSupported"
+				}
+			],
+			"editor/title/run": [
+				{
+					"command": "bb-code.runBbcFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+				}
+			]
+		},    
+		"commands": [
+			{
+				"command": "bb-code.runBbcFile",
+				"category": "BBC Runner",
+				"title": "Run BBC File",
+				"shortTitle": "Run BBC File",
+				"icon": "$(run)",
+				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+			}
+		],    
+    "snippets": [{
+      "language": "bbc",
+      "path": "./snippets.json"
+    }]
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "update-vscode": "node ./node_modules/vscode/bin/install",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.33",
+    "@types/node": "^6.0.52",
+    "typescript": "^2.1.5",
+    "vscode": "^1.1.37"
+  },
+  "dependencies": {
+    "vscode-languageclient": "~3.3.0"
+  },  
+	"capabilities": {
+		"virtualWorkspaces": {
+			"supported": false,
+			"description": "BBC runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
+		}
+	}
+}
