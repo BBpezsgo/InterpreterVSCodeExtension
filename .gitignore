@@ -6,3 +6,5 @@
 /out.log
 /icon.xcf
 /InterpreterVSCodeExtension.njsproj.user
+/obj
+/bin
