@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{53e5a4e6-7b82-431a-8e3a-b74428482774}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ProjectFiles</ProjectView>
+    <StartupFile />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <EnableTypeScript>true</EnableTypeScript>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include=".vscodeignore" />
+    <Content Include="file-icon.svg" />
+    <Content Include="icon.png" />
+    <Content Include="icon.xcf" />
+    <Content Include="InterpreterVSCodeExtension.njsproj" />
+    <Content Include="language-configuration.json" />
+    <Content Include="out.log" />
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
+    <Content Include="README.md" />
+    <Content Include="snippets.json" />
+    <Content Include="syntax.json" />
+    <None Include="tsconfig.json" />
+    <None Include="src\extension.ts" />
+    <None Include="src\utils.ts" />
+    <Content Include="TestFiles\a.bbc" />
+    <Content Include="TestFiles\a.nuspec" />
+    <Content Include="TestFiles\a.xml" />
+    <Content Include="TestFiles\helloworld.bbc" />
+    <Content Include="TestFiles\log.txt" />
+    <Content Include="TestFiles\System.bbc" />
+    <Content Include="TestFiles\System.Net.bbc" />
+    <Content Include="TestFiles\test-code-optimization.bbc" />
+    <Content Include="TestFiles\test-for.bbc" />
+    <Content Include="TestFiles\test-func-overload.bbc" />
+    <Content Include="TestFiles\test-heap.bbc" />
+    <Content Include="TestFiles\test-list.bbc" />
+    <Content Include="TestFiles\test-net.bbc" />
+    <Content Include="TestFiles\test-type-prediction.bbc" />
+    <Content Include="TestFiles\test0.bbc" />
+    <Content Include="TestFiles\test0.bcc" />
+    <Content Include="TestFiles\test1.bbc" />
+    <Content Include="TestFiles\test2.bbc" />
+    <Content Include="TestFiles\test3.bbc" />
+    <Content Include="TestFiles\test4.bbc" />
+    <Content Include="TestFiles\test5.bbc" />
+    <Content Include="TestFiles\test7.bbc" />
+    <Content Include="out\src\execute.js" />
+    <Content Include="out\src\execute.js.map" />
+    <Content Include="out\src\extension.js" />
+    <Content Include="out\src\extension.js.map" />
+    <Content Include="out\src\utils.js" />
+    <Content Include="out\src\utils.js.map" />
+    <Content Include="out\test\extension.test.js" />
+    <Content Include="out\test\extension.test.js.map" />
+    <Content Include="out\test\index.js" />
+    <Content Include="out\test\index.js.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="out" />
+    <Folder Include="out\src" />
+    <Folder Include="out\test" />
+    <Folder Include="src" />
+    <Folder Include="TestFiles" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
