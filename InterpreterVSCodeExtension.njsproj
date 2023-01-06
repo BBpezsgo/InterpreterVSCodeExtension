@@ -19,60 +19,29 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="*.svg" />
+    <Content Include="*.js" />
+    <Content Include="*.ts" />
+    <Content Include="*.bat" />
+    <Content Include="*.json" />
+    <Content Include="*.log" />
     <Content Include=".gitignore" />
     <Content Include=".vscodeignore" />
-    <Content Include="file-icon.svg" />
-    <Content Include="icon.png" />
-    <Content Include="icon.xcf" />
-    <Content Include="InterpreterVSCodeExtension.njsproj" />
-    <Content Include="language-configuration.json" />
-    <Content Include="out.log" />
-    <Content Include="package-lock.json" />
-    <Content Include="package.json" />
+    <Content Include="TestFiles/*" />
+    <Content Include="src/**/*" />
     <Content Include="README.md" />
-    <Content Include="snippets.json" />
-    <Content Include="syntax.json" />
-    <None Include="tsconfig.json" />
-    <None Include="src\extension.ts" />
-    <None Include="src\utils.ts" />
-    <Content Include="TestFiles\a.bbc" />
-    <Content Include="TestFiles\a.nuspec" />
-    <Content Include="TestFiles\a.xml" />
-    <Content Include="TestFiles\helloworld.bbc" />
-    <Content Include="TestFiles\log.txt" />
-    <Content Include="TestFiles\System.bbc" />
-    <Content Include="TestFiles\System.Net.bbc" />
-    <Content Include="TestFiles\test-code-optimization.bbc" />
-    <Content Include="TestFiles\test-for.bbc" />
-    <Content Include="TestFiles\test-func-overload.bbc" />
-    <Content Include="TestFiles\test-heap.bbc" />
-    <Content Include="TestFiles\test-list.bbc" />
-    <Content Include="TestFiles\test-net.bbc" />
-    <Content Include="TestFiles\test-type-prediction.bbc" />
-    <Content Include="TestFiles\test0.bbc" />
-    <Content Include="TestFiles\test0.bcc" />
-    <Content Include="TestFiles\test1.bbc" />
-    <Content Include="TestFiles\test2.bbc" />
-    <Content Include="TestFiles\test3.bbc" />
-    <Content Include="TestFiles\test4.bbc" />
-    <Content Include="TestFiles\test5.bbc" />
-    <Content Include="TestFiles\test7.bbc" />
-    <Content Include="out\src\execute.js" />
-    <Content Include="out\src\execute.js.map" />
-    <Content Include="out\src\extension.js" />
-    <Content Include="out\src\extension.js.map" />
-    <Content Include="out\src\utils.js" />
-    <Content Include="out\src\utils.js.map" />
-    <Content Include="out\test\extension.test.js" />
-    <Content Include="out\test\extension.test.js.map" />
-    <Content Include="out\test\index.js" />
-    <Content Include="out\test\index.js.map" />
+    <Content Include=".vscode/**/*" />
+    <Content Include="icons/**/*" />
+    <Content Include="syntax/**/*" />
+    <Content Include="snippets/**/*" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="out" />
-    <Folder Include="out\src" />
-    <Folder Include="out\test" />
+    <Folder Include=".vscode\" />
+    <Folder Include="icons\" />
+    <Folder Include="icons\files\" />
+    <Folder Include="snippets\" />
     <Folder Include="src" />
+    <Folder Include="syntax\" />
     <Folder Include="TestFiles" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
