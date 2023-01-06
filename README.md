@@ -20,4 +20,4 @@
 
 ## [Download Extension](https://onedrive.live.com/download?cid=6AEB0DA011C539BF&resid=6AEB0DA011C539BF%2153988&authkey=ACPWTGklQbU9cNQ)
 ![VSCode 1.74.2](https://img.shields.io/badge/VSCode-1.74.2-0078d7.svg?logo=visual-studio-code&logoColor=white)
-![win32-x64](https://img.shields.io/badge/win32-x64-0078D6?logo=windows&logoColor=white)
+![win-x64](https://img.shields.io/badge/win-x64-0078D6?logo=windows&logoColor=white)
