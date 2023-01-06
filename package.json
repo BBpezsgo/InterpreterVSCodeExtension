@@ -15,7 +15,7 @@
     "url": "https://github.com/BBpezsgo/InterpreterVSCodeExtension"
   },
   "markdown": "github",
-  "icon": "icon.png",
+  "icon": "/icons/extension.png",
   "homepage": "https://github.com/BBpezsgo/InterpreterVSCodeExtension",
   "galleryBanner": {
     "color": "#cc0055",
@@ -26,7 +26,8 @@
     "Snippets"
   ],
   "activationEvents": [
-    "onLanguage:bbc"
+    "onLanguage:bbc",
+    "onLanguage:bbct"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -53,20 +54,20 @@
           "type": "string",
           "enum": [
             "Terminal",
-            "External-cmd"
+            "External"
           ],
           "enumDescriptions": [
-            "Open the bbc files in the built-in VS Code terminal",
-            "Open the bbc files in an external cmd window"
+            "Run the files in the built-in VS Code terminal",
+            "Run the files in an external window"
           ],
           "default": "Terminal",
-          "description": "Where the bbc file should be executed",
+          "description": "Where to execute the file",
           "scope": "resource"
         },
         "bbcodeServer.cmdPath": {
           "type": "string",
           "default": "D:\\Program Files\\BBCodeProject\\BBCode\\bin\\Release\\net6.0\\BBCode.exe",
-          "description": "Path to where 'BBCode.exe' is located",
+          "description": "Path to the interpreter",
           "scope": "machine"
         }
       }
@@ -77,21 +78,39 @@
       "extensions": [".bbc"],
       "configuration": "./language-configuration.json",
       "icon": {
-        "dark": "file-icon.svg",
-        "light": "file-icon.svg"
+        "dark": "./icons/files/bbc.svg",
+        "light": "./icons/files/bbc.svg"
+      }
+    }, {
+      "id": "bbct",
+      "aliases": ["BBCode Tester", "bbc-tester"],
+      "extensions": [".bbct"],
+      "configuration": "./language-configuration.json",
+      "icon": {
+        "dark": "./icons/files/bbct.svg",
+        "light": "./icons/files/bbct.svg"
       }
     }],
     "grammars": [{
       "language": "bbc",
       "scopeName": "source.bbc",
-      "path": "./syntax.json"
-    }],    
-		"menus": {
+      "path": "./syntax/bbc.json"
+    }, {
+      "language": "bbct",
+      "scopeName": "source.bbct",
+      "path": "./syntax/bbct.json"
+    }],
+    "menus": {
 			"explorer/context": [
 				{
 					"command": "bb-code.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
+				},
+				{
+					"command": "bb-code.runBbcTestFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbct && shellExecutionSupported"
 				}
 			],
 			"editor/title/context": [
@@ -99,6 +118,11 @@
 					"command": "bb-code.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
+				},
+				{
+					"command": "bb-code.runBbcTestFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbct && shellExecutionSupported"
 				}
 			],
 			"editor/title/run": [
@@ -106,6 +130,11 @@
 					"command": "bb-code.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+				},
+				{
+					"command": "bb-code.runBbcTestFile",
+					"group": "bbc",
+					"when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
 				}
 			]
 		},    
@@ -117,11 +146,22 @@
 				"shortTitle": "Run BBC File",
 				"icon": "$(run)",
 				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+			},
+			{
+				"command": "bb-code.runBbcTestFile",
+				"category": "BBC Runner",
+				"title": "Run BBC Tester File",
+				"shortTitle": "Run BBC Tester File",
+				"icon": "$(beaker)",
+				"enablement": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
 			}
 		],    
     "snippets": [{
       "language": "bbc",
-      "path": "./snippets.json"
+      "path": "./snippets/bbc.json"
+    }, {
+      "language": "bbct",
+      "path": "./snippets/bbct.json"
     }]
   },
   "scripts": {
