@@ -7,15 +7,16 @@
   "private": true,
   "preview": true,
   "engines": {
-    "vscode": "^1.8.0"
+    "vscode": "^1.74.2"
   },
+  "pricing": "Free",
   "publisher": "BB",
   "repository": {
     "type": "git",
     "url": "https://github.com/BBpezsgo/InterpreterVSCodeExtension"
   },
   "markdown": "github",
-  "icon": "/icons/extension.png",
+  "icon": "icons/extension.png",
   "homepage": "https://github.com/BBpezsgo/InterpreterVSCodeExtension",
   "galleryBanner": {
     "color": "#cc0055",
@@ -169,7 +170,9 @@
     "compile": "tsc -watch -p ./",
     "update-vscode": "node ./node_modules/vscode/bin/install",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "build": "call \"./build.bat\""
+    "build": "call \"./build.bat\"",
+    "package": "vsce package --target win32-x64 --dependencies --out BBCodeExtension.vsix",
+    "upload": "call \"./upload.bat\""
   },
   "devDependencies": {
     "@types/mocha": "^2.2.33",

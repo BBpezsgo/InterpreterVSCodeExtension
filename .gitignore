@@ -1,10 +1,12 @@
 /node_modules
 /server
 /out
-/package-lock.json
 /TestFiles
+/obj
+/bin
+
+/package-lock.json
 /out.log
 /icon.xcf
 /InterpreterVSCodeExtension.njsproj.user
-/obj
-/bin
+/BBCodeExtension.vsix
