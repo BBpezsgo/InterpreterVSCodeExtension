@@ -1,4 +1,4 @@
-# <img src=./icons/extension.png height=40> BBCode
+# <img src=./icons/extension.png height=40> [BBCode](https://github.com/BBpezsgo/Interpreter) VSCode Extension
 
 ## Features:
 
