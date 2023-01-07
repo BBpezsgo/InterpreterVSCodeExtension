@@ -30,7 +30,7 @@
     "onLanguage:bbc",
     "onLanguage:bbct"
   ],
-  "main": "./out/src/extension",
+  "main": "./out/extension",
   "contributes": {
     "configuration": {
       "title": "BBCode configuration",
@@ -104,36 +104,36 @@
     "menus": {
 			"explorer/context": [
 				{
-					"command": "bb-code.runBbcFile",
+					"command": "bbc.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				},
 				{
-					"command": "bb-code.runBbcTestFile",
+					"command": "bbc.runBbcTestFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbct && shellExecutionSupported"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "bb-code.runBbcFile",
+					"command": "bbc.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				},
 				{
-					"command": "bb-code.runBbcTestFile",
+					"command": "bbc.runBbcTestFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbct && shellExecutionSupported"
 				}
 			],
 			"editor/title/run": [
 				{
-					"command": "bb-code.runBbcFile",
+					"command": "bbc.runBbcFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
 				},
 				{
-					"command": "bb-code.runBbcTestFile",
+					"command": "bbc.runBbcTestFile",
 					"group": "bbc",
 					"when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
 				}
@@ -141,7 +141,7 @@
 		},    
 		"commands": [
 			{
-				"command": "bb-code.runBbcFile",
+				"command": "bbc.runBbcFile",
 				"category": "BBC Runner",
 				"title": "Run BBC File",
 				"shortTitle": "Run BBC File",
@@ -149,7 +149,7 @@
 				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
 			},
 			{
-				"command": "bb-code.runBbcTestFile",
+				"command": "bbc.runBbcTestFile",
 				"category": "BBC Runner",
 				"title": "Run BBC Tester File",
 				"shortTitle": "Run BBC Tester File",
@@ -166,12 +166,12 @@
     }]
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "vscode:prepublish": "tsc -p ./ && echo Compile done",
     "compile": "tsc -watch -p ./",
     "update-vscode": "node ./node_modules/vscode/bin/install",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "build": "call \"./build.bat\"",
-    "package": "vsce package --target win32-x64 --dependencies --out BBCodeExtension.vsix",
+    "package": "vsce package --target win32-x64 --out BBCodeExtension.vsix",
     "upload": "call \"./upload.bat\""
   },
   "devDependencies": {

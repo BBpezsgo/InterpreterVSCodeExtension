@@ -1,6 +1,4 @@
 .vscode/**
-out/test/**
-test/**
 TestFiles/**
 src/**
 bin/**

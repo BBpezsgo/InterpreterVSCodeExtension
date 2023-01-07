@@ -15,7 +15,7 @@ let Client: LanguageClient
 
 export function activate(context: VSCode.ExtensionContext) {
 	context.subscriptions.push(
-		VSCode.commands.registerCommand('bb-code.runBbcFile', args => {
+		VSCode.commands.registerCommand('bbc.runBbcFile', args => {
 			let filepath = GetFilePath(args)
 
 			if (filepath) {
