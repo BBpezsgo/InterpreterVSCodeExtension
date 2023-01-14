@@ -245,6 +245,10 @@
 				{
 					"name": "entity.name.tag",
 					"match": "\\bthis\\b"
+				},
+				{
+					"name": "entity.name.tag",
+					"match": "\\bexport\\b"
 				}
 			]
 		},
