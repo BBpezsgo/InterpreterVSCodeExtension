@@ -25,6 +25,17 @@ export function activate(context: VSCode.ExtensionContext) {
 			}
 		})
 	)
+	context.subscriptions.push(
+		VSCode.commands.registerCommand('bbc.runBbcTestFile', args => {
+			let filepath = GetFilePath(args)
+
+			if (filepath) {
+				const cmdPath = BbcRunnerUtils.GetExePath()
+				const terminal = VSCode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `"${filepath}"`])
+				terminal.show()
+			}
+		})
+	)
 
 	const serverPath = context.asAbsolutePath(Path.join('server', 'Release', 'net6.0', 'BBCodeLanguageServer.exe'))
 	const commandOptions: ExecutableOptions = { stdio: 'pipe', detached: false }
