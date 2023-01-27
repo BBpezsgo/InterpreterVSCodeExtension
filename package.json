@@ -50,7 +50,7 @@
           ],
           "default": "off",
           "description": "Traces the communication between VSCode and the language server service"
-        },      
+        },
         "bbcodeServer.runBbcIn": {
           "type": "string",
           "enum": [
@@ -73,97 +73,116 @@
         }
       }
     },
-    "languages": [{
-      "id": "bbc",
-      "aliases": ["BBCode", "bbc"],
-      "extensions": [".bbc"],
-      "configuration": "./language-configuration.json",
-      "icon": {
-        "dark": "./icons/files/bbc.svg",
-        "light": "./icons/files/bbc.svg"
+    "languages": [
+      {
+        "id": "bbc",
+        "aliases": [
+          "BBCode",
+          "bbc"
+        ],
+        "extensions": [
+          ".bbc"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "dark": "./icons/files/bbc.svg",
+          "light": "./icons/files/bbc.svg"
+        }
+      },
+      {
+        "id": "bbct",
+        "aliases": [
+          "BBCode Tester",
+          "bbc-tester"
+        ],
+        "extensions": [
+          ".bbct"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "dark": "./icons/files/bbct.svg",
+          "light": "./icons/files/bbct.svg"
+        }
       }
-    }, {
-      "id": "bbct",
-      "aliases": ["BBCode Tester", "bbc-tester"],
-      "extensions": [".bbct"],
-      "configuration": "./language-configuration.json",
-      "icon": {
-        "dark": "./icons/files/bbct.svg",
-        "light": "./icons/files/bbct.svg"
+    ],
+    "grammars": [
+      {
+        "language": "bbc",
+        "scopeName": "source.bbc",
+        "path": "./syntax/bbc.json"
+      },
+      {
+        "language": "bbct",
+        "scopeName": "source.bbct",
+        "path": "./syntax/bbct.json"
       }
-    }],
-    "grammars": [{
-      "language": "bbc",
-      "scopeName": "source.bbc",
-      "path": "./syntax/bbc.json"
-    }, {
-      "language": "bbct",
-      "scopeName": "source.bbct",
-      "path": "./syntax/bbct.json"
-    }],
+    ],
     "menus": {
-			"explorer/context": [
-				{
-					"command": "bbc.runBbcFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
-				},
-				{
-					"command": "bbc.runBbcTestFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbct && shellExecutionSupported"
-				}
-			],
-			"editor/title/context": [
-				{
-					"command": "bbc.runBbcFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
-				},
-				{
-					"command": "bbc.runBbcTestFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbct && shellExecutionSupported"
-				}
-			],
-			"editor/title/run": [
-				{
-					"command": "bbc.runBbcFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
-				},
-				{
-					"command": "bbc.runBbcTestFile",
-					"group": "bbc",
-					"when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
-				}
-			]
-		},    
-		"commands": [
-			{
-				"command": "bbc.runBbcFile",
-				"category": "BBC Runner",
-				"title": "Run BBC File",
-				"shortTitle": "Run BBC File",
-				"icon": "$(run)",
-				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
-			},
-			{
-				"command": "bbc.runBbcTestFile",
-				"category": "BBC Runner",
-				"title": "Run BBC Tester File",
-				"shortTitle": "Run BBC Tester File",
-				"icon": "$(beaker)",
-				"enablement": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
-			}
-		],    
-    "snippets": [{
-      "language": "bbc",
-      "path": "./snippets/bbc.json"
-    }, {
-      "language": "bbct",
-      "path": "./snippets/bbct.json"
-    }]
+      "explorer/context": [
+        {
+          "command": "bbc.runBbcFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbc && shellExecutionSupported"
+        },
+        {
+          "command": "bbc.runBbcTestFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbct && shellExecutionSupported"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "bbc.runBbcFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbc && shellExecutionSupported"
+        },
+        {
+          "command": "bbc.runBbcTestFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbct && shellExecutionSupported"
+        }
+      ],
+      "editor/title/run": [
+        {
+          "command": "bbc.runBbcFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+        },
+        {
+          "command": "bbc.runBbcTestFile",
+          "group": "bbc",
+          "when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "bbc.runBbcFile",
+        "category": "BBC Runner",
+        "title": "Run BBC File",
+        "shortTitle": "Run BBC File",
+        "icon": "$(run)",
+        "enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+      },
+      {
+        "command": "bbc.runBbcTestFile",
+        "category": "BBC Runner",
+        "title": "Run BBC Tester File",
+        "shortTitle": "Run BBC Tester File",
+        "icon": "$(beaker)",
+        "enablement": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "bbc",
+        "path": "./snippets/bbc.json"
+      },
+      {
+        "language": "bbct",
+        "path": "./snippets/bbct.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./ && echo Compile done",
@@ -177,16 +196,17 @@
   "devDependencies": {
     "@types/mocha": "^2.2.33",
     "@types/node": "^6.0.52",
+    "@vscode/vsce": "^2.17.0",
     "typescript": "^2.1.5",
     "vscode": "^1.1.37"
   },
   "dependencies": {
     "vscode-languageclient": "~3.3.0"
-  },  
-	"capabilities": {
-		"virtualWorkspaces": {
-			"supported": false,
-			"description": "BBC runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
-		}
-	}
+  },
+  "capabilities": {
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "BBC runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
+    }
+  }
 }

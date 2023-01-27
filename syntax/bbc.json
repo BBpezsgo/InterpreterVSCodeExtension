@@ -163,18 +163,15 @@
 			}
 		},
 		"using": {
-			"match": "(using)[\\s]*([a-zA-Z0-9\\._]+)",
+			"match": "(using)[\\s]+",
 			"captures": {
 				"1": {
 					"name": "entity.name.tag"
-				},
-				"2": {
-					"name": "entity.name.namespace"
 				}
 			}
 		},
 		"var-def": {
-			"match": "(var)[\\s]*([a-zA-Z]+)",
+			"match": "(var)[\\s]+([a-zA-Z]+)",
 			"captures": {
 				"1": {	
 					"name": "entity.name.tag"
