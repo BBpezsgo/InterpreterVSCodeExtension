@@ -11,6 +11,7 @@ InterpreterVSCodeExtension.njsproj.user
 .gitignore
 tsconfig.json
 BBCodeExtension.vsix
+tslint.json
 
 **/*.map
 **/*.ts

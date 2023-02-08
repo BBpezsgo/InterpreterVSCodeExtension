@@ -1,5 +1,6 @@
 @echo off
+echo TypeScript version:
 call tsc --version
-echo Build TypeScript project ...
+echo Compile TypeScript project ...
 call tsc --project ./
-echo Done
+echo Compile Done!

@@ -13,13 +13,13 @@ function GetExtensionConfig(filepath?: string): VSCode.WorkspaceConfiguration {
     // Try to get the active workspace folder first, to have it read Folder Settings
     let workspaceFolder: VSCode.WorkspaceFolder | null = null
     if (filepath) {
-        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.Uri.file(filepath))
+        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.Uri.file(filepath)) ?? null
     }
     else if (VSCode.window.activeTextEditor) {
-        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.window.activeTextEditor.document.uri)
+        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.window.activeTextEditor.document.uri) ?? null
     }
 
-    return VSCode.workspace.getConfiguration(ExtensionConfigName, workspaceFolder.uri)
+    return VSCode.workspace.getConfiguration(ExtensionConfigName, workspaceFolder?.uri)
 }
 
 /**
@@ -53,4 +53,11 @@ export function GetExePath() {
     }
 
     return cmdPath
+}
+
+export function GetNonce() {
+	let text = ''
+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+	for (let i = 0; i < 32; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
+	return text
 }

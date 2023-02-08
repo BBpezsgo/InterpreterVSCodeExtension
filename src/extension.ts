@@ -1,44 +1,46 @@
-'use strict'
-
-import * as Path from 'path'
-import * as OS from 'os'
-import * as VSCode from 'vscode'
+import * as vscode from 'vscode'
+// import * as WebView from './webview'
+import * as Activator from './debug-activator'
 import * as BbcRunnerUtils from './utils'
+import * as Path from 'path'
 import {
 	LanguageClient,
 	LanguageClientOptions,
 	ServerOptions,
 	ExecutableOptions
-} from 'vscode-languageclient'
+} from 'vscode-languageclient/node'
+import * as OS from 'os'
 
 let Client: LanguageClient
 
-export function activate(context: VSCode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {	
+	// WebView.Activate(context)
+	Activator.Activate(context)
 	context.subscriptions.push(
-		VSCode.commands.registerCommand('bbc.runBbcFile', args => {
+		vscode.commands.registerCommand('bbc.runBbcFile', args => {
 			let filepath = GetFilePath(args)
 
 			if (filepath) {
 				const cmdPath = BbcRunnerUtils.GetExePath()
-				const terminal = VSCode.window.createTerminal("BBC Terminal", cmdPath, [`"${filepath}"`])
+				const terminal = vscode.window.createTerminal("BBC Terminal", cmdPath, [`"${filepath}"`])
 				terminal.show()
 			}
 		})
 	)
 	context.subscriptions.push(
-		VSCode.commands.registerCommand('bbc.runBbcTestFile', args => {
+		vscode.commands.registerCommand('bbc.runBbcTestFile', args => {
 			let filepath = GetFilePath(args)
 
 			if (filepath) {
 				const cmdPath = BbcRunnerUtils.GetExePath()
-				const terminal = VSCode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `"${filepath}"`])
+				const terminal = vscode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `"${filepath}"`])
 				terminal.show()
 			}
 		})
 	)
 
 	const serverPath = context.asAbsolutePath(Path.join('server', 'Release', 'net6.0', 'BBCodeLanguageServer.exe'))
-	const commandOptions: ExecutableOptions = { stdio: 'pipe', detached: false }
+	const commandOptions: ExecutableOptions = { detached: false }
 
 	const serverOptions: ServerOptions =
 	{
@@ -58,7 +60,7 @@ export function activate(context: VSCode.ExtensionContext) {
 		],
 		synchronize: {
 			configurationSection: 'bbcodeServer',
-			fileEvents: VSCode.workspace.createFileSystemWatcher('**/.clientrc')
+			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	}
 
@@ -69,23 +71,21 @@ export function activate(context: VSCode.ExtensionContext) {
 		clientOptions
 	)
 
-	let disposable = Client.start()
-	context.subscriptions.push(disposable)
-	Client.onReady().then(() => {
+	Client.start().then(() => {
 		Client.onNotification('custom/test', arg => {
-			VSCode.window.showInformationMessage(arg)
+			vscode.window.showInformationMessage(arg)
 		})
 	})
 }
 
-export function deactivate(): Thenable<void> { return (Client) ? Client.stop() : undefined }
+export function deactivate() { return Client?.stop() }
 
-function GetFilePath(args: any): string {
+function GetFilePath(args: any) {
 	if (args) {
 		const filepath: string = args["path"]
 		if (filepath && filepath.startsWith("/"))
 		{ return filepath.replace("/", "") }
 		return filepath
 	}
-	return VSCode.window.activeTextEditor.document.uri.fsPath
+	return vscode.window.activeTextEditor?.document.uri.fsPath ?? null
 }

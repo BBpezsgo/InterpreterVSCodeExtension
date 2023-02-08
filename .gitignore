@@ -1,7 +1,6 @@
 /node_modules
 /server
 /out
-/TestFiles
 /obj
 /bin
 
@@ -10,3 +9,9 @@
 /icon.xcf
 /InterpreterVSCodeExtension.njsproj.user
 /BBCodeExtension.vsix
+/BBCodeInterpreter.debs.json
+/BBCodeInterpreter.dll
+/BBCodeInterpreter.exe
+/BBCodeInterpreter.pdb
+/BBCodeInterpreter.runtimeconfig.json
+/sampleWorkspace
