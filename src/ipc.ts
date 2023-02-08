@@ -15,12 +15,15 @@ export declare interface IPC {
     on(event: 'message', listener: (message: IpcMessage) => void): this
 }
 
+type ResponseCallback = { resolve: (message: BaseIpcMessage<any>) => void, timeout: NodeJS.Timeout | null }
+
 export class IPC extends EventEmitter {
     public Process: ChildProcessWithoutNullStreams | null
 
-    private outMessages: BaseIpcMessage<string, any>[]
+    private outMessages: BaseIpcMessage<any>[]
     private rawInput: string
     private idCounter: number
+    private readonly waitForResponses: Map<string, ResponseCallback>
 
     constructor() {
         super()
@@ -28,6 +31,7 @@ export class IPC extends EventEmitter {
         this.outMessages = []
         this.rawInput = ''
         this.idCounter = 0
+        this.waitForResponses = new Map<string, ResponseCallback>()
     }
 
     Start(...args: string[]) {
@@ -76,7 +80,7 @@ export class IPC extends EventEmitter {
         this.Process.stdin.setDefaultEncoding("utf-8")
 
         this.Process.stderr.on('data', function (data) {
-            console.warn('< ', data.toString())
+            console.error(' << ', data.toString())
             self.emit('error-message', data.toString())
         })
 
@@ -125,14 +129,26 @@ export class IPC extends EventEmitter {
         this.outMessages = []
     }
 
-    OnRecive(data: BaseIpcMessage<string, any>) {
-        if (data.type === 'base/ping/res') {
-            console.log('< Pong: ', data.data)
+    OnRecive(data: BaseIpcMessage<any>) {
+        if (data.type === 'base/ping/req') {
+            this.Reply('base/ping/res', Date.now().toString(), data.id)
             return
         }
 
-        if (data.type === 'base/ping/req') {
-            this.Send({ type: 'base/ping/res', data: Date.now().toString() })
+        if (data.reply) {
+            if (this.waitForResponses.has(data.reply)) {
+                const callback = this.waitForResponses.get(data.reply)
+                if (callback) {
+                    if (callback.timeout) clearTimeout(callback.timeout)
+                    callback.resolve(data)
+                }
+                this.waitForResponses.delete(data.reply)
+                return
+            }
+        }
+
+        if (data.type === 'base/ping/res') {
+            console.log('< Pong: ', data)
             return
         }
         
@@ -156,9 +172,29 @@ export class IPC extends EventEmitter {
         }, 100)
     }
 
-    Send(message: { type: string, data: any }) {
+    Send(type: string, data: any) {
         this.idCounter++
-        this.outMessages.push({ type: message.type, id: this.idCounter.toString(), data: message.data })
+        this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
+        this.TrySendNext()
+    }
+
+    SendAsync(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<any>> {
+        this.idCounter++
+        this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
+        return new Promise<BaseIpcMessage<any>>((resolve, reject) => {
+            const id = this.idCounter.toString()
+            const _timeout = !timeout ? null : setTimeout(() => {
+                this.waitForResponses.delete(id)
+                reject()
+            }, timeout)
+            this.waitForResponses.set(id, { resolve, timeout: _timeout })
+            this.TrySendNext()
+        })
+    }
+
+    Reply(type: string, data: any, reply: string) {
+        this.idCounter++
+        this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: reply })
         this.TrySendNext()
     }
 

@@ -203,12 +203,12 @@ export class Debugger extends EventEmitter {
 		
 		this.getCodeTimeout = setTimeout(() => {
 			console.log('Get compiler result ...')
-			this.processInterpreter.Send({ type: 'comp/res', data: null })
+			this.processInterpreter.Send('comp/res', null)
 		}, 1000)
 		
 		this.updateInterval = setInterval(() => {
-			this.processInterpreter.Send({ type: 'get-intp-data', data: null })
-			this.processInterpreter.Send({ type: 'get-intp2-data', data: null })
+			this.processInterpreter.Send('get-intp-data', null)
+			this.processInterpreter.Send('get-intp2-data', null)
 		}, 1000)
 		
 		return this.WaitForStatus()
@@ -216,7 +216,7 @@ export class Debugger extends EventEmitter {
 
 	public async ExecuteNext() {
 		StatusItem.Update(this.State, 'loading~spin')
-		this.processInterpreter.Send({ type: 'intp/step', data: null })
+		this.processInterpreter.Send('intp/step', null)
 		await this.WaitForStatus()
 		StatusItem.Update(this.State, this.StateIcon)
 	}

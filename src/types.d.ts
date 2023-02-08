@@ -58,10 +58,11 @@ export type DataItem = {
 	IsHeapAddress: boolean
 }
 
-export type BaseIpcMessage<T0, T1> = {
-	type: T0
+export type BaseIpcMessage<T> = {
+	type: string
 	id: string
-	data: T1
+	reply: string | null
+	data: T
 }
 
 export type IpcMessage = {
