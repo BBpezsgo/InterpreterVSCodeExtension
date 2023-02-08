@@ -35,10 +35,10 @@ export type DataItem = {
 export type Listener<T> = (data: T) => void
 
 export type Listeners = {
-	"con-out": Listener<{ Message: string, Type: 'System' | 'Normal' | 'Warning' | 'Error' | 'Debug' }> | undefined
+	"console/out": Listener<{ Message: string, Type: 'System' | 'Normal' | 'Warning' | 'Error' | 'Debug' }> | undefined
 	"stdout": Listener<string> | undefined
 	"stderr": Listener<string> | undefined
-	"comp-res": Listener<CompilerResult> | undefined
+	"comp/res": Listener<CompilerResult> | undefined
 	"intp-data": Listener<Interpeter> | undefined
 	"intp2-data": Listener<Interpeter2> | undefined
 }

@@ -36,7 +36,7 @@ function Main() {
 
     /** @type {import("./types").Listeners} */
     const events = {
-        'comp-res': CompilerResult => {
+        'comp/res': CompilerResult => {
             CompiledCode = CompilerResult.CompiledCode
             const eContentCode = document.querySelector('#code-content ul')
             if (!eContentCode) return
@@ -258,7 +258,7 @@ function Main() {
                 }
             }
         },
-        'con-out': LogMessage => {
+        'console/out': LogMessage => {
 
         },
         'stdout': Message => {

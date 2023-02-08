@@ -7,8 +7,8 @@ import { StatusItem } from './status-item'
 export declare interface Debugger {
     on(event: 'closed', listener: (code: number | null) => void): this
     on(event: 'unknown-message', listener: (data: string | any) => void): this
-    on(event: 'con-out', listener: (e: { Message: string; Type: "System" | "Normal" | "Warning" | "Error" | "Debug"; }, context: { CodePointer: number; CallStack: ({ IsState: true; Name: string } | { IsState: false; Name: string; File: string; Offset: number })[] } | null) => void): this
-    on(event: 'comp-res', listener: (e: CompilerResult) => void): this
+    on(event: 'console/out', listener: (e: { Message: string; Type: "System" | "Normal" | "Warning" | "Error" | "Debug"; }, context: { CodePointer: number; CallStack: ({ IsState: true; Name: string } | { IsState: false; Name: string; File: string; Offset: number })[] } | null) => void): this
+    on(event: 'comp/res', listener: (e: CompilerResult) => void): this
     on(event: 'intp-data', listener: (e: Interpeter) => void): this
     on(event: 'stdout', listener: (data: string) => void): this
     on(event: 'stderr', listener: (data: string) => void): this
@@ -90,7 +90,7 @@ export class Debugger extends EventEmitter {
 		})
 		this.processInterpreter.on('message', function (message: IpcMessage) {
 			switch (message.type) {
-				case 'con-out':
+				case 'console/out':
 					{
 						const CallStack: ({
 							IsState: true;
@@ -137,7 +137,7 @@ export class Debugger extends EventEmitter {
 						}
 						return
 					}
-				case 'comp-res':
+				case 'comp/res':
 					{
 						self.CompiledCode = message.data.CompiledCode
 						self.DebugInfo = message.data.DebugInfo
@@ -203,7 +203,7 @@ export class Debugger extends EventEmitter {
 		
 		this.getCodeTimeout = setTimeout(() => {
 			console.log('Get compiler result ...')
-			this.processInterpreter.Send({ type: 'get-comp-res', data: null })
+			this.processInterpreter.Send({ type: 'comp/res', data: null })
 		}, 1000)
 		
 		this.updateInterval = setInterval(() => {
@@ -216,7 +216,7 @@ export class Debugger extends EventEmitter {
 
 	public async ExecuteNext() {
 		StatusItem.Update(this.State, 'loading~spin')
-		this.processInterpreter.Send({ type: 'intp-update', data: null })
+		this.processInterpreter.Send({ type: 'intp/step', data: null })
 		await this.WaitForStatus()
 		StatusItem.Update(this.State, this.StateIcon)
 	}

@@ -137,7 +137,7 @@ export class DebugRuntime extends EventEmitter {
 		StatusItem.Create()
 		StatusItem.Show()
 		this._debugger = new Debugger()
-		this._debugger.on('con-out', (e, context) => {
+		this._debugger.on('console/out', (e, context) => {
 			// const frame = this._debugger.CallStack ? this._debugger.CallStack[0] : null
 			// const currentPosition = frame ? frame.IsState ? null : this.InstructionToDebugInfo(frame.Offset) : null
 

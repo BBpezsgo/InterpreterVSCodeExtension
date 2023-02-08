@@ -65,7 +65,7 @@ export type BaseIpcMessage<T0, T1> = {
 }
 
 export type IpcMessage = {
-	type: "con-out"
+	type: "console/out"
 	data: { Message: string, Type: 'System' | 'Normal' | 'Warning' | 'Error' | 'Debug', Context: Context }
 } | {
 	type: "stdout"
@@ -74,7 +74,7 @@ export type IpcMessage = {
 	type: "stderr"
 	data: string
 } | {
-	type: "comp-res"
+	type: "comp/res"
 	data: CompilerResult
 } | {
 	type: "intp-data"
