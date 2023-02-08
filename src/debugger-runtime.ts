@@ -184,12 +184,37 @@ export class DebugRuntime extends EventEmitter {
 		}
 	}
 
+	private ThereIsBreakpoint() {
+		const line = this.CurrentLine
+		if (!line) return false
+		let result = false
+		this.breakPoints.forEach(breakPoint => {
+			for (let i = 0; i < breakPoint.length; i++) {
+				if (result) break
+				const breakPointElement = breakPoint[i]
+				if (breakPointElement.line === line) {
+					result = true
+					break
+				}
+			}
+		})
+		return result
+	}
+
 	/**
 	 * Continue execution to the end/beginning.
 	 */
-	public Continue() {
-		this._debugger.ExecuteNext()
-		this.SendEvent('stopOnStep')
+	public async Continue() {
+		await this.ExecuteBaseInstructions()
+		while (this._debugger.IsRunningCode) {
+			if (this.ThereIsBreakpoint()) {
+				this.SendEvent('stopOnStep')
+				break
+			} else {
+				await this._debugger.ExecuteNext()
+			}
+		}
+		await this.ExecuteBaseInstructions()
 	}
 
 	/**
@@ -197,7 +222,7 @@ export class DebugRuntime extends EventEmitter {
 	 */
 	public async Step(instruction: boolean) {
 		await this.ExecuteBaseInstructions()
-		if (instruction && false) {
+		if (instruction) {
 			await this._debugger.ExecuteNext()
 			this.SendEvent('stopOnStep')
 		} else {
@@ -255,17 +280,20 @@ export class DebugRuntime extends EventEmitter {
 	public Stack(): IRuntimeStack {
 		const frames: IRuntimeStackFrame[] = []
 		if (this._debugger.CallStack) {
+			for (let i = 0; i < this._debugger.CallStack.length; i++) {
+				const frame = this._debugger.CallStack[i]
+				if (frame.IsState) continue
+				const functionPosition = this.InstructionToDebugInfo(frame.Offset)?.Position
+				if (functionPosition) frames.push({
+					file: frame.File,
+					index: frames.length,
+					line: functionPosition.StartLine,
+					name: frame.Name,
+				})
+			}
+
 			const lastCallStack = this._debugger.CallStack[this._debugger.CallStack.length - 1]
 			if (lastCallStack) if (!lastCallStack.IsState) {
-				const functionPosition = this.InstructionToDebugInfo(lastCallStack.Offset)?.Position
-				if (functionPosition) {
-					frames.push({
-						file: lastCallStack.File,
-						index: frames.length,
-						line: functionPosition.StartLine,
-						name: lastCallStack.Name,
-					})
-				}
 				const currentPosition = this.CurrentLine
 				if (currentPosition) {
 					frames.push({

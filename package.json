@@ -300,16 +300,15 @@
 				},
 				{
 					"command": "bbc.runBbcFile",
-					"group": "bbc",
+					"group": "bbcode",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
 				},
 				{
 					"command": "bbc.runBbcTestFile",
-					"group": "bbc",
+					"group": "bbcode",
 					"when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
 				}
-			],
-			"debug/toolbar": []
+			]
 		}
 	},
 	"scripts": {
