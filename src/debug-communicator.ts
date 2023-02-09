@@ -60,16 +60,14 @@ export class Debugger extends EventEmitter {
 	}
 
 	private WaitForStatus(timeoutMs: number = 5000): Promise<void> {
-		console.log('Debugger: Wait for status ...')
 		let id = GetNonce() + this._waitForStatus.size
 		return new Promise((resolve, reject) => {
 			const timeout = setTimeout(() => {
 				if (this._waitForStatus.has(id)) this._waitForStatus.delete(id)
-				console.warn('Debugger: Wait for status timeout')
+				console.warn('Debugger: timeout')
 				reject()
 			}, timeoutMs)
 			this._waitForStatus.set(id, () => {
-				console.log('Debugger: Wait for status done')
 				clearTimeout(timeout)
 				resolve()
 			})
