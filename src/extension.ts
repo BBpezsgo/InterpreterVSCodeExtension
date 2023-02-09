@@ -13,7 +13,7 @@ import * as OS from 'os'
 
 let Client: LanguageClient
 
-export function activate(context: vscode.ExtensionContext) {	
+export function activate(context: vscode.ExtensionContext) {
 	// WebView.Activate(context)
 	Activator.Activate(context)
 	context.subscriptions.push(

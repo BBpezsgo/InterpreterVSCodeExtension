@@ -15,6 +15,8 @@ export declare interface IPC {
     on(event: 'message', listener: (message: IpcMessage) => void): this
 }
 
+const EOM = '\x04'
+
 type ResponseCallback = { resolve: (message: BaseIpcMessage<any>) => void, timeout: NodeJS.Timeout | null }
 
 export class IPC extends EventEmitter {
@@ -95,10 +97,10 @@ export class IPC extends EventEmitter {
                 self.OnRecive(parsed)
             }
             
-            if (self.rawInput.includes('\n')) {
+            if (self.rawInput.includes(EOM)) {
                 var errorMessage = ''
-                while (self.rawInput.includes('\n')) {
-                    const firstLine = self.rawInput.split('\n')[0]
+                while (self.rawInput.includes(EOM)) {
+                    const firstLine = self.rawInput.split(EOM)[0]
                     self.rawInput = self.rawInput.substring(firstLine.length + 1)
                     try {
                         ParseLine(firstLine)
@@ -162,7 +164,7 @@ export class IPC extends EventEmitter {
             if (this.Process?.stdin.writable === false) { return }
             const message = this.outMessages[0]
             try {
-                this.Process?.stdin.write(JSON.stringify(message) + "\n")
+                this.Process?.stdin.write(JSON.stringify(message) + EOM)
             } catch (error) {
                 console.error(error)
                 this.emit('error', error)
