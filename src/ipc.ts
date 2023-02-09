@@ -23,32 +23,36 @@ export class IPC extends EventEmitter {
     public Process: ChildProcessWithoutNullStreams | null
 
     private outMessages: BaseIpcMessage<any>[]
-    private rawInput: string
+    private Incoming: string
     private idCounter: number
     private readonly waitForResponses: Map<string, ResponseCallback>
 
-    constructor() {
+    public constructor() {
         super()
         this.Process = null
         this.outMessages = []
-        this.rawInput = ''
+        this.Incoming = ''
         this.idCounter = 0
         this.waitForResponses = new Map<string, ResponseCallback>()
     }
 
-    Start(...args: string[]) {
+    public Start(...args: string[]) {
         console.log(`IPC.Start(${args.join(', ')})`)
+        if (!this.SetupProcess(args)) return
+        this.outMessages = []
+    }
 
+    private SetupProcess(args: string[]): boolean {
         if (!settings) {
-            console.error('IPC.Start: Failed to start: No settings file')
-            return
+            console.error('No settings file')
+            return false
         }
 
         this.Process = spawn(settings.path, args)
 
         if (!this.Process) {
             console.error('Failed to start child process')
-            return
+            return false
         }
 
         this.Process.on('close', (code, signal) => {
@@ -81,83 +85,74 @@ export class IPC extends EventEmitter {
 
         this.Process.stdin.setDefaultEncoding("utf-8")
 
-        this.Process.stderr.on('data', function (data) {
+        this.Process.stderr.on('data', function (data: Buffer) {
             console.error(' << ', data.toString())
             self.emit('error-message', data.toString())
         })
 
         const self = this
-        this.Process.stdout.on('data', function (payload) {
-            self.rawInput += payload.toString()
-
-            const ParseLine = function(line: string) {
-                const trimmed = line.trim()
-                if (trimmed.length === 0) { return }
-                const parsed = JSON.parse(trimmed)
-                self.OnRecive(parsed)
-            }
-            
-            if (self.rawInput.includes(EOM)) {
-                var errorMessage = ''
-                while (self.rawInput.includes(EOM)) {
-                    const firstLine = self.rawInput.split(EOM)[0]
-                    self.rawInput = self.rawInput.substring(firstLine.length + 1)
-                    try {
-                        ParseLine(firstLine)
-                    } catch (error) {
-                        console.error(error, '\nMessage: ', firstLine)
-                        errorMessage += firstLine + '\n'
-                    }
-                }
-                if (errorMessage !== '') {
-                    self.emit('unknown-message', errorMessage)
-                    return
-                }
-            } else {
-                console.log('Wait end of message')
-                return
-            }
-
-            try {
-                ParseLine(self.rawInput)
-                return
-            } catch (error) {
-                console.error(error, '\nMessage: ', self.rawInput.replace(/\n/g, '\\n').replace(/\r/g, '\\r'))
-            }
-
-            self.emit('unknown-message', self.rawInput)
+        this.Process.stdout.on('data', function (payload: Buffer) {
+            self.OnDataRecive(payload.toString())
         })
 
-        this.outMessages = []
+        return true
     }
 
-    OnRecive(data: BaseIpcMessage<any>) {
-        if (data.type === 'base/ping/req') {
-            this.Reply('base/ping/res', Date.now().toString(), data.id)
+    private OnDataRecive(data: string) {
+        this.Incoming += data
+        while (this.Incoming.startsWith(EOM)) { this.Incoming = this.Incoming.replace(EOM, '') }
+
+        let endlessSafe = 128
+        while (this.Incoming.includes(EOM)) {
+            while (this.Incoming.startsWith(EOM)) { this.Incoming = this.Incoming.replace(EOM, '') }
+            if (!this.Incoming.includes(EOM)) break
+
+            endlessSafe = endlessSafe - 1
+            if (endlessSafe <= 0) { console.error("Endless loop!!!"); break }
+
+            const message = this.Incoming.substring(0, this.Incoming.indexOf(EOM)).trim()
+            this.Incoming = this.Incoming.substring(this.Incoming.indexOf(EOM))
+            if (!message || message.length === 0) break
+            if (message.includes(EOM)) {
+                console.log('WTF: ' + message)
+                break
+            }
+
+            this.OnMessageRecived(message)
+        }
+    }
+
+    private OnMessageRecived(message: string) {
+        const parsed: BaseIpcMessage<any> = JSON.parse(message)
+
+        if (parsed.type === 'base/ping/req') {
+            this.Reply('base/ping/res', Date.now().toString(), parsed.id)
             return
         }
 
-        if (data.reply) {
-            if (this.waitForResponses.has(data.reply)) {
-                const callback = this.waitForResponses.get(data.reply)
+        if (parsed.reply) {
+            if (this.waitForResponses.has(parsed.reply)) {
+                const callback = this.waitForResponses.get(parsed.reply)
                 if (callback) {
                     if (callback.timeout) clearTimeout(callback.timeout)
-                    callback.resolve(data)
+                    console.log(parsed)
+                    callback.resolve(parsed)
                 }
-                this.waitForResponses.delete(data.reply)
+                this.waitForResponses.delete(parsed.reply)
                 return
             }
         }
 
-        if (data.type === 'base/ping/res') {
-            console.log('< Pong: ', data)
+        if (parsed.type === 'base/ping/res') {
+            console.log('< Pong: ', parsed)
             return
         }
         
-        this.emit('message', data)
+        console.log(parsed)
+        this.emit('message', parsed)
     }
 
-    TrySendNext() {
+    private TrySendNext() {
         if (this.outMessages.length === 0) { return }
         if (this.Process?.stdin.writable === false) { return }
         setTimeout(() => {
@@ -174,13 +169,13 @@ export class IPC extends EventEmitter {
         }, 100)
     }
 
-    Send(type: string, data: any) {
+    public Send(type: string, data: any) {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
         this.TrySendNext()
     }
 
-    SendAsync(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<any>> {
+    public SendAsync(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<any>> {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
         return new Promise<BaseIpcMessage<any>>((resolve, reject) => {
@@ -194,17 +189,17 @@ export class IPC extends EventEmitter {
         })
     }
 
-    Reply(type: string, data: any, reply: string) {
+    public Reply(type: string, data: any, reply: string) {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: reply })
         this.TrySendNext()
     }
 
-    Stop() {
+    public Stop() {
         this.Process?.kill()
     }
 
-    IsRunning() {
+    public IsRunning() {
         if (this.Process === undefined) { return false }
         if (this.Process === null) { return false }
         if (this.Process.killed) { return false }
