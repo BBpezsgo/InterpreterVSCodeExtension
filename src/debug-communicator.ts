@@ -1,5 +1,6 @@
 import * as IPCManager from './ipc'
 import { CompilerResult, DataItem, DebugInfo, Instruction, Interpeter, InterpeterState, IpcMessage } from './types'
+import * as Types from './types'
 import EventEmitter = require('events')
 import { GetNonce } from './utils'
 import { StatusItem } from './status-item'
@@ -23,10 +24,11 @@ export class Debugger extends EventEmitter {
 
 	public State: 'Loading' | InterpeterState = 'Loading'
 	public CompiledCode: Instruction[] | null = null
+	public Functions: Types.Function[] | null = null
 	public Stack: DataItem[] | null = null
 	public BasePointer: number = -1
 	public CodePointer: number = -1
-	public CallStack: ({IsState: true; Name: string}|{IsState: false; Name: string; File: string; Offset: number})[] | null = null
+	public CallStack: ({IsState: true; Name: string}|{IsState: false; Name: string; File: string; Offset: number; Line: number})[] | null = null
 	public DebugInfo: DebugInfo[] | null = []
 	public get IsRunningCode() : boolean {
 		return this.State === 'CallCodeEnd' ||
@@ -98,6 +100,7 @@ export class Debugger extends EventEmitter {
 							Name: string;
 							File: string;
 							Offset: number;
+							Line: number;
 						})[] = []
 						for (let i = 0; i < message.data.Context.CallStack.length; i++) {
 							const frame = message.data.Context.CallStack[i]
@@ -112,6 +115,7 @@ export class Debugger extends EventEmitter {
 									Name: frame.split(';')[0],
 									File: frame.split(';')[1],
 									Offset: Number.parseInt(frame.split(';')[2]),
+									Line: Number.parseInt(frame.split(';')[3]),
 								})
 							}
 						}
@@ -127,7 +131,7 @@ export class Debugger extends EventEmitter {
 							self._waitForStatus.clear()
 						}
 						self.State = message.data.State
-						StatusItem.Update(self.State, self.StateIcon)
+						self.UpdateStatusItem()
 
 						if (!self.doneEmitted && message.data.State === 'CodeExecuted') {
 							self.doneEmitted = true
@@ -139,6 +143,7 @@ export class Debugger extends EventEmitter {
 					{
 						self.CompiledCode = message.data.CompiledCode
 						self.DebugInfo = message.data.DebugInfo
+						self.Functions = message.data.Functions
 						break
 					}
 				case 'intp-data':
@@ -160,6 +165,7 @@ export class Debugger extends EventEmitter {
 									Name: frame.split(';')[0],
 									File: frame.split(';')[1],
 									Offset: Number.parseInt(frame.split(';')[2]),
+									Line: Number.parseInt(frame.split(';')[3]),
 								})
 							}
 						}
@@ -190,6 +196,10 @@ export class Debugger extends EventEmitter {
 		})
 	}
 
+	private UpdateStatusItem() {
+		StatusItem.Update(this.State + ' (' + this.CodePointer + ')', this.StateIcon)
+	}
+
 	public Start(path: string | undefined = undefined) {
 		const settings = require('./settings').Get()
 		if (this.processInterpreter.IsRunning() === false)
@@ -216,7 +226,7 @@ export class Debugger extends EventEmitter {
 		StatusItem.Update(this.State, 'loading~spin')
 		this.processInterpreter.Send('intp/step', null)
 		await this.WaitForStatus()
-		StatusItem.Update(this.State, this.StateIcon)
+		this.UpdateStatusItem()
 	}
 
 	public Dispose() {

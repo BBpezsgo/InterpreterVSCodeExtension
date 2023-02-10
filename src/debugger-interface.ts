@@ -151,7 +151,7 @@ export class DebugSession extends LoggingDebugSession {
 		response.body.supportsDataBreakpoints = false
 
 		// make VS Code support completion in REPL
-		response.body.supportsCompletionsRequest = false
+		response.body.supportsCompletionsRequest = true
 
 		// make VS Code send cancel request
 		response.body.supportsCancelRequest = false
@@ -183,13 +183,13 @@ export class DebugSession extends LoggingDebugSession {
 		]
 
 		// make VS Code send exceptionInfo request
-		response.body.supportsExceptionInfoRequest = false
+		response.body.supportsExceptionInfoRequest = true
 
 		// make VS Code send setVariable request
 		response.body.supportsSetVariable = false
 
 		// make VS Code send setExpression request
-		response.body.supportsSetExpression = false
+		response.body.supportsSetExpression = true
 
 		// make VS Code send disassemble request
 		response.body.supportsDisassembleRequest = false
@@ -470,6 +470,97 @@ export class DebugSession extends LoggingDebugSession {
 		}
 
 		this.sendResponse(response)
+	}
+
+	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
+		console.log(`evaulateRequest(${args})`)
+
+		let reply: string | undefined;
+		let rv: RuntimeVariable | undefined;
+
+		switch (args.context) {
+			case 'repl':
+			default:
+				reply = "WTF?"
+				break;
+		}
+
+		if (rv) {
+			const v = this.convertFromRuntime(rv);
+			response.body = {
+				result: v.value,
+				type: v.type,
+				variablesReference: v.variablesReference,
+				presentationHint: v.presentationHint
+			};
+		} else {
+			response.body = {
+				result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
+				variablesReference: 0
+			};
+		}
+
+		this.sendResponse(response);
+	}
+
+	protected setExpressionRequest(response: DebugProtocol.SetExpressionResponse, args: DebugProtocol.SetExpressionArguments): void {
+		console.log(`setExpressionRequest(${args})`)
+
+		if (args.expression.startsWith('$')) {
+			const rv = null
+			if (rv) {
+				this.sendResponse(response);
+			} else {
+				this.sendErrorResponse(response, {
+					id: 1002,
+					format: `variable '{lexpr}' not found`,
+					variables: { lexpr: args.expression },
+					showUser: true
+				});
+			}
+		} else {
+			this.sendErrorResponse(response, {
+				id: 1003,
+				format: `'{lexpr}' not an assignable expression`,
+				variables: { lexpr: args.expression },
+				showUser: true
+			});
+		}
+	}
+
+	protected completionsRequest(response: DebugProtocol.CompletionsResponse, args: DebugProtocol.CompletionsArguments): void {
+		console.log(`completionsRequest(${args})`)
+
+		response.body = {
+			targets: [
+				{
+					label: "item 10",
+					sortText: "10"
+				},
+				{
+					label: "item 1",
+					sortText: "01",
+					detail: "detail 1"
+				},
+				{
+					label: "item 2",
+					sortText: "02",
+					detail: "detail 2"
+				},
+				{
+					label: "array[]",
+					selectionStart: 6,
+					sortText: "03"
+				},
+				{
+					label: "func(arg)",
+					selectionStart: 5,
+					selectionLength: 3,
+					sortText: "04"
+				}
+			]
+		};
+		this.sendResponse(response);
 	}
 
 	protected setDataBreakpointsRequest(response: DebugProtocol.SetDataBreakpointsResponse, args: DebugProtocol.SetDataBreakpointsArguments): void {

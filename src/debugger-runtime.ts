@@ -242,8 +242,8 @@ export class DebugRuntime extends EventEmitter {
 			let startedLine = this.CurrentLine || -1
 			do {
 				await this._debugger.ExecuteNext()
-			} while (this._debugger.IsRunningCode && startedLine === this.CurrentLine && this.CurrentLine)
-		} catch (error) { }
+			} while (this._debugger.IsRunningCode && startedLine === this.CurrentLine)
+		} catch (error) { console.error(error) }
 		this.SendEvent('stopOnStep')
 	}
 
@@ -257,8 +257,9 @@ export class DebugRuntime extends EventEmitter {
 			if (item.EndOffset < instruction) continue
 			result = item
 		}
-		if (result) return result
 
+		return result
+		/*
 		const distances: { dist: number, v: DebugInfo }[] = []
 
 		for (let i = 0; i < this._debugger.DebugInfo.length; i++) {
@@ -272,6 +273,7 @@ export class DebugRuntime extends EventEmitter {
 		distances.reverse()
 		for (let i = 0; i < distances.length; i++) result = distances[i].v
 		return result
+		*/
 	}
 
 	/**
@@ -283,11 +285,11 @@ export class DebugRuntime extends EventEmitter {
 			for (let i = 0; i < this._debugger.CallStack.length; i++) {
 				const frame = this._debugger.CallStack[i]
 				if (frame.IsState) continue
-				const functionPosition = this.InstructionToDebugInfo(frame.Offset)?.Position
-				if (functionPosition) frames.push({
+				frames.push({
 					file: frame.File,
 					index: frames.length,
-					line: functionPosition.StartLine,
+					line: frame.Line,
+					instruction: frame.Offset,
 					name: frame.Name,
 				})
 			}

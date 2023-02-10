@@ -3,6 +3,7 @@ export type CompilerResult = {
 	ClearGlobalVariablesInstruction: number
 	CompiledCode: Instruction[]
 	DebugInfo: DebugInfo[]
+	Functions: Function[]
 }
 
 export type Context = {
@@ -56,6 +57,11 @@ export type DataItem = {
 	Type: 'INT' | 'FLOAT' | 'STRING' | 'BOOLEAN' | 'STRUCT' | 'LIST' | 'RUNTIME'
 	Tag: string | null
 	IsHeapAddress: boolean
+}
+
+export type Function = {
+	FullName: string
+	Position: Position
 }
 
 export type BaseIpcMessage<T> = {
