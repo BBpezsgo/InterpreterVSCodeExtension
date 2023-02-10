@@ -10,6 +10,7 @@ import {
 	ExecutableOptions
 } from 'vscode-languageclient/node'
 import * as OS from 'os'
+import { StackView } from './testView'
 
 let Client: LanguageClient
 
@@ -76,6 +77,8 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(arg)
 		})
 	})
+
+	new StackView(context)
 }
 
 export function deactivate() { return Client?.stop() }

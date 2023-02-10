@@ -8,6 +8,7 @@ import { Debugger } from './debug-communicator'
 import { DebugInfo } from './types'
 import { StatusItem } from './status-item'
 import { OutputEventCategory } from './debugger-interface'
+import { StackView } from './testView'
 
 export type Event =
 	'stopOnEntry' |
@@ -201,6 +202,29 @@ export class DebugRuntime extends EventEmitter {
 		return result
 	}
 
+	public Evaluate(expression: string, context: string | undefined): string | undefined {
+		switch (context) {
+			case 'watch':
+				if (expression.startsWith('%') && expression.endsWith('%') && expression.length > 2) {
+					const BuiltinVar = expression.substring(1, expression.length - 1).toLowerCase()
+					switch (BuiltinVar) {
+						case 'bp':
+						case 'basepointer':
+							return this._debugger.BasePointer.toString()
+						case 'cp':
+						case 'codepointer':
+							return this._debugger.CodePointer.toString()
+					}
+					return undefined
+				}
+				break		
+			default:
+				break
+		}
+
+		return undefined
+	}
+
 	/**
 	 * Continue execution to the end/beginning.
 	 */
@@ -208,10 +232,12 @@ export class DebugRuntime extends EventEmitter {
 		await this.ExecuteBaseInstructions()
 		while (this._debugger.IsRunningCode) {
 			if (this.ThereIsBreakpoint()) {
+				this.UpdateStackView()
 				this.SendEvent('stopOnStep')
 				break
 			} else {
 				await this._debugger.ExecuteNext()
+				this.UpdateStackView()
 			}
 		}
 		await this.ExecuteBaseInstructions()
@@ -224,6 +250,7 @@ export class DebugRuntime extends EventEmitter {
 		await this.ExecuteBaseInstructions()
 		if (instruction) {
 			await this._debugger.ExecuteNext()
+			this.UpdateStackView()
 			this.SendEvent('stopOnStep')
 		} else {
 			await this.ExecuteNextLine()
@@ -234,6 +261,7 @@ export class DebugRuntime extends EventEmitter {
 	private async ExecuteBaseInstructions() {
 		while (this._debugger.State === 'DisposeGlobalVariables' || this._debugger.State === 'SetGlobalVariables') {
 			await this._debugger.ExecuteNext()
+			this.UpdateStackView()
 		}
 	}
 
@@ -242,9 +270,24 @@ export class DebugRuntime extends EventEmitter {
 			let startedLine = this.CurrentLine || -1
 			do {
 				await this._debugger.ExecuteNext()
+				this.UpdateStackView()
 			} while (this._debugger.IsRunningCode && startedLine === this.CurrentLine)
 		} catch (error) { console.error(error) }
 		this.SendEvent('stopOnStep')
+	}
+
+	private UpdateStackView() {
+		StackView.Instance.List.splice(0)
+		if (this._debugger.Stack) for (let i = 0; i < this._debugger.Stack.length; i++) {
+			const dataItem = this._debugger.Stack[i]
+			StackView.Instance.List.push({
+				"label": dataItem.Value,
+				"description": dataItem.Tag,
+				"tooltip": null,
+				"icon": null,
+			})
+		}
+		StackView.Instance.refresh()
 	}
 
 	private InstructionToDebugInfo(instruction: number): DebugInfo | null {

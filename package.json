@@ -199,9 +199,9 @@
 									"hide"
 								],
 								"enumDescriptions": [
-									"default: show fake compile error to user",
-									"show fake compile error to user",
-									"do not show fake compile error to user"
+									"default: show compile error to user",
+									"show compile error to user",
+									"do not show compile error to user"
 								]
 							}
 						}
@@ -309,6 +309,16 @@
 					"when": "resourceLangId == bbct && !isInDiffEditor && shellExecutionSupported"
 				}
 			]
+		},
+		"views": {
+		  "debug": [
+			{
+			  "id": "bbcodeStack",
+			  "name": "Stack",
+			  "type": "tree",
+			  "when": "debugType == bbcode && inDebugMode && false"
+			}
+		  ]
 		}
 	},
 	"scripts": {

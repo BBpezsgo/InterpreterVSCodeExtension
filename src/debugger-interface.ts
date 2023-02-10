@@ -473,17 +473,11 @@ export class DebugSession extends LoggingDebugSession {
 	}
 
 	protected async evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): Promise<void> {
-		console.log(`evaulateRequest(${args})`)
+		console.log(`evaulateRequest`, args)
 
-		let reply: string | undefined;
-		let rv: RuntimeVariable | undefined;
+		let rv: RuntimeVariable | undefined = undefined
 
-		switch (args.context) {
-			case 'repl':
-			default:
-				reply = "WTF?"
-				break;
-		}
+		const reply = this._runtime.Evaluate(args.expression, args.context)
 
 		if (rv) {
 			const v = this.convertFromRuntime(rv);
@@ -491,12 +485,16 @@ export class DebugSession extends LoggingDebugSession {
 				result: v.value,
 				type: v.type,
 				variablesReference: v.variablesReference,
-				presentationHint: v.presentationHint
+				presentationHint: v.presentationHint,
 			};
 		} else {
 			response.body = {
 				result: reply ? reply : `evaluate(context: '${args.context}', '${args.expression}')`,
-				variablesReference: 0
+				variablesReference: 0,
+				presentationHint: {
+					kind: 'data',
+					attributes: ['readOnly']
+				},
 			};
 		}
 
