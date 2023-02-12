@@ -175,10 +175,10 @@ export class IPC extends EventEmitter {
         this.TrySendNext()
     }
 
-    public SendAsync(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<any>> {
+    public SendAsync<T>(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<T>> {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
-        return new Promise<BaseIpcMessage<any>>((resolve, reject) => {
+        return new Promise<BaseIpcMessage<T>>((resolve, reject) => {
             const id = this.idCounter.toString()
             const _timeout = !timeout ? null : setTimeout(() => {
                 this.waitForResponses.delete(id)

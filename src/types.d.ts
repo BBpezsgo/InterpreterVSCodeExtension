@@ -1,9 +1,5 @@
 export type CompilerResult = {
-	SetGlobalVariablesInstruction: number
-	ClearGlobalVariablesInstruction: number
-	CompiledCode: Instruction[]
 	DebugInfo: DebugInfo[]
-	Functions: Function[]
 }
 
 export type Context = {
@@ -39,17 +35,20 @@ export type DebugInfo = {
 
 export type InterpeterState = 'Initialized' | 'Destroyed' | 'SetGlobalVariables' | 'CallCodeEntry' | 'CallUpdate' | 'CallCodeEnd' | 'DisposeGlobalVariables' | 'CodeExecuted'
 
-export type Interpeter2 = {
-	State: InterpeterState
-}
+export type CallStackFrame = ({
+    IsState: true;
+    Name: string;
+} | {
+    IsState: false;
+    Name: string;
+    File: string;
+    Offset: number;
+    Line: number;
+})
 
-export type Interpeter = {
-	BasePointer: number
-	CodePointer: number
+export type Stack = {
 	StackMemorySize: number
 	Stack: DataItem[]
-	Heap: DataItem[]
-	CallStack: string[]
 }
 
 export type DataItem = {
@@ -80,13 +79,4 @@ export type IpcMessage = {
 } | {
 	type: "stderr"
 	data: string
-} | {
-	type: "comp/res"
-	data: CompilerResult
-} | {
-	type: "intp-data"
-	data: Interpeter
-} | {
-	type: "intp2-data"
-	data: Interpeter2
 }

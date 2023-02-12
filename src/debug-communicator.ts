@@ -1,5 +1,5 @@
 import * as IPCManager from './ipc'
-import { CompilerResult, DataItem, DebugInfo, Instruction, Interpeter, InterpeterState, IpcMessage } from './types'
+import { IpcMessage } from './types'
 import * as Types from './types'
 import EventEmitter = require('events')
 import { GetNonce } from './utils'
@@ -8,13 +8,33 @@ import { StatusItem } from './status-item'
 export declare interface Debugger {
     on(event: 'closed', listener: (code: number | null) => void): this
     on(event: 'unknown-message', listener: (data: string | any) => void): this
-    on(event: 'console/out', listener: (e: { Message: string; Type: "System" | "Normal" | "Warning" | "Error" | "Debug"; }, context: { CodePointer: number; CallStack: ({ IsState: true; Name: string } | { IsState: false; Name: string; File: string; Offset: number })[] } | null) => void): this
-    on(event: 'comp/res', listener: (e: CompilerResult) => void): this
-    on(event: 'intp-data', listener: (e: Interpeter) => void): this
+    on(event: 'console/out', listener: (e: { Message: string; Type: "System" | "Normal" | "Warning" | "Error" | "Debug"; }, context: { CodePointer: number; CallStack: Types.CallStackFrame[] } | null) => void): this
     on(event: 'stdout', listener: (data: string) => void): this
     on(event: 'stderr', listener: (data: string) => void): this
     on(event: 'done', listener: () => void): this
     on(event: string, listener: (...params: any[]) => void): this
+}
+
+function ParseCallStack(callstack: string[]) {
+	const result: Types.CallStackFrame[] = []
+	for (let i = 0; i < callstack.length; i++) {
+		const frame = callstack[i]
+		if (frame.startsWith('State: ')) {
+			result.push({
+				IsState: true,
+				Name: frame.replace('State: ', '')
+			})
+		} else {
+			result.push({
+				IsState: false,
+				Name: frame.split(';')[0],
+				File: frame.split(';')[1],
+				Offset: Number.parseInt(frame.split(';')[2]),
+				Line: Number.parseInt(frame.split(';')[3]),
+			})
+		}
+	}
+	return result
 }
 
 export class Debugger extends EventEmitter {
@@ -22,14 +42,15 @@ export class Debugger extends EventEmitter {
 	private getCodeTimeout: NodeJS.Timeout | undefined
 	private updateInterval: NodeJS.Timeout | undefined
 
-	public State: 'Loading' | InterpeterState = 'Loading'
-	public CompiledCode: Instruction[] | null = null
-	public Functions: Types.Function[] | null = null
-	public Stack: DataItem[] | null = null
+	public State: 'Loading' | Types.InterpeterState = 'Loading'
+	public CompiledCode: Types.Instruction[] | null = null
+	public Stack: Types.DataItem[] | null = null
 	public BasePointer: number = -1
 	public CodePointer: number = -1
-	public CallStack: ({IsState: true; Name: string}|{IsState: false; Name: string; File: string; Offset: number; Line: number})[] | null = null
-	public DebugInfo: DebugInfo[] | null = []
+	public CallStack: Types.CallStackFrame[] | null = null
+	public DebugInfo: Types.DebugInfo[] | null = []
+	public Offsets: { SetGlobalVariablesInstruction: number, ClearGlobalVariablesInstruction: number } | null = null
+
 	public get IsRunningCode() : boolean {
 		return this.State === 'CallCodeEnd' ||
 			   this.State === 'CallCodeEntry' ||
@@ -92,84 +113,11 @@ export class Debugger extends EventEmitter {
 			switch (message.type) {
 				case 'console/out':
 					{
-						const CallStack: ({
-							IsState: true;
-							Name: string;
-						} | {
-							IsState: false;
-							Name: string;
-							File: string;
-							Offset: number;
-							Line: number;
-						})[] = []
-						for (let i = 0; i < message.data.Context.CallStack.length; i++) {
-							const frame = message.data.Context.CallStack[i]
-							if (frame.startsWith('State: ')) {
-								CallStack.push({
-									IsState: true,
-									Name: frame.replace('State: ', '')
-								})
-							} else {
-								CallStack.push({
-									IsState: false,
-									Name: frame.split(';')[0],
-									File: frame.split(';')[1],
-									Offset: Number.parseInt(frame.split(';')[2]),
-									Line: Number.parseInt(frame.split(';')[3]),
-								})
-							}
-						}
-						self.emit(message.type, message.data, message.data.Context.CodePointer === -1 ? null : { CodePointer: message.data.Context.CodePointer, CallStack: CallStack })
+						self.emit(message.type, message.data, message.data.Context.CodePointer === -1 ? null : {
+							CodePointer: message.data.Context.CodePointer,
+							CallStack: ParseCallStack(message.data.Context.CallStack)
+						})
 						return
-					}
-				case 'intp2-data':
-					{
-						if (self._waitForStatus.size > 0) {
-							self._waitForStatus.forEach((value, key) => {
-								value()
-							})
-							self._waitForStatus.clear()
-						}
-						self.State = message.data.State
-						self.UpdateStatusItem()
-
-						if (!self.doneEmitted && message.data.State === 'CodeExecuted') {
-							self.doneEmitted = true
-							self.emit('done')
-						}
-						return
-					}
-				case 'comp/res':
-					{
-						self.CompiledCode = message.data.CompiledCode
-						self.DebugInfo = message.data.DebugInfo
-						self.Functions = message.data.Functions
-						break
-					}
-				case 'intp-data':
-					{
-						self.Stack = message.data.Stack
-						self.BasePointer = message.data.BasePointer
-						self.CodePointer = message.data.CodePointer
-						self.CallStack = []
-						for (let i = 0; i < message.data.CallStack.length; i++) {
-							const frame = message.data.CallStack[i]
-							if (frame.startsWith('State: ')) {
-								self.CallStack.push({
-									IsState: true,
-									Name: frame.replace('State: ', '')
-								})
-							} else {
-								self.CallStack.push({
-									IsState: false,
-									Name: frame.split(';')[0],
-									File: frame.split(';')[1],
-									Offset: Number.parseInt(frame.split(';')[2]),
-									Line: Number.parseInt(frame.split(';')[3]),
-								})
-							}
-						}
-						break
 					}
 				default:
 					{
@@ -211,12 +159,48 @@ export class Debugger extends EventEmitter {
 		
 		this.getCodeTimeout = setTimeout(() => {
 			console.log('Get compiler result ...')
-			this.processInterpreter.Send('comp/res', null)
+			this.SendAsync('comp/debuginfo')
+				.then(debugInfo => {
+					this.DebugInfo = debugInfo
+				})
+			this.SendAsync('comp/offsets')
+				.then(offsets => {
+					this.Offsets = offsets.data
+				})
+			this.SendAsync('comp/code')
+				.then(compiledCode => {
+					this.CompiledCode = compiledCode
+				})
 		}, 1000)
 		
 		this.updateInterval = setInterval(() => {
-			this.processInterpreter.Send('get-intp-data', null)
-			this.processInterpreter.Send('get-intp2-data', null)
+			this.SendAsync('intp/pointers')
+				.then(pointers => {
+					this.BasePointer = pointers.BasePointer
+					this.CodePointer = pointers.CodePointer
+				})
+			this.SendAsync('intp/stack')
+				.then(stack => {
+					this.Stack = stack.Stack
+				})
+			this.SendAsync('intp/callstack')
+				.then(callstack => {
+					this.CallStack = ParseCallStack(callstack)
+				})
+			this.SendAsync<Types.InterpeterState>('intp/state')
+				.then(state => {
+					if (this._waitForStatus.size > 0) {
+						this._waitForStatus.forEach(value => value())
+						this._waitForStatus.clear()
+					}
+					this.State = state
+					this.UpdateStatusItem()
+
+					if (!this.doneEmitted && state === 'CodeExecuted') {
+						this.doneEmitted = true
+						this.emit('done')
+					}
+				})
 		}, 1000)
 		
 		return this.WaitForStatus()
@@ -224,10 +208,19 @@ export class Debugger extends EventEmitter {
 
 	public async ExecuteNext() {
 		StatusItem.Update(this.State, 'loading~spin')
-		this.processInterpreter.Send('intp/step', null)
+		this.Send('intp/step')
 		await this.WaitForStatus()
 		this.UpdateStatusItem()
 	}
+
+	public async SendAsync<T = any>(type: string, data: any = null) {
+		return new Promise<T>((resolve, reject) => {
+			this.processInterpreter.SendAsync<T>(type, data)
+				.then(message => resolve(message.data))
+				.catch(reject)
+		})
+	}
+	public Send(type: string, data: any = null) { this.processInterpreter.Send(type, data) }
 
 	public Dispose() {
 		if (this.getCodeTimeout) clearTimeout(this.getCodeTimeout)

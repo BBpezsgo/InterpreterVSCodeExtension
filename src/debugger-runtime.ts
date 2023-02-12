@@ -138,13 +138,10 @@ export class DebugRuntime extends EventEmitter {
 		StatusItem.Create()
 		StatusItem.Show()
 		this._debugger = new Debugger()
-		this._debugger.on('console/out', (e, context) => {
-			// const frame = this._debugger.CallStack ? this._debugger.CallStack[0] : null
-			// const currentPosition = frame ? frame.IsState ? null : this.InstructionToDebugInfo(frame.Offset) : null
-
+		this._debugger.on('console/out', message => {
 			let type: OutputEventCategory | 'important'
 
-			switch (e.Type) {
+			switch (message.Type) {
 				case 'Debug':
 					type = OutputEventCategory.Stdout
 					break
@@ -159,10 +156,10 @@ export class DebugRuntime extends EventEmitter {
 					break
 			}
 
-			this.SendEvent('output', type, e.Message)
+			this.SendEvent('output', type, message.Message)
 		})
-		this._debugger.on('closed', e => this.SendEvent('end'))
-		this._debugger.on('done', e => this.Terminate())
+		this._debugger.on('closed', () => this.SendEvent('end'))
+		this._debugger.on('done', () => this.Terminate())
 	}
 
 	
@@ -203,6 +200,11 @@ export class DebugRuntime extends EventEmitter {
 	}
 
 	public Evaluate(expression: string, context: string | undefined): string | undefined {
+		this._debugger.SendAsync('eval', { expression, context })
+			.then(reply => {
+				console.log(reply)
+			})
+
 		switch (context) {
 			case 'watch':
 				if (expression.startsWith('%') && expression.endsWith('%') && expression.length > 2) {
@@ -266,14 +268,9 @@ export class DebugRuntime extends EventEmitter {
 	}
 
 	private async ExecuteNextLine() {
-		try {
-			let startedLine = this.CurrentLine || -1
-			do {
-				await this._debugger.ExecuteNext()
-				this.UpdateStackView()
-			} while (this._debugger.IsRunningCode && startedLine === this.CurrentLine)
-		} catch (error) { console.error(error) }
-		this.SendEvent('stopOnStep')
+		this._debugger.SendAsync('intp/stepline')
+			.then(() => this.SendEvent('stopOnStep'))
+			.catch(error => console.error(error))
 	}
 
 	private UpdateStackView() {
