@@ -44,15 +44,15 @@ export function activate(context: vscode.ExtensionContext) {
 	const commandOptions: ExecutableOptions = { detached: false }
 
 	const serverOptions: ServerOptions =
-	{
-		run: { command: 'dotnet', args: [serverPath], options: commandOptions },
-		debug: { command: 'dotnet', args: [serverPath], options: commandOptions }
-	}
-
-	const serverOptions32: ServerOptions =
+	(OS.platform() === 'win32') ?
 	{
 		run: { command: serverPath, options: commandOptions },
 		debug: { command: serverPath, options: commandOptions }
+	}
+	:
+	{
+		run: { command: 'dotnet', args: [serverPath], options: commandOptions },
+		debug: { command: 'dotnet', args: [serverPath], options: commandOptions }
 	}
 
 	const clientOptions: LanguageClientOptions = {
@@ -68,15 +68,21 @@ export function activate(context: vscode.ExtensionContext) {
 	Client = new LanguageClient(
 		'bbcodeServer',
 		'BBC Language Server',
-		(OS.platform() === 'win32') ? serverOptions32 : serverOptions,
+		serverOptions,
 		clientOptions
 	)
 
+	console.log('Start', serverPath)
 	Client.start().then(() => {
 		Client.onNotification('custom/test', arg => {
 			vscode.window.showInformationMessage(arg)
 		})
 	})
+
+	const tokenDebugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0)
+	tokenDebugButton.text = 'Inspect Token'
+	tokenDebugButton.command = 'editor.action.inspectTMScopes'
+	tokenDebugButton.show()
 
 	new StackView(context)
 }

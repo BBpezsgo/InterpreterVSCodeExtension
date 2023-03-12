@@ -15,6 +15,9 @@
 			"include": "#struct-def"
 		},
 		{
+			"include": "#namespace-def"
+		},
+		{
 			"include": "#func-def-2"
 		},
 		{
@@ -143,6 +146,17 @@
 				}
 			}
 		},
+		"namespace-def": {
+			"match": "(namespace)[\\s]+([a-zA-Z0-9_]+)",
+			"captures": {
+				"1": {	
+					"name": "entity.name.tag"
+				},
+				"2": {	
+					"name": "entity.name.class"
+				}
+			}
+		},
 		"func-def": {
 			"match": "([a-zA-Z0-9_]+)(?<!new)[\\s]+([a-zA-Z0-9_]+)[\\s]*\\(",
 			"captures": {
@@ -166,7 +180,7 @@
 			"match": "(using)[\\s]+",
 			"captures": {
 				"1": {
-					"name": "entity.name.tag"
+					"name": "keyword.control"
 				}
 			}
 		},
@@ -214,6 +228,10 @@
 				{
 					"name": "entity.name.tag",
 					"match": "\\bint\\b"
+				},
+				{
+					"name": "entity.name.tag",
+					"match": "\\bbyte\\b"
 				},
 				{
 					"name": "entity.name.tag",
