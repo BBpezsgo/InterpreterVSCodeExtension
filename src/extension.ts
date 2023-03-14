@@ -1,22 +1,15 @@
 import * as vscode from 'vscode'
-// import * as WebView from './webview'
 import * as Activator from './debug-activator'
 import * as BbcRunnerUtils from './utils'
 import * as Path from 'path'
-import {
-	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	ExecutableOptions
-} from 'vscode-languageclient/node'
-import * as OS from 'os'
 import { StackView } from './testView'
+import LanguageClient from './language-client'
 
-let Client: LanguageClient
+let client: LanguageClient
 
 export function activate(context: vscode.ExtensionContext) {
-	// WebView.Activate(context)
 	Activator.Activate(context)
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('bbc.runBbcFile', args => {
 			let filepath = GetFilePath(args)
@@ -39,45 +32,23 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	)
-
-	const serverPath = context.asAbsolutePath(Path.join('server', 'Release', 'net6.0', 'BBCodeLanguageServer.exe'))
-	const commandOptions: ExecutableOptions = { detached: false }
-
-	const serverOptions: ServerOptions =
-	(OS.platform() === 'win32') ?
-	{
-		run: { command: serverPath, options: commandOptions },
-		debug: { command: serverPath, options: commandOptions }
-	}
-	:
-	{
-		run: { command: 'dotnet', args: [serverPath], options: commandOptions },
-		debug: { command: 'dotnet', args: [serverPath], options: commandOptions }
-	}
-
-	const clientOptions: LanguageClientOptions = {
-		documentSelector: [
-			{ pattern: '**/*.bbc' }
-		],
-		synchronize: {
-			configurationSection: 'bbcodeServer',
-			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-		}
-	}
-
-	Client = new LanguageClient(
-		'bbcodeServer',
-		'BBC Language Server',
-		serverOptions,
-		clientOptions
+	context.subscriptions.push(
+		vscode.commands.registerCommand('bbc.runBbcTestFileSpecificTest', (filepath, testid) => {
+			if (filepath && testid) {
+				const cmdPath = BbcRunnerUtils.GetExePath()
+				const terminal = vscode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `-test-id "${testid}"`, `"${filepath}"`])
+				terminal.show()
+			}
+		})
 	)
 
-	console.log('Start', serverPath)
-	Client.start().then(() => {
-		Client.onNotification('custom/test', arg => {
-			vscode.window.showInformationMessage(arg)
-		})
+	client = new LanguageClient(context, {
+		ServerPath: Path.join('server', 'Release', 'net6.0', 'BBCodeLanguageServer.exe'),
+		Name: 'BBC Language Server',
+		ID: 'bbcodeServer',
+		DocumentSelector: [ '**/*.bbc', '**/*.bbct' ],
 	})
+	client.Activate()
 
 	const tokenDebugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0)
 	tokenDebugButton.text = 'Inspect Token'
@@ -87,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 	new StackView(context)
 }
 
-export function deactivate() { return Client?.stop() }
+export function deactivate() { return client?.Deactivate() }
 
 function GetFilePath(args: any) {
 	if (args) {
