@@ -12,7 +12,8 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"${workspaceFolder}/sampleWorkspace"
+				"D:/Program Files/BBCodeProject/BBCode/TestFiles"
+				//"${workspaceFolder}/sampleWorkspace"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"

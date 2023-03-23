@@ -1,9 +1,12 @@
 {
-	"name": "BBC Language",
 	"scopeName": "source.bbc",
+	"fileTypes": [
+		"bbc"
+	],
+	"name": "BBC Language",
 	"patterns": [
 		{
-			"include": "#string"
+			"include": "#strings"
 		},
 		{
 			"include": "#hash"
@@ -13,6 +16,9 @@
 		},
 		{
 			"include": "#struct-def"
+		},
+		{
+			"include": "#class-def"
 		},
 		{
 			"include": "#namespace-def"
@@ -39,10 +45,7 @@
 			"include": "#func-call"
 		},
 		{
-			"include": "#attr0"
-		},
-		{
-			"include": "#attr1"
+			"include": "#attribute"
 		},
 		{
 			"include": "#builtin-function"
@@ -119,11 +122,7 @@
 			"patterns": [
 				{
 					"name": "constant.numeric",
-					"match": "[0-9]{1,}"
-				},
-				{
-					"name": "constant.numeric",
-					"match": "[0-9]*.[0-9]{1,}"
+					"match": "(\\.[0-9]+f?\\b|\\b[0-9]+f?\\b|\\b0x[0-9a-fA-F_]+\\b|\\b0b[01_]+\\b|\\b[0-9]e[0-9]f?\\b)"
 				}
 			]
 		},
@@ -146,8 +145,19 @@
 				}
 			}
 		},
+		"class-def": {
+			"match": "(class)[\\s]+([a-zA-Z0-9_]+)",
+			"captures": {
+				"1": {	
+					"name": "entity.name.tag"
+				},
+				"2": {	
+					"name": "entity.name.class"
+				}
+			}
+		},
 		"namespace-def": {
-			"match": "(namespace)[\\s]+([a-zA-Z0-9_]+)",
+			"match": "(namespace)\\s+([a-zA-Z_]+[a-zA-Z0-9_]*)",
 			"captures": {
 				"1": {	
 					"name": "entity.name.tag"
@@ -158,20 +168,23 @@
 			}
 		},
 		"func-def": {
-			"match": "([a-zA-Z0-9_]+)(?<!new)[\\s]+([a-zA-Z0-9_]+)[\\s]*\\(",
+			"match": "(([a-zA-Z]+[a-zA-Z0-9_]*)[\\[\\]]*)(?<!new|return) \\s*([a-zA-Z_]+[a-zA-Z0-9_])\\(",
 			"captures": {
 				"2": {	
+					"name": "entity.name.class"
+				},
+				"3": {	
 					"name": "entity.name.function"
 				}
 			}
 		},
 		"func-def-2": {
-			"match": "(void|int|bool|float|string)[\\s]+([a-zA-Z_0-9]+)[\\s]*\\(",
+			"match": "((void|int|byte|float|bool|string)([\\[\\]]*)) \\s*([a-zA-Z_]+[a-zA-Z0-9_])\\(",
 			"captures": {
-				"1": {	
+				"2": {	
 					"name": "entity.name.tag"
 				},
-				"2": {	
+				"4": {	
 					"name": "entity.name.function"
 				}
 			}
@@ -203,16 +216,8 @@
 				}
 			}
 		},
-		"attr0": {
-			"match": "^[\\s]*\\[[\\s]*([a-zA-Z0-9_]+)[\\s]*\\]",
-			"captures": {
-				"1": {
-					"name": "entity.name.class"
-				}
-			}
-		},
-		"attr1": {
-			"match": "^[\\s]*\\[[\\s]*([a-zA-Z0-9_]+)[\\s]*(?=(\\s*\\([^\\)\\]]*\\)\\s*\\])[\\s]*)",
+		"attribute": {
+			"match": "[\\s\\r\\n]+\\[\\s*(\\w+)\\s*(\\]|\\()",
 			"captures": {
 				"1": {
 					"name": "entity.name.class"
@@ -220,62 +225,74 @@
 			}
 		},
 		"keyword": {
-			"patterns": [
-				{
-					"name": "entity.name.tag",
-					"match": "\\bvoid\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bint\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bbyte\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bfloat\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bbool\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bstring\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\btrue\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bfalse\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bnamespace\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bthis\\b"
-				},
-				{
-					"name": "entity.name.tag",
-					"match": "\\bexport\\b"
-				}
-			]
+			"match": "\\b(void|int|byte|float|bool|string|true|false|namespace|export)\\b",
+			"name": "entity.name.tag"
 		},
 		"func-call": {
 			"patterns": [
 				{
-					"match": "(?<!\\[)\\b([a-zA-Z0-9_]+)\\b\\s*\\(",
+					"match": "(?<!\\[)\\b([a-zA-Z_]+[a-zA-Z0-9_]*)\\b\\s*\\(",
 					"captures": {
 						"1": {	
 							"name": "entity.name.function"
 						}
 					}
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"begin": "\"",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.bbc"
+						}
+					},
+					"end": "\"",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.bbc"
+						}
+					},
+					"name": "string.quoted.double.bbc",
+					"patterns": [
+						{
+							"include": "#string_escaped_char"
+						}
+					]
+				},
+				{
+					"begin": "'",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.bbc"
+						}
+					},
+					"end": "'",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.bbc"
+						}
+					},
+					"name": "string.quoted.single",
+					"patterns": [
+						{
+							"include": "#string_escaped_char"
+						}
+					]
+				}
+			]
+		},
+		"string_escaped_char": {
+			"patterns": [
+				{
+					"match": "(?x)\\\\(\\\\|[ntr\\\"]|(u[0-9a-fA-F]{4}))",
+					"name": "constant.character.escape.bbc"
+				},
+				{
+					"match": "\\\\(u[0-9a-zA-Z]{4}|.)",
+					"name": "invalid.illegal.unknown-escape.bbc"
 				}
 			]
 		}
