@@ -311,14 +311,14 @@
 			]
 		},
 		"views": {
-		  "debug": [
-			{
-			  "id": "bbcodeStack",
-			  "name": "Stack",
-			  "type": "tree",
-			  "when": "debugType == bbcode && inDebugMode && false"
-			}
-		  ]
+			"debug": [
+				{
+					"id": "bbcodeStack",
+					"name": "Stack",
+					"type": "tree",
+					"when": "debugType == bbcode && inDebugMode && false"
+				}
+			]
 		}
 	},
 	"scripts": {
