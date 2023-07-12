@@ -29,8 +29,7 @@
 	},
 	"activationEvents": [
 		"onCommand:bbcode.debug.debugEditorContents",
-		"onLanguage:bbc",
-		"onLanguage:bbct"
+		"onLanguage:bbc"
 	],
 	"main": "./out/extension",
 	"contributes": {

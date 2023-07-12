@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
 		ServerPath: Path.join('server', Debug ? 'Debug' : 'Release', 'net6.0', 'BBCodeLanguageServer.exe'),
 		Name: 'BBC Language Server',
 		ID: 'bbcodeServer',
-		DocumentSelector: [ '**/*.bbc', '**/*.bbct' ],
+		DocumentSelector: [ '**/*.bbc' ],
 	})
 	client.Activate()
 

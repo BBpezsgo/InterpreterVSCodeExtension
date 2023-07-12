@@ -6,6 +6,9 @@
 	"name": "BBC Language",
 	"patterns": [
 		{
+			"include": "#comment"
+		},
+		{
 			"include": "#strings"
 		},
 		{
@@ -19,9 +22,6 @@
 		},
 		{
 			"include": "#class-def"
-		},
-		{
-			"include": "#namespace-def"
 		},
 		{
 			"include": "#func-def-2"
@@ -52,9 +52,6 @@
 		},
 		{
 			"include": "#keyword"
-		},
-		{
-			"include": "#comment"
 		}
 	],
 	"repository": {
@@ -105,7 +102,15 @@
 		"builtin-function": {
 			"patterns": [
 				{
-					"match": "typeof",
+					"match": "delete",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "clone",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "sizeof",
 					"name": "entity.name.tag"
 				}
 			]
@@ -160,23 +165,9 @@
 				}
 			}
 		},
-		"namespace-def": {
-			"match": "(namespace)\\s+([a-zA-Z_]+[a-zA-Z0-9_]*)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				},
-				"2": {
-					"name": "entity.name.class"
-				}
-			}
-		},
 		"func-def": {
 			"match": "(([a-zA-Z]+[a-zA-Z0-9_]*)[\\[\\]]*)(?<!new|return) \\s*([a-zA-Z_]+[a-zA-Z0-9_])\\(",
 			"captures": {
-				"2": {
-					"name": "entity.name.class"
-				},
 				"3": {
 					"name": "entity.name.function"
 				}
@@ -201,14 +192,6 @@
 				}
 			}
 		},
-		"var-def": {
-			"match": "(var)[\\s]+([a-zA-Z]+)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				}
-			}
-		},
 		"new-struct": {
 			"match": "(new)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
@@ -229,7 +212,7 @@
 			}
 		},
 		"keyword": {
-			"match": "\\b(void|int|byte|float|bool|string|true|false|namespace|export|this)\\b",
+			"match": "\\b(void|int|byte|float|char|true|false|export|private|this|var)\\b",
 			"name": "entity.name.tag"
 		},
 		"func-call": {
