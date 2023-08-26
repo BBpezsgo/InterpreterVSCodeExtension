@@ -112,6 +112,14 @@
 				{
 					"match": "sizeof",
 					"name": "entity.name.tag"
+				},
+				{
+					"match": "out",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "in",
+					"name": "entity.name.tag"
 				}
 			]
 		},
@@ -212,8 +220,60 @@
 			}
 		},
 		"keyword": {
-			"match": "\\b(void|int|byte|float|char|true|false|export|private|this|var)\\b",
-			"name": "entity.name.tag"
+			"patterns": [
+				{
+					"match": "void",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "int",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "byte",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "float",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "char",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "true",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "false",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "export",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "private",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "adaptive",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "macro",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "this",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "var",
+					"name": "entity.name.tag"
+				}
+			]
 		},
 		"func-call": {
 			"patterns": [
