@@ -24,6 +24,9 @@
 			"include": "#class-def"
 		},
 		{
+			"include": "#enum-def"
+		},
+		{
 			"include": "#func-def-2"
 		},
 		{
@@ -102,23 +105,23 @@
 		"builtin-function": {
 			"patterns": [
 				{
-					"match": "delete",
+					"match": "\\sdelete\\s",
 					"name": "entity.name.tag"
 				},
 				{
-					"match": "clone",
+					"match": "\\sclone\\s",
 					"name": "entity.name.tag"
 				},
 				{
-					"match": "sizeof",
+					"match": "\\ssizeof\\s",
 					"name": "entity.name.tag"
 				},
 				{
-					"match": "out",
+					"match": "\\sout\\s",
 					"name": "entity.name.tag"
 				},
 				{
-					"match": "in",
+					"match": "\\sin\\s",
 					"name": "entity.name.tag"
 				}
 			]
@@ -164,6 +167,17 @@
 		},
 		"class-def": {
 			"match": "(class)[\\s]+([a-zA-Z0-9_]+)",
+			"captures": {
+				"1": {
+					"name": "entity.name.tag"
+				},
+				"2": {
+					"name": "entity.name.class"
+				}
+			}
+		},
+		"enum-def": {
+			"match": "(enum)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
 				"1": {
 					"name": "entity.name.tag"
@@ -222,56 +236,12 @@
 		"keyword": {
 			"patterns": [
 				{
-					"match": "void",
+					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this)(\\b)",
 					"name": "entity.name.tag"
 				},
 				{
-					"match": "int",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "byte",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "float",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "char",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "true",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "false",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "export",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "private",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "adaptive",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "macro",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "this",
-					"name": "entity.name.tag"
-				},
-				{
-					"match": "var",
-					"name": "entity.name.tag"
+					"match": "\\b(export)\\b",
+					"name": "keyword.control"
 				}
 			]
 		},
@@ -334,7 +304,7 @@
 		"string_escaped_char": {
 			"patterns": [
 				{
-					"match": "(?x)\\\\(\\\\|[ntr\\\"]|(u[0-9a-fA-F]{4}))",
+					"match": "(?x)\\\\(\\\\|[ntr\\\"]|0|(u[0-9a-fA-F]{4}))",
 					"name": "constant.character.escape.bbc"
 				},
 				{
