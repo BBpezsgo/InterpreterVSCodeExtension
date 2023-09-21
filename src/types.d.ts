@@ -9,11 +9,8 @@ export type Context = {
 
 export type Instruction = {
 	Opcode: string
-	Parameter: string | number | boolean | null
-	ParameterIsComplicated: boolean
+	Parameter: DataItem
 	Tag: string
-	AdditionParameter: string
-	AdditionParameter2: number
 }
 
 export type Position = {
@@ -53,9 +50,8 @@ export type Stack = {
 
 export type DataItem = {
 	Value: string | 'null'
-	Type: 'INT' | 'FLOAT' | 'STRING' | 'BOOLEAN' | 'STRUCT' | 'LIST' | 'RUNTIME'
+	Type: 'INT' | 'FLOAT' | 'BYTE' | 'CHAR'
 	Tag: string | null
-	IsHeapAddress: boolean
 }
 
 export type Function = {
@@ -63,14 +59,21 @@ export type Function = {
 	Position: Position
 }
 
-export type BaseIpcMessage<T> = {
-	type: string
+export type BaseIpcMessage_In<T> = {
+	type: AllAndCoreMessages_In
 	id: string
 	reply: string | null
 	data: T
 }
 
-export type IpcMessage = {
+export type BaseIpcMessage_Out<T> = {
+	type: AllAndCoreMessages_Out
+	id: string
+	reply: string | null
+	data: T
+}
+
+export type Message_In = {
 	type: "console/out"
 	data: { Message: string, Type: 'System' | 'Normal' | 'Warning' | 'Error' | 'Debug', Context: Context }
 } | {
@@ -79,4 +82,74 @@ export type IpcMessage = {
 } | {
 	type: "stderr"
 	data: string
+} | {
+	type: DebuggerMessages_In
+	data: any
 }
+
+export type Message_Out = {
+	type: "stdin"
+	data: string
+} | {
+	type: DebuggerMessages_Out
+	data: any
+}
+
+export type DebuggerMessages_In =
+	"interpreter/updated" |
+	"compiler/debuginfo" |
+	"compiler/code" |
+	"interpreter/details" |
+	"interpreter/registers" |
+	"interpreter/stack" |
+	"interpreter/state" |
+	"interpreter/callstack"
+
+export type DebuggerMessages_Out =
+	"base/ping/req" |
+	"debug/step" |
+	"debug/stepinto" |
+	"interpreter/tick" |
+	"compiler/debuginfo" |
+	"compiler/code" |
+	"interpreter/details" |
+	"interpreter/registers" |
+	"interpreter/stack" |
+	"interpreter/state" |
+	"interpreter/callstack"
+
+export type AllMessages_In =
+	DebuggerMessages_In |
+	"interpreter/updated" |
+	"compiler/debuginfo" |
+	"compiler/code" |
+	"interpreter/details" |
+	"interpreter/registers" |
+	"interpreter/stack" |
+	"interpreter/state" |
+	"interpreter/callstack" 
+
+export type AllMessages_Out =
+	DebuggerMessages_Out |
+	"debug/step" |
+	"debug/stepinto" |
+	"interpreter/tick" |
+	"compiler/debuginfo" |
+	"compiler/code" |
+	"interpreter/details" |
+	"interpreter/registers" |
+	"interpreter/stack" |
+	"interpreter/state" |
+	"interpreter/callstack" |
+	"eval" |
+	"stdin"
+
+export type AllAndCoreMessages_In =
+	AllMessages_In |
+	"base/ping/req" |
+	"base/ping/res"
+
+export type AllAndCoreMessages_Out =
+	AllMessages_Out |
+	"base/ping/req" |
+	"base/ping/res"

@@ -1,6 +1,6 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { EventEmitter } from 'node:events'
-import { BaseIpcMessage, IpcMessage } from './types'
+import * as Types from './types'
 import * as Settings from './settings'
 const settings = Settings.Get()
 
@@ -12,17 +12,17 @@ export declare interface IPC {
     on(event: 'error', listener: (error: any) => void): this
     on(event: 'error-message', listener: (error: string) => void): this
     on(event: 'unknown-message', listener: (message: string) => void): this
-    on(event: 'message', listener: (message: IpcMessage) => void): this
+    on(event: 'message', listener: (message: Types.Message_In) => void): this
 }
 
 const EOM = '\x04'
 
-type ResponseCallback = { resolve: (message: BaseIpcMessage<any>) => void, timeout: NodeJS.Timeout | null }
+type ResponseCallback = { resolve: (message: Types.BaseIpcMessage_In<any>) => void, timeout: NodeJS.Timeout | null }
 
 export class IPC extends EventEmitter {
     public Process: ChildProcessWithoutNullStreams | null
 
-    private outMessages: BaseIpcMessage<any>[]
+    private outMessages: Types.BaseIpcMessage_Out<any>[]
     private Incoming: string
     private idCounter: number
     private readonly waitForResponses: Map<string, ResponseCallback>
@@ -91,8 +91,8 @@ export class IPC extends EventEmitter {
         })
 
         const self = this
-        this.Process.stdout.on('data', function (payload: Buffer) {
-            self.OnDataRecive(payload.toString())
+        this.Process.stdout.on('data', function (data: Buffer) {
+            self.OnDataRecive(data.toString())
         })
 
         return true
@@ -123,7 +123,7 @@ export class IPC extends EventEmitter {
     }
 
     private OnMessageRecived(message: string) {
-        const parsed: BaseIpcMessage<any> = JSON.parse(message)
+        const parsed: Types.BaseIpcMessage_In<any> = JSON.parse(message)
 
         if (parsed.type === 'base/ping/req') {
             this.Reply('base/ping/res', Date.now().toString(), parsed.id)
@@ -135,7 +135,7 @@ export class IPC extends EventEmitter {
                 const callback = this.waitForResponses.get(parsed.reply)
                 if (callback) {
                     if (callback.timeout) clearTimeout(callback.timeout)
-                    console.log(parsed)
+                    // console.log('<', parsed)
                     callback.resolve(parsed)
                 }
                 this.waitForResponses.delete(parsed.reply)
@@ -148,7 +148,7 @@ export class IPC extends EventEmitter {
             return
         }
         
-        console.log(parsed)
+        // console.log('<', parsed)
         this.emit('message', parsed)
     }
 
@@ -159,6 +159,7 @@ export class IPC extends EventEmitter {
             if (this.Process?.stdin.writable === false) { return }
             const message = this.outMessages[0]
             try {
+                // console.log('>', message)
                 this.Process?.stdin.write(JSON.stringify(message) + EOM)
             } catch (error) {
                 console.error(error)
@@ -169,16 +170,16 @@ export class IPC extends EventEmitter {
         }, 100)
     }
 
-    public Send(type: string, data: any) {
+    public Send(type: Types.AllMessages_Out, data: any) {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
         this.TrySendNext()
     }
 
-    public SendAsync<T>(type: string, data: any, timeout: number | null = null): Promise<BaseIpcMessage<T>> {
+    public SendAsync<T>(type: Types.AllMessages_Out, data: any, timeout: number | null = null): Promise<Types.BaseIpcMessage_In<T>> {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: null })
-        return new Promise<BaseIpcMessage<T>>((resolve, reject) => {
+        return new Promise<Types.BaseIpcMessage_In<T>>((resolve, reject) => {
             const id = this.idCounter.toString()
             const _timeout = !timeout ? null : setTimeout(() => {
                 this.waitForResponses.delete(id)
@@ -189,7 +190,7 @@ export class IPC extends EventEmitter {
         })
     }
 
-    public Reply(type: string, data: any, reply: string) {
+    public Reply(type: Types.AllAndCoreMessages_Out, data: any, reply: string) {
         this.idCounter++
         this.outMessages.push({ type: type, id: this.idCounter.toString(), data: data, reply: reply })
         this.TrySendNext()

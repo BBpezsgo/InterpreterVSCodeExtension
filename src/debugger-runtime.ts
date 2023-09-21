@@ -9,6 +9,7 @@ import { DebugInfo } from './types'
 import { StatusItem } from './status-item'
 import { OutputEventCategory } from './debugger-interface'
 import { StackView } from './testView'
+import * as vscode from 'vscode'
 
 export type Event =
 	'stopOnEntry' |
@@ -167,18 +168,29 @@ export class DebugRuntime extends EventEmitter {
 	 * Start executing the given program.
 	 */
 	public async Start(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.StartInternal(program, stopOnEntry, debug)
+				.then(resolve)
+				.catch(reason => {
+					vscode.window.showErrorMessage(`Failed to debug the given program\r\nReason: ${reason}`)
+					resolve()
+				})
+		})
+	}
+
+	private async StartInternal(program: string, stopOnEntry: boolean, debug: boolean): Promise<void> {
 		this._debugger.Dispose()
-		this._debugger.Start(this.NormalizePathAndCasing(program))
+		await this._debugger.Start(this.NormalizePathAndCasing(program))
 		
 		if (debug) {
 			await this.VerifyBreakpoints(this._sourceFile)
 			if (stopOnEntry) {
 				await this.Step(true)
 			} else {
-				this.Continue()
+				await this.Continue()
 			}
 		} else {
-			this.Continue()
+			await this.Continue()
 		}
 	}
 
@@ -240,6 +252,7 @@ export class DebugRuntime extends EventEmitter {
 			} else {
 				await this._debugger.ExecuteNext()
 				this.UpdateStackView()
+				this.SendEvent('stopOnStep')
 			}
 		}
 		await this.ExecuteBaseInstructions()
@@ -268,7 +281,7 @@ export class DebugRuntime extends EventEmitter {
 	}
 
 	private async ExecuteNextLine() {
-		this._debugger.SendAsync('intp/stepline')
+		this._debugger.SendAsync('debug/step')
 			.then(() => this.SendEvent('stopOnStep'))
 			.catch(error => console.error(error))
 	}
@@ -445,6 +458,13 @@ export class DebugRuntime extends EventEmitter {
 				result.push(new RuntimeVariable(item.Tag.replace('var.', ''), item.Value))
 			}
 		}
+		return result
+	}
+
+	public getGlobalVariables(): RuntimeVariable[] {
+		const result: RuntimeVariable[] = []
+		result.push(new RuntimeVariable('CODE_POINTER', this._debugger.CodePointer))
+		result.push(new RuntimeVariable('BASE_POINTER', this._debugger.BasePointer))
 		return result
 	}
 

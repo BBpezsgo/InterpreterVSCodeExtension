@@ -236,7 +236,7 @@
 		"keyword": {
 			"patterns": [
 				{
-					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this)(\\b)",
+					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this|delete)(\\b)",
 					"name": "entity.name.tag"
 				},
 				{

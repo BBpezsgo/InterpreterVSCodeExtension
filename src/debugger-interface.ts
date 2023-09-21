@@ -420,7 +420,7 @@ export class DebugSession extends LoggingDebugSession {
 		if (v === 'locals') {
 			vs = this._runtime.getLocalVariables()
 		} else if (v === 'globals') {
-			vs = []
+			vs = this._runtime.getGlobalVariables()
 		} else if (v && Array.isArray(v.value)) {
 			vs = v.value
 		}
@@ -437,6 +437,7 @@ export class DebugSession extends LoggingDebugSession {
 		this._runtime.Continue()
 		this.sendResponse(response)
 	}
+
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 		console.log('nextRequest')
 
@@ -476,6 +477,8 @@ export class DebugSession extends LoggingDebugSession {
 		console.log(`evaulateRequest`, args)
 
 		let rv: RuntimeVariable | undefined = undefined
+
+		console.log(args)
 
 		const reply = this._runtime.Evaluate(args.expression, args.context)
 

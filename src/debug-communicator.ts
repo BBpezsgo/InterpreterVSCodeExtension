@@ -1,9 +1,9 @@
 import * as IPCManager from './ipc'
-import { IpcMessage } from './types'
 import * as Types from './types'
 import EventEmitter = require('events')
 import { GetNonce } from './utils'
 import { StatusItem } from './status-item'
+import * as vscode from 'vscode'
 
 export declare interface Debugger {
     on(event: 'closed', listener: (code: number | null) => void): this
@@ -49,7 +49,6 @@ export class Debugger extends EventEmitter {
 	public CodePointer: number = -1
 	public CallStack: Types.CallStackFrame[] | null = null
 	public DebugInfo: Types.DebugInfo[] | null = []
-	public Offsets: { SetGlobalVariablesInstruction: number, ClearGlobalVariablesInstruction: number } | null = null
 
 	public get IsRunningCode() : boolean {
 		return this.State === 'CallCodeEnd' ||
@@ -88,7 +87,7 @@ export class Debugger extends EventEmitter {
 			const timeout = setTimeout(() => {
 				if (this._waitForStatus.has(id)) this._waitForStatus.delete(id)
 				console.warn('Debugger: timeout')
-				reject()
+				reject(`Debugger timed out (${timeoutMs} ms)`)
 			}, timeoutMs)
 			this._waitForStatus.set(id, () => {
 				clearTimeout(timeout)
@@ -109,7 +108,7 @@ export class Debugger extends EventEmitter {
 		this.processInterpreter.on('spawned', () => {
 			if (StatusItem.Created) StatusItem.Update('Spawned', 'loading~spin')
 		})
-		this.processInterpreter.on('message', function (message: IpcMessage) {
+		this.processInterpreter.on('message', function (message: Types.Message_In) {
 			switch (message.type) {
 				case 'console/out':
 					{
@@ -148,46 +147,52 @@ export class Debugger extends EventEmitter {
 		StatusItem.Update(this.State + ' (' + this.CodePointer + ')', this.StateIcon)
 	}
 
-	public Start(path: string | undefined = undefined) {
+	public async Start(path: string | undefined = undefined): Promise<void> {
 		const settings = require('./settings').Get()
 		if (this.processInterpreter.IsRunning() === false)
-		{ this.processInterpreter.Start(
+		{
+			this.processInterpreter.Start(
 			"-debug",
 			"-throw-errors",
 			'"' + (path || settings.testFiles + 'helloworld.bbc') + '"'
-			) }
+			)
+		}
 		
 		this.getCodeTimeout = setTimeout(() => {
+			if (this.processInterpreter.IsRunning() === false) {
+				return
+			}
 			console.log('Get compiler result ...')
-			this.SendAsync('comp/debuginfo')
+			this.SendAsync('compiler/debuginfo')
 				.then(debugInfo => {
 					this.DebugInfo = debugInfo
 				})
-			this.SendAsync('comp/offsets')
-				.then(offsets => {
-					this.Offsets = offsets.data
-				})
-			this.SendAsync('comp/code')
+			this.SendAsync('compiler/code')
 				.then(compiledCode => {
 					this.CompiledCode = compiledCode
 				})
 		}, 1000)
 		
 		this.updateInterval = setInterval(() => {
-			this.SendAsync('intp/pointers')
+			if (this.processInterpreter.IsRunning() === false) {
+				vscode.window.showErrorMessage(`Process exited with code ${this.processInterpreter.Process?.exitCode}`)
+				clearInterval(this.updateInterval)
+				return
+			}
+			this.SendAsync('interpreter/registers')
 				.then(pointers => {
 					this.BasePointer = pointers.BasePointer
 					this.CodePointer = pointers.CodePointer
 				})
-			this.SendAsync('intp/stack')
+			this.SendAsync('interpreter/stack')
 				.then(stack => {
 					this.Stack = stack.Stack
 				})
-			this.SendAsync('intp/callstack')
+			this.SendAsync('interpreter/callstack')
 				.then(callstack => {
 					this.CallStack = ParseCallStack(callstack)
 				})
-			this.SendAsync<Types.InterpeterState>('intp/state')
+			this.SendAsync<Types.InterpeterState>('interpreter/state')
 				.then(state => {
 					if (this._waitForStatus.size > 0) {
 						this._waitForStatus.forEach(value => value())
@@ -203,24 +208,24 @@ export class Debugger extends EventEmitter {
 				})
 		}, 1000)
 		
-		return this.WaitForStatus()
+		await this.WaitForStatus()
 	}
 
 	public async ExecuteNext() {
 		StatusItem.Update(this.State, 'loading~spin')
-		this.Send('intp/step')
+		this.Send('debug/step')
 		await this.WaitForStatus()
 		this.UpdateStatusItem()
 	}
 
-	public async SendAsync<T = any>(type: string, data: any = null) {
+	public async SendAsync<T = any>(type: Types.AllMessages_Out, data: any = null) {
 		return new Promise<T>((resolve, reject) => {
 			this.processInterpreter.SendAsync<T>(type, data)
 				.then(message => resolve(message.data))
 				.catch(reject)
 		})
 	}
-	public Send(type: string, data: any = null) { this.processInterpreter.Send(type, data) }
+	public Send(type: Types.AllMessages_Out, data: any = null) { this.processInterpreter.Send(type, data) }
 
 	public Dispose() {
 		if (this.getCodeTimeout) clearTimeout(this.getCodeTimeout)
