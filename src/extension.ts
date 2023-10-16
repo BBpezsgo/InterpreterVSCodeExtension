@@ -1,7 +1,5 @@
 import * as vscode from 'vscode'
-import * as Activator from './debugger/debug-activator'
 import * as Path from 'path'
-// import { StackView } from './testView'
 import LanguageClient from './language-client'
 import * as FileExecutor from './file-executor'
 
@@ -9,7 +7,12 @@ let client: LanguageClient
 const Debug: boolean = true
 
 export function activate(context: vscode.ExtensionContext) {
-	Activator.Activate(context)
+	try {
+		const DebugActivator: (typeof import('./debugger/debug-activator')) = require('./debugger/debug-activator')
+		DebugActivator.Activate(context)
+	} catch (error) {
+		console.error(error)
+	}
 	FileExecutor.Activate(context)
 
 	client = new LanguageClient(context, {
@@ -24,8 +27,6 @@ export function activate(context: vscode.ExtensionContext) {
 	tokenDebugButton.text = 'Inspect Token'
 	tokenDebugButton.command = 'editor.action.inspectTMScopes'
 	tokenDebugButton.show()
-
-	// new StackView(context)
 }
 
 export function deactivate() { return client?.Deactivate() }
