@@ -14,13 +14,14 @@ export function Activate(context: vscode.ExtensionContext, factory?: vscode.Debu
 	console.log('Activate debug ...')
 	context.subscriptions.push(
 		vscode.commands.registerCommand('bbcode.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
-			console.log('Try to start debuging ...')
+			console.log('Try to start debugging ...')
 
 			const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
 			if (!targetResource) {
 				vscode.window.showErrorMessage(`No document opened for debugging`)
 				return
 			}
+
 			console.log('Start debuging ...')
 			vscode.debug.startDebugging(undefined, {
 				type: 'bbcode',

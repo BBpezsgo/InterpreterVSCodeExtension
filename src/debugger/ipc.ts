@@ -1,7 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { EventEmitter } from 'node:events'
 import * as Types from './types'
-import * as Settings from './settings'
+import * as Settings from '../settings'
 const settings = Settings.Get()
 
 export declare interface IPC {

@@ -1,8 +1,8 @@
 import * as IPCManager from './ipc'
 import * as Types from './types'
 import EventEmitter = require('events')
-import { GetNonce } from './utils'
-import { StatusItem } from './status-item'
+import { GetNonce } from '../utils'
+import { StatusItem } from '../status-item'
 import * as vscode from 'vscode'
 
 export declare interface Debugger {

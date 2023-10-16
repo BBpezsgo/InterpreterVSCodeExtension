@@ -1,7 +1,7 @@
 import * as vscode from 'vscode'
-import * as Activator from './debug-activator'
+import * as Activator from './debugger/debug-activator'
 import * as Path from 'path'
-import { StackView } from './testView'
+// import { StackView } from './testView'
 import LanguageClient from './language-client'
 import * as FileExecutor from './file-executor'
 
@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 	tokenDebugButton.command = 'editor.action.inspectTMScopes'
 	tokenDebugButton.show()
 
-	new StackView(context)
+	// new StackView(context)
 }
 
 export function deactivate() { return client?.Deactivate() }

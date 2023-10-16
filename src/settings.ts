@@ -1,6 +1,7 @@
 import * as fs from "fs"
+import * as path from "path"
 
-const PATH = "C:\\Users\\bazsi\\Documents\\GitHub\\InterpreterVSCodeExtension\\settings.json"
+const PATH = path.join(__dirname, 'settings.json')
 
 export type Result = {
   path: string

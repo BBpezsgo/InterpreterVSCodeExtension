@@ -1,11 +1,10 @@
 .vscode/**
-TestFiles/**
 src/**
 bin/**
 obj/**
-server/Debug/**
 
 build.bat
+upload.bat
 InterpreterVSCodeExtension.njsproj
 InterpreterVSCodeExtension.njsproj.user
 .gitignore

@@ -6,9 +6,9 @@ import { EventEmitter } from 'events'
 import { TextDecoder, TextEncoder } from 'util'
 import { Debugger } from './debug-communicator'
 import { DebugInfo } from './types'
-import { StatusItem } from './status-item'
+import { StatusItem } from '../status-item'
 import { OutputEventCategory } from './debugger-interface'
-import { StackView } from './testView'
+import { StackView } from '../testView'
 import * as vscode from 'vscode'
 
 export type Event =

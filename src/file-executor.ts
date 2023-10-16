@@ -1,4 +1,4 @@
-import * as BbcRunnerUtils from './utils'
+import * as Config from './config'
 import * as vscode from 'vscode'
 
 export function Activate(context: vscode.ExtensionContext) {
@@ -6,31 +6,20 @@ export function Activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('bbc.runBbcFile', args => {
 			const filepath = GetFilePath(args)
 
-			if (filepath) {
-				const cmdPath = BbcRunnerUtils.GetExePath()
-				const terminal = vscode.window.createTerminal("BBC Terminal", cmdPath, [`"${filepath}"`])
-				terminal.show()
+			if (!filepath) {
+				vscode.window.showErrorMessage(`No path specified`)
+				return
 			}
-		})
-	)
-	context.subscriptions.push(
-		vscode.commands.registerCommand('bbc.runBbcTestFile', args => {
-			const filepath = GetFilePath(args)
 
-			if (filepath) {
-				const cmdPath = BbcRunnerUtils.GetExePath()
-				const terminal = vscode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `"${filepath}"`])
-				terminal.show()
-			}
-		})
-	)
-	context.subscriptions.push(
-		vscode.commands.registerCommand('bbc.runBbcTestFileSpecificTest', (filepath, testid) => {
-			if (filepath && testid) {
-				const cmdPath = BbcRunnerUtils.GetExePath()
-				const terminal = vscode.window.createTerminal("BBC Tester Terminal", cmdPath, ['-test', `-test-id "${testid}"`, `"${filepath}"`])
-				terminal.show()
-			}
+			const cmdPath = Config.GetExePath()
+			if (!cmdPath) { return }
+
+			const terminal = vscode.window.createTerminal({
+				name: 'BBC Terminal',
+				shellPath: cmdPath,
+				shellArgs: [`-hide-debug "${filepath}"`],
+			})
+			terminal.show()
 		})
 	)
 }

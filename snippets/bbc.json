@@ -1,33 +1,10 @@
 {
-    "Code entry": {
-		"prefix": "entry",
-		"body": [
-			"[CodeEntry]",
-			"void Start()",
-            "{",
-            "  $1",
-            "}"
-		],
-		"description": "Function definition with an attribute CodeEntry"
-	},
-    "Event": {
-		"prefix": "event",
-		"body": [
-			"[Catch(\"$1\")]",
-			"void On$2()",
-            "{",
-            "  $3",
-            "}"
-		],
-		"description": "Function definition with an attribute Catch"
-	},
     "For loop": {
 		"prefix": "for",
 		"body": [
 			"for (int ${1:i}; $1 < $2.Length; $1++)",
             "{",
-			"  var item = $2[$1];",
-            "  $4",
+            "  $3",
             "};"
 		]
 	},
@@ -79,16 +56,6 @@
 		"prefix": "using",
 		"body": [
 			"using ${1:System};"
-		]
-	},
-    "Namespace": {
-		"prefix": "namespace",
-		"body": [
-			"namespace ${1:MyNamespace}",
-			"{",
-			"  $2",
-			"}",
-			""
 		]
 	},
     "Function": {

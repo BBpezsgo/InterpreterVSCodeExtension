@@ -22,7 +22,7 @@ import { basename } from 'path-browserify'
 import { DebugRuntime, IRuntimeBreakpoint, FileAccessor, RuntimeVariable } from './debugger-runtime'
 import { Subject } from 'await-notify'
 import * as base64 from 'base64-js'
-import { StatusItem } from './status-item'
+import { StatusItem } from '../status-item'
 
 export enum OutputEventCategory {
 	Console = "console",
