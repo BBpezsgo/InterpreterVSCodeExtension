@@ -45,9 +45,6 @@
 			"include": "#statement"
 		},
 		{
-			"include": "#func-call"
-		},
-		{
 			"include": "#attribute"
 		},
 		{
@@ -236,7 +233,7 @@
 		"keyword": {
 			"patterns": [
 				{
-					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this|delete)(\\b)",
+					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this|delete|temp|as)(\\b)",
 					"name": "entity.name.tag"
 				},
 				{
