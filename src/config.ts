@@ -4,9 +4,9 @@ import * as path from 'path'
 
 const ExtensionConfigName = "bbcodeServer"
 
-let defaultCmdPath = path.join(__dirname, 'interpreter', 'Release', 'net6.0', 'BBCodeInterpreter.exe')
+let defaultCmdPath = path.join(__dirname, 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
 if (__dirname.endsWith(path.sep + 'out') || __dirname.endsWith(path.sep + 'out' + path.sep)) {
-    defaultCmdPath = path.join(__dirname, '..', 'interpreter', 'Release', 'net6.0', 'BBCodeInterpreter.exe')
+    defaultCmdPath = path.join(__dirname, '..', 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
 }
 
 /**

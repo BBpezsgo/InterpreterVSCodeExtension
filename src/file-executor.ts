@@ -17,7 +17,10 @@ export function Activate(context: vscode.ExtensionContext) {
 			const terminal = vscode.window.createTerminal({
 				name: 'BBC Terminal',
 				shellPath: cmdPath,
-				shellArgs: [`-hide-debug "${filepath}"`],
+				shellArgs: [
+					'--hide-debug',
+					`"${filepath}"`
+				],
 			})
 			terminal.show()
 		})

@@ -148,13 +148,12 @@ export class Debugger extends EventEmitter {
 	}
 
 	public async Start(path: string | undefined = undefined): Promise<void> {
-		const settings = require('./settings').Get()
 		if (this.processInterpreter.IsRunning() === false)
 		{
 			this.processInterpreter.Start(
-			"-debug",
-			"-throw-errors",
-			'"' + (path || settings.testFiles + 'helloworld.bbc') + '"'
+			'--debug',
+			'--throw-errors',
+			`"${path}"`,
 			)
 		}
 		

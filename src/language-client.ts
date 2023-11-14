@@ -58,11 +58,18 @@ export default class LanguageClientManager {
 	}
 
 	public Activate() {
-		console.log(`Execute ${this.serverOptions.run.command} ${(this.serverOptions.run.args?.join(' ')) ?? ''}`)
+		console.log(`Language server command:`, this.serverOptions.run.command)
+		console.log(`Language server args:`, this.serverOptions.run.args)
+		console.log(`Starting language server ...`)
 		this.Client.start().then(() => {
+			console.log(`Language server started`)
 			this.Client.onNotification('custom/test', arg => {
 				vscode.window.showInformationMessage(arg)
 			})
+		}).catch(error => {
+			console.error(`Failed to start language server`)
+			console.error(error)
+			vscode.window.showErrorMessage(error)
 		})
 	}
 
