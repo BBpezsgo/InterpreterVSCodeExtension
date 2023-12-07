@@ -233,7 +233,7 @@
 		"keyword": {
 			"patterns": [
 				{
-					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this|delete|temp|as|sizeof)(\\b)",
+					"match": "(\\b)(void|int|byte|float|char|private|adaptive|macro|template|var|this|delete|temp|as|sizeof|class|enum|struct)(\\b)",
 					"name": "entity.name.tag"
 				},
 				{

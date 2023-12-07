@@ -153,6 +153,7 @@ export class Debugger extends EventEmitter {
 			this.processInterpreter.Start(
 			'--debug',
 			'--throw-errors',
+			'--no-pause',
 			`"${path}"`,
 			)
 		}

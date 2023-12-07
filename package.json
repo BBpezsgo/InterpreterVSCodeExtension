@@ -29,7 +29,8 @@
 	},
 	"activationEvents": [
 		"onCommand:bbcode.debug.debugEditorContents",
-		"onLanguage:bbc"
+		"onLanguage:bbc",
+		"onDebug"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -133,8 +134,7 @@
 					"bbc"
 				],
 				"label": "BBCode Debug",
-				"program": "./out/debugAdapter.js",
-				"runtime": "node",
+				"program": "C:/Users/bazsi/Documents/GitHub/InterpreterVSCodeExtension/debug-server/Release/net7.0/DebugServer.exe",
 				"configurationAttributes": {
 					"launch": {
 						"required": [

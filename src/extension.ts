@@ -4,7 +4,7 @@ import LanguageClient from './language-client'
 import * as FileExecutor from './file-executor'
 
 let client: LanguageClient
-const Debug: boolean = true
+const Debug: boolean = false
 
 export function activate(context: vscode.ExtensionContext) {
 	try {
@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
 	FileExecutor.Activate(context)
 
 	client = new LanguageClient(context, {
-		ServerPath: Path.join('server', Debug ? 'Debug' : 'Release', 'net7.0', 'BBCodeLanguageServer.exe'),
+		ServerPath: Path.join('language-server', Debug ? 'Debug' : 'Release', 'net7.0', 'BBCodeLanguageServer.exe'),
 		Name: 'BBC Language Server',
 		ID: 'bbcodeServer',
 		DocumentSelector: [ '**/*.bbc' ],

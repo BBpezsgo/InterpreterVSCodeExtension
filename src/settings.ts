@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import * as path from "path"
 
-const PATH = path.join(__dirname, 'settings.json')
+const PATH = path.join(__dirname, '..', 'settings.json')
 
 export type Result = {
   path: string
@@ -9,7 +9,10 @@ export type Result = {
 }
 
 export function Get(): null | Result {
-  if (!fs.existsSync(PATH)) { return null }
+  if (!fs.existsSync(PATH)) {
+    console.warn(`Settings file "${PATH}" not found`)
+    return null
+  }
   const content = fs.readFileSync(PATH, 'utf-8')
   return JSON.parse(content)
 }

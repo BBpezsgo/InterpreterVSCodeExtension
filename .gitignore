@@ -1,5 +1,6 @@
 /node_modules
-/server
+/language-server
+/debug-server
 /interpreter
 /out
 /obj

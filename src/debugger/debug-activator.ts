@@ -9,9 +9,39 @@ import * as vscode from 'vscode'
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode'
 import { DebugSession } from './debugger-interface'
 import { FileAccessor } from './debugger-runtime'
+import * as Path from 'path'
 
-export function Activate(context: vscode.ExtensionContext, factory?: vscode.DebugAdapterDescriptorFactory) {
-	console.log('Activate debug ...')
+const runMode: 'external' | 'server' | 'inline' = 'external'
+
+const DebugAdapterServerExecutable = Path.join(__dirname, '..', '..', 'debug-server', 'Release', 'net7.0', 'DebugServer.exe')
+
+export function Activate(context: vscode.ExtensionContext) {
+	console.log('Activating debugger ...')
+	
+	const provider = new ConfigurationProvider()
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bbcode', provider))
+
+	let factory: vscode.DebugAdapterDescriptorFactory
+	switch (runMode) {
+		case 'server':
+			throw new Error('Not implemented')
+		case 'inline':
+			console.log('Configuring debugger as inline')
+			factory = new InlineDebugAdapterFactory()
+			break
+		case 'external': default:
+			console.log('Configuring debugger as external')
+			factory = new DebugAdapterExecutableFactory()
+			break
+		}
+	
+	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bbcode', factory))
+	
+	if ('dispose' in factory && typeof factory.dispose === 'function' && factory.dispose instanceof Function) {
+		// @ts-ignore
+		context.subscriptions.push(factory)
+	}
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('bbcode.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
 			console.log('Try to start debugging ...')
@@ -22,50 +52,37 @@ export function Activate(context: vscode.ExtensionContext, factory?: vscode.Debu
 				return
 			}
 
+			console.log('Resource:', targetResource)
+
 			console.log('Start debuging ...')
 			vscode.debug.startDebugging(undefined, {
 				type: 'bbcode',
 				name: 'Debug File',
 				request: 'launch',
 				program: targetResource.fsPath,
-				stopOnEntry: true
+				stopOnEntry: true,
+			})
+			.then(result => {
+				if (!result) {
+					vscode.window.showErrorMessage('Failed to start debugging')
+				}
+				console.log('Debugging started', result)
+			}, error => {
+				console.error(error)
 			})
 		})
 	)
 
-	const provider = new ConfigurationProvider()
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bbcode', provider))
+	vscode.debug.onDidStartDebugSession(e => {
+		console.log(e)
+	})
 
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bbcode', {
-		provideDebugConfigurations(folder: WorkspaceFolder | undefined): ProviderResult<DebugConfiguration[]> {
-			return [
-				{
-					name: "BBCode Launch",
-					request: "launch",
-					type: "bbcode",
-					program: "${file}"
-				}
-			]
-		}
-	}, vscode.DebugConfigurationProviderTriggerKind.Dynamic))
-
-	if (!factory)
-	{ factory = new InlineDebugAdapterFactory() }
-	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bbcode', factory))
-	if ('dispose' in factory) {
-		// @ts-ignore
-		context.subscriptions.push(factory)
-	}
+	console.log('Debugger activated')
 }
 
 class ConfigurationProvider implements vscode.DebugConfigurationProvider {
-
-	/**
-	 * Massage a debug configuration just before a debug session is being launched,
-	 * e.g. add all missing attributes to the debug configuration.
-	 */
 	resolveDebugConfiguration(folder: WorkspaceFolder | undefined, config: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration> {
-		// if launch.json is missing or empty
+
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor
 			if (editor && editor.document.languageId === 'bbc') {
@@ -82,6 +99,8 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 				return undefined // abort launch
 			})
 		}
+
+		console.log('Debug configuration:', config)
 
 		return config
 	}
@@ -111,8 +130,30 @@ function PathToUri(path: string) {
 	{ return vscode.Uri.parse(path) }
 }
 
+class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
+	createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
+		if (!executable) {
+			const command = DebugAdapterServerExecutable
+			const args = [
+				
+			]
+			const options: vscode.DebugAdapterExecutableOptions = {
+				
+			}
+			executable = new vscode.DebugAdapterExecutable(command, args, options)
+		}
+
+		console.log('Describe debug adapter as external', executable)
+
+		// make VS Code launch the DA executable
+		return executable
+	}
+}
+
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
+		console.log('Describe debug adapter as inline')
+		
 		return new vscode.DebugAdapterInlineImplementation(new DebugSession(WorkspaceFileAccessor))
 	}
 }

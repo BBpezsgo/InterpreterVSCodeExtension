@@ -1,8 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { EventEmitter } from 'node:events'
 import * as Types from './types'
-import * as Settings from '../settings'
-const settings = Settings.Get()
+import * as Config from '../config'
 
 export declare interface IPC {
     on(event: 'closed', listener: (code: number | null) => void): this
@@ -43,12 +42,15 @@ export class IPC extends EventEmitter {
     }
 
     private SetupProcess(args: string[]): boolean {
-        if (!settings) {
-            console.error('No settings file')
+        const cmdPath = Config.GetExePath()
+
+        if (!cmdPath) {
+            console.error('No interpreter specified')
             return false
         }
 
-        this.Process = spawn(settings.path, args)
+        console.log(`Executing \"${cmdPath}\" with args ${args.join(', ')}`)
+        this.Process = spawn(cmdPath, args)
 
         if (!this.Process) {
             console.error('Failed to start child process')
