@@ -1,3 +1,10 @@
+export const Options: { LanguageServerMode: Config, DebugServerMode: Config } = Object.freeze({
+	LanguageServerMode: 'Debug',
+	DebugServerMode: 'Debug',
+})
+
+export type Config = 'Debug' | 'Release'
+
 export function GetNonce() {
 	let text = ''
 	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

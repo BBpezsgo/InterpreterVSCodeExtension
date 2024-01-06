@@ -9,11 +9,12 @@ import * as vscode from 'vscode'
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode'
 import { DebugSession } from './debugger-interface'
 import { FileAccessor } from './debugger-runtime'
+import * as Utils from '../utils'
 import * as Path from 'path'
 
 const runMode: 'external' | 'server' | 'inline' = 'external'
 
-const DebugAdapterServerExecutable = Path.join(__dirname, '..', '..', 'debug-server', 'Release', 'net7.0', 'DebugServer.exe')
+const DebugAdapterServerExecutable = Path.join(__dirname, '..', '..', 'debug-server', Utils.Options.DebugServerMode, 'net8.0', 'DebugServer.exe')
 
 export function Activate(context: vscode.ExtensionContext) {
 	console.log('Activating debugger ...')
