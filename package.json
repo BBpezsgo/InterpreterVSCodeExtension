@@ -276,8 +276,8 @@
 		"vscode:prepublish": "npm run build",
 		"watch": "tsc -w -p ./",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
-		"build": "call \"./build.bat\"",
-		"package": "vsce package --target win32-x64 --out BBCodeExtension.vsix"
+		"build": "tsc --project ./",
+		"package": "echo Bruh >LICENSE.txt && vsce package --target win32-x64 --out BBCodeExtension.vsix && del LICENSE.txt"
 	},
 	"devDependencies": {
 		"@types/node": "^18.13.0",

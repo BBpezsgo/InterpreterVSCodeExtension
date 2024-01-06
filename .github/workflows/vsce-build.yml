@@ -1,0 +1,47 @@
+name: VSCE Build
+
+on:
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+    
+jobs:
+
+  build:
+  
+    runs-on: windows-latest
+
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Building
+      run: |
+        npm install
+        npm run package
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Create tag
+      uses: EndBug/latest-tag@latest
+      with:
+        ref: ${{ steps.date.outputs.date }}
+
+    - name: Publish Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./BBCodeExtension.vsix
+        tag_name: ${{ steps.date.outputs.date }}
+        name: Release ${{ steps.date.outputs.date }}
+        fail_on_unmatched_files: true

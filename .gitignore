@@ -1,26 +1,15 @@
 /node_modules
-/language-server
+/package-lock.json
+
 /debug-server
 /interpreter
-/out
-/obj
-/bin
+/language-server
 
-/package-lock.json
-/out.log
-/icon.xcf
-/InterpreterVSCodeExtension.njsproj.user
+/bin
+/obj
+/out
+
+*.user
+*.lnk
+
 /BBCodeExtension.vsix
-/BBCodeInterpreter.deps.json
-/BBCodeInterpreter.dll
-/BBCodeInterpreter.exe
-/BBCodeInterpreter.pdb
-/BBCodeInterpreter.runtimeconfig.json
-/sampleWorkspace
-Data Utilities.deps.json
-Data Utilities.dll
-Data Utilities.exe
-Data Utilities.pdb
-Data Utilities.runtimeconfig.json
-output.bin
-output.txt

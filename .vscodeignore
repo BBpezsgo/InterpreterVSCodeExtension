@@ -3,14 +3,12 @@ src/**
 bin/**
 obj/**
 
-build.bat
-upload.bat
-InterpreterVSCodeExtension.njsproj
-InterpreterVSCodeExtension.njsproj.user
-.gitignore
-tsconfig.json
-BBCodeExtension.vsix
-tslint.json
-
 **/*.map
 **/*.ts
+
+*.njsproj
+*.njsproj.user
+.gitignore
+
+tsconfig.json
+BBCodeExtension.vsix
