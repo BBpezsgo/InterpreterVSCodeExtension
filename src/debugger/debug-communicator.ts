@@ -150,12 +150,12 @@ export class Debugger extends EventEmitter {
 	public async Start(path: string | undefined = undefined): Promise<void> {
 		if (this.processInterpreter.IsRunning() === false)
 		{
-			this.processInterpreter.Start(
-			'--debug',
-			'--throw-errors',
-			'--no-pause',
-			`"${path}"`,
-			)
+			await this.processInterpreter.Start(
+					'--debug',
+					'--throw-errors',
+					'--no-pause',
+					`"${path}"`,
+				)
 		}
 		
 		this.getCodeTimeout = setTimeout(() => {

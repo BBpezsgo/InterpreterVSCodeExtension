@@ -1,7 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { EventEmitter } from 'node:events'
 import * as Types from './types'
-import * as Config from '../config'
+import * as ExecutionProvider from '../execution-provider'
 
 export declare interface IPC {
     on(event: 'closed', listener: (code: number | null) => void): this
@@ -35,14 +35,15 @@ export class IPC extends EventEmitter {
         this.waitForResponses = new Map<string, ResponseCallback>()
     }
 
-    public Start(...args: string[]) {
+    public async Start(...args: string[]) {
         console.log(`IPC.Start(${args.join(', ')})`)
-        if (!this.SetupProcess(args)) return
+        const setupResult = await this.SetupProcess(args)
+        if (!setupResult) return
         this.outMessages = []
     }
 
-    private SetupProcess(args: string[]): boolean {
-        const cmdPath = Config.GetExePath()
+    private async SetupProcess(args: string[]): Promise<boolean> {
+        const cmdPath = await ExecutionProvider.Get()
 
         if (!cmdPath) {
             console.error('No interpreter specified')

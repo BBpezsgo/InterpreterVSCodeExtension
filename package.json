@@ -280,6 +280,7 @@
 		"package": "echo Bruh >LICENSE.txt && vsce package --target win32-x64 --out BBCodeExtension.vsix && del LICENSE.txt"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^20.10.6",
 		"@types/path-browserify": "^1.0.2",
 		"@types/vscode": "^1.85.0",
@@ -296,9 +297,12 @@
 		"vsce": "^2.7.0"
 	},
 	"dependencies": {
+		"@types/adm-zip": "^0.5.5",
 		"@vscode/codicons": "^0.0.35",
 		"@vscode/debugadapter": "^1.64.0",
 		"@vscode/debugprotocol": "^1.59.0",
+		"adm-zip": "^0.5.10",
+		"fs-extra": "^11.2.0",
 		"handlebars": "^4.7.8",
 		"vscode-languageclient": "^9.0.1"
 	},

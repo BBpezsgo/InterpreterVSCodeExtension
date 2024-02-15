@@ -1,9 +1,9 @@
-import * as Config from './config'
+import * as ExecutionProvider from './execution-provider'
 import * as vscode from 'vscode'
 
 export function Activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
-		vscode.commands.registerCommand('bbc.runBbcFile', args => {
+		vscode.commands.registerCommand('bbc.runBbcFile', async args => {
 			const filepath = GetFilePath(args)
 
 			if (!filepath) {
@@ -11,7 +11,7 @@ export function Activate(context: vscode.ExtensionContext) {
 				return
 			}
 
-			const cmdPath = Config.GetExePath()
+			const cmdPath = await ExecutionProvider.Get()
 			if (!cmdPath) { return }
 
 			const terminal = vscode.window.createTerminal({
