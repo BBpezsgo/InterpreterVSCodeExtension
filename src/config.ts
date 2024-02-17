@@ -6,10 +6,17 @@ import * as Utils from './utils'
 const ExtensionConfigName = "bbcodeServer"
 
 export const InterpreterUpdateOptions: Updater.UpdateOptions = {
-	GithubUsername: 'BBpezsgo',
-	GithubRepository: 'Interpreter',
-	GithubAssetName: 'Windows_x64_RuntimeIndependent.zip',
-	LocalPath: Path.join(__dirname, 'interpreter')
+    GithubUsername: 'BBpezsgo',
+    GithubRepository: 'Interpreter',
+    GithubAssetName: 'Windows_x64_RuntimeIndependent.zip',
+    LocalPath: Path.join(__dirname, 'interpreter')
+}
+
+export const LanguageServerUpdateOptions: Updater.UpdateOptions = {
+    GithubUsername: 'BBpezsgo',
+    GithubRepository: 'Interpreter',
+    GithubAssetName: 'LanguageServer_Windows_x64_RuntimeIndependent.zip',
+    LocalPath: Path.join(__dirname, 'language-server')
 }
 
 /**
@@ -41,11 +48,20 @@ export function GetConfig() {
     }
 }
 
-export function GoToConfig(config: string) {    
+export function GoToConfig(config: string) {
     const searchPath = `${ExtensionConfigName}.${config}`
     VSCode.commands.executeCommand('workbench.action.openSettings', searchPath)
 }
 
 export const DebugAdapterServerExecutable = (() => {
     return Path.join(__dirname, '..', 'debug-server', Utils.Options.DebugServerMode, 'net8.0', 'DebugServer.exe')
+})()
+
+export const LanguageServerExecutable = (() => {
+    if (false) {
+        return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\Release\\net8.0\\publish\\BBCodeLanguageServer.exe`
+        return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\${Utils.Options.LanguageServerMode}\\net8.0\\BBCodeLanguageServer.exe`
+    } else {
+        return Path.join(__dirname, 'language-server', 'BBCodeLanguageServer.exe')
+    }
 })()

@@ -25,13 +25,13 @@ export async function Get() {
     if (fs.existsSync(downloaded)) {
         return downloaded
     }
-    
+
     const ButtonTexts = {
         ShowSettings: 'Update Path',
         UseDefault: 'Use Default',
         Download: 'Download',
     } as const
-    const buttons: string[] = [ ButtonTexts.ShowSettings, ButtonTexts.Download ]
+    const buttons: string[] = [ButtonTexts.ShowSettings, ButtonTexts.Download]
 
     if (fs.existsSync(defaultCmdPath)) {
         buttons.push(ButtonTexts.UseDefault)
@@ -45,8 +45,7 @@ export async function Get() {
             break
 
         case ButtonTexts.UseDefault:
-            if (fs.existsSync(defaultCmdPath))
-            { return defaultCmdPath }
+            if (fs.existsSync(defaultCmdPath)) { return defaultCmdPath }
 
             break
 
@@ -64,8 +63,7 @@ export async function Get() {
                     )
                 })
 
-            if (fs.existsSync(downloaded))
-            { return downloaded }
+            if (fs.existsSync(downloaded)) { return downloaded }
 
             break
 

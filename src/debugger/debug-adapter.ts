@@ -48,11 +48,11 @@ args.forEach(function (val, index, array) {
 if (port > 0) {
 
 	// start a server that creates a new session for every connection request
-	console.log(`Waiting for debug protocol on port ${port}`)
+	console.log(`[DebugAdapter]: Waiting for debug protocol on port ${port}`)
 	Net.createServer((socket) => {
-		console.log('>> Accepted connection from client')
+		console.log('[DebugAdapter]: >> Accepted connection from client')
 		socket.on('end', () => {
-			console.warn('>> Client connection closed\n')
+			console.warn('[DebugAdapter]: >> Client connection closed\n')
 		})
 		const session = new DebugSession(FsAccessor)
 		session.setRunAsServer(true)

@@ -86,7 +86,7 @@ export class Debugger extends EventEmitter {
 		return new Promise((resolve, reject) => {
 			const timeout = setTimeout(() => {
 				if (this._waitForStatus.has(id)) this._waitForStatus.delete(id)
-				console.warn('Debugger: timeout')
+				console.warn('[DebugAdapter]: Timeout')
 				reject(`Debugger timed out (${timeoutMs} ms)`)
 			}, timeoutMs)
 			this._waitForStatus.set(id, () => {

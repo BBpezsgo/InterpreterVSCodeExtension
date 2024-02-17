@@ -16,7 +16,7 @@ import * as Utils from '../utils'
 const runMode: 'external' | 'server' | 'inline' = 'external'
 
 export function Activate(context: vscode.ExtensionContext) {
-	console.log('Activating debugger ...')
+	console.log('[DebugAdapter]: Activating debugger ...')
 	
 	const provider = new ConfigurationProvider()
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bbcode', provider))
@@ -26,12 +26,12 @@ export function Activate(context: vscode.ExtensionContext) {
 		case 'server':
 			throw new Error('Not implemented')
 		case 'inline':
-			console.log('Configuring debugger as inline')
+			console.log('[DebugAdapter]: Configuring debugger as inline')
 			factory = new InlineDebugAdapterFactory()
 			break
 		case 'external':
 		default:
-			console.log('Configuring debugger as external')
+			console.log('[DebugAdapter]: Configuring debugger as external')
 			factory = new DebugAdapterExecutableFactory()
 			break
 		}
@@ -47,7 +47,7 @@ export function Activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('bbcode.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
-			console.log('Try to start debugging ...')
+			console.log('[DebugAdapter]: Try to start debugging ...')
 
 			const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
 			if (!targetResource) {
@@ -55,11 +55,11 @@ export function Activate(context: vscode.ExtensionContext) {
 				return
 			}
 
-			console.log('Resource:', targetResource)
+			console.log('[DebugAdapter]: Resource:', targetResource)
 
 			const workspaceFolder = vscode.workspace.getWorkspaceFolder(targetResource)
 
-			console.log('Start debuging ...')
+			console.log('[DebugAdapter]: Start debuging ...')
 			vscode.debug.startDebugging(workspaceFolder, {
 				type: 'bbcode',
 				name: 'Debug Editor Contents',
@@ -71,9 +71,9 @@ export function Activate(context: vscode.ExtensionContext) {
 				if (!result) {
 					vscode.window.showErrorMessage('Failed to start debugging')
 				}
-				console.log('Debugging started:', result)
+				console.log('[DebugAdapter]: Debugging started:', result)
 			}, error => {
-				console.error(error)
+				console.error('[DebugAdapter]:', error)
 			})
 		})
 	)
@@ -82,7 +82,7 @@ export function Activate(context: vscode.ExtensionContext) {
 		console.log(e)
 	})
 
-	console.log('Debugger activated')
+	console.log('[DebugAdapter]: Debugger activated')
 }
 
 class ConfigurationProvider implements vscode.DebugConfigurationProvider {
@@ -105,7 +105,7 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 			})
 		}
 
-		console.log('Debug configuration:', config)
+		console.log('[DebugAdapter]: Debug configuration:', config)
 
 		return config
 	}
@@ -131,7 +131,7 @@ const WorkspaceFileAccessor: FileAccessor = {
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
 	createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
 		if (!fs.existsSync(Config.DebugAdapterServerExecutable)) {
-			console.error(`Debug server \"${Config.DebugAdapterServerExecutable}\" not found`)
+			console.error(`[DebugAdapter]: Debug server \"${Config.DebugAdapterServerExecutable}\" not found`)
 		}
 
 		const command = Config.DebugAdapterServerExecutable
@@ -143,7 +143,7 @@ class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFact
 		}
 		executable = new vscode.DebugAdapterExecutable(command, args, options)
 
-		console.log('Describe debug adapter as external', executable)
+		console.log('[DebugAdapter]: Describe debug adapter as external', executable)
 
 		// make VS Code launch the DA executable
 		return executable
@@ -152,7 +152,7 @@ class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFact
 
 class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
 	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
-		console.log('Describe debug adapter as inline')
+		console.log('[DebugAdapter]: Describe debug adapter as inline')
 		
 		return new vscode.DebugAdapterInlineImplementation(new DebugSession(WorkspaceFileAccessor))
 	}
