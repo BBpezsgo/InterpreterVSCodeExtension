@@ -9,12 +9,11 @@ import * as vscode from 'vscode'
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode'
 import { DebugSession } from './debugger-interface'
 import { FileAccessor } from './debugger-runtime'
+import * as Config from '../config'
+import * as fs from 'fs'
 import * as Utils from '../utils'
-import * as Path from 'path'
 
 const runMode: 'external' | 'server' | 'inline' = 'external'
-
-const DebugAdapterServerExecutable = Path.join(__dirname, '..', '..', 'debug-server', Utils.Options.DebugServerMode, 'net8.0', 'DebugServer.exe')
 
 export function Activate(context: vscode.ExtensionContext) {
 	console.log('Activating debugger ...')
@@ -30,7 +29,8 @@ export function Activate(context: vscode.ExtensionContext) {
 			console.log('Configuring debugger as inline')
 			factory = new InlineDebugAdapterFactory()
 			break
-		case 'external': default:
+		case 'external':
+		default:
 			console.log('Configuring debugger as external')
 			factory = new DebugAdapterExecutableFactory()
 			break
@@ -38,7 +38,9 @@ export function Activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bbcode', factory))
 	
-	if ('dispose' in factory && typeof factory.dispose === 'function' && factory.dispose instanceof Function) {
+	if ('dispose' in factory &&
+		typeof factory.dispose === 'function' &&
+		factory.dispose instanceof Function) {
 		// @ts-ignore
 		context.subscriptions.push(factory)
 	}
@@ -55,10 +57,12 @@ export function Activate(context: vscode.ExtensionContext) {
 
 			console.log('Resource:', targetResource)
 
+			const workspaceFolder = vscode.workspace.getWorkspaceFolder(targetResource)
+
 			console.log('Start debuging ...')
-			vscode.debug.startDebugging(undefined, {
+			vscode.debug.startDebugging(workspaceFolder, {
 				type: 'bbcode',
-				name: 'Debug File',
+				name: 'Debug Editor Contents',
 				request: 'launch',
 				program: targetResource.fsPath,
 				stopOnEntry: true,
@@ -67,7 +71,7 @@ export function Activate(context: vscode.ExtensionContext) {
 				if (!result) {
 					vscode.window.showErrorMessage('Failed to start debugging')
 				}
-				console.log('Debugging started', result)
+				console.log('Debugging started:', result)
 			}, error => {
 				console.error(error)
 			})
@@ -112,37 +116,32 @@ const WorkspaceFileAccessor: FileAccessor = {
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri
 		try {
-			uri = PathToUri(path)
+			uri = Utils.PathToUri(path)
 		} catch (e) {
-			return new TextEncoder().encode(`cannot read '${path}'`)
+			return new TextEncoder().encode(`Cannot read \"${path}\"`)
 		}
 
 		return await vscode.workspace.fs.readFile(uri)
 	},
 	async writeFile(path: string, contents: Uint8Array) {
-		await vscode.workspace.fs.writeFile(PathToUri(path), contents)
-	}
-}
-
-function PathToUri(path: string) {
-	try
-	{ return vscode.Uri.file(path) }
-	catch (error)
-	{ return vscode.Uri.parse(path) }
+		await vscode.workspace.fs.writeFile(Utils.PathToUri(path), contents)
+	},
 }
 
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
 	createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
-		if (!executable) {
-			const command = DebugAdapterServerExecutable
-			const args = [
-				
-			]
-			const options: vscode.DebugAdapterExecutableOptions = {
-				
-			}
-			executable = new vscode.DebugAdapterExecutable(command, args, options)
+		if (!fs.existsSync(Config.DebugAdapterServerExecutable)) {
+			console.error(`Debug server \"${Config.DebugAdapterServerExecutable}\" not found`)
 		}
+
+		const command = Config.DebugAdapterServerExecutable
+		const args = [
+			
+		]
+		const options: vscode.DebugAdapterExecutableOptions = {
+			
+		}
+		executable = new vscode.DebugAdapterExecutable(command, args, options)
 
 		console.log('Describe debug adapter as external', executable)
 

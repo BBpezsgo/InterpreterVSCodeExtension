@@ -1,6 +1,7 @@
 import * as VSCode from 'vscode'
 import * as Path from 'path'
 import * as Updater from './updater'
+import * as Utils from './utils'
 
 const ExtensionConfigName = "bbcodeServer"
 
@@ -44,3 +45,7 @@ export function GoToConfig(config: string) {
     const searchPath = `${ExtensionConfigName}.${config}`
     VSCode.commands.executeCommand('workbench.action.openSettings', searchPath)
 }
+
+export const DebugAdapterServerExecutable = (() => {
+    return Path.join(__dirname, '..', 'debug-server', Utils.Options.DebugServerMode, 'net8.0', 'DebugServer.exe')
+})()

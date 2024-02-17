@@ -1,19 +1,25 @@
 import * as fsExtra from 'fs-extra'
 import * as path from 'path'
+import * as vscode from 'vscode'
 import * as fs from 'fs'
 
-export const Options: { LanguageServerMode: Config, DebugServerMode: Config } = Object.freeze({
+export const Options = {
     LanguageServerMode: 'Debug',
     DebugServerMode: 'Debug',
-})
-
-export type Config = 'Debug' | 'Release'
+} as const
 
 export function GetNonce(length: number = 32) {
     let text = ''
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
     return text
+}
+
+export function PathToUri(path: string) {
+	try
+	{ return vscode.Uri.file(path) }
+	catch (error)
+	{ return vscode.Uri.parse(path) }
 }
 
 export function IsModuleExists(module: string) {
