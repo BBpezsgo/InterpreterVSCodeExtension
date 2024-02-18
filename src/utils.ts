@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 
 export const Options = {
-    LanguageServerMode: 'Release',
+    LanguageServerMode: 'Debug',
     DebugServerMode: 'Debug',
 } as const
 

@@ -21,16 +21,25 @@
 			"include": "#number"
 		},
 		{
-			"include": "#struct-def"
+			"include": "#builtin-function"
 		},
 		{
-			"include": "#class-def"
+			"include": "#struct-definition"
 		},
 		{
-			"include": "#enum-def"
+			"include": "#class-definition"
+		},
+		{
+			"include": "#enum-definition"
 		},
 		{
 			"include": "#macro-definition"
+		},
+		{
+			"include": "#variable-definition"
+		},
+		{
+			"include": "#keyword"
 		},
 		{
 			"include": "#function"
@@ -39,22 +48,13 @@
 			"include": "#using"
 		},
 		{
-			"include": "#var-def"
-		},
-		{
-			"include": "#new-struct"
+			"include": "#new-instance"
 		},
 		{
 			"include": "#statement"
 		},
 		{
 			"include": "#attribute"
-		},
-		{
-			"include": "#builtin-function"
-		},
-		{
-			"include": "#keyword"
 		}
 	],
 	"repository": {
@@ -173,7 +173,7 @@
 				}
 			]
 		},
-		"struct-def": {
+		"struct-definition": {
 			"match": "(struct)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
 				"1": {
@@ -184,7 +184,7 @@
 				}
 			}
 		},
-		"class-def": {
+		"class-definition": {
 			"match": "(class)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
 				"1": {
@@ -195,7 +195,7 @@
 				}
 			}
 		},
-		"enum-def": {
+		"enum-definition": {
 			"match": "(enum)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
 				"1": {
@@ -233,7 +233,7 @@
 				}
 			}
 		},
-		"new-struct": {
+		"new-instance": {
 			"match": "(new)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
 				"1": {
@@ -243,6 +243,32 @@
 					"name": "entity.name.class"
 				}
 			}
+		},
+		"variable-definition": {
+			"patterns": [
+				{
+					"match": "(int|char|byte|float)\\s+(\\w+)\\s+(?!\\()",
+					"captures": {
+						"1": {
+							"name": "entity.name.tag"
+						},
+						"2": {
+							"name": "entity.name.variable"
+						}
+					}
+				},
+				{
+					"match": "(\\w+\\b(?<!\\bexport|new|this|temp|enum|class|struct))\\s+(\\w+)\\s+(?!\\()",
+					"captures": {
+						"1": {
+							"name": "entity.name.type"
+						},
+						"2": {
+							"name": "entity.name.variable"
+						}
+					}
+				}
+			]
 		},
 		"attribute": {
 			"match": "\\s\\[\\s*(\\w+)\\s*(\\]|\\()",
