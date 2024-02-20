@@ -12,4 +12,3 @@
 *.lnk
 
 /BBCodeExtension.vsix
-/package-lock.json
