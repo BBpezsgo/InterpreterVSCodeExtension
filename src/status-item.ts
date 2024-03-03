@@ -7,7 +7,7 @@ export class StatusItem {
 
 	public static Create() {
 		if (StatusItem.Instance) return
-		StatusItem.Instance = VsCode.window.createStatusBarItem('bbcode.debug.statusitem', VsCode.StatusBarAlignment.Left, -1)
+		StatusItem.Instance = VsCode.window.createStatusBarItem('bblang.debug.statusitem', VsCode.StatusBarAlignment.Left, -1)
 	}
 
 	public static Show() { StatusItem.Instance.show() }

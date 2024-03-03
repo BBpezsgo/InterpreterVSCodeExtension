@@ -32,9 +32,8 @@ export enum OutputEventCategory {
 }
 
 /**
- * This interface describes the bbcode-debug specific launch attributes
  * (which are not part of the Debug Adapter Protocol).
- * The schema for these attributes lives in the package.json of the bbcode-debug extension.
+ * The schema for these attributes lives in the package.json of the extension.
  * The interface should always match this schema.
  */
 interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
@@ -72,7 +71,7 @@ export class DebugSession extends LoggingDebugSession {
 	public constructor(fileAccessor: FileAccessor) {
 		StatusItem.Create()
 		
-		super("bbcode-debug.txt")
+		super("bblang-debug.txt")
 
 		// this debugger uses zero-based lines and columns
 		this.setDebuggerLinesStartAt1(true)
@@ -687,6 +686,6 @@ export class DebugSession extends LoggingDebugSession {
 	}
 
 	private createSource(filePath: string): Source {
-		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'bbcode-adapter-data')
+		return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, 'bblang-adapter-data')
 	}
 }

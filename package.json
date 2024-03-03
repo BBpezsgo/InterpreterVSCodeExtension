@@ -1,9 +1,9 @@
 {
-	"name": "bb-code",
-	"description": "A VSCode extension to support some basic things in my BBCode programming language",
+	"name": "bblang",
+	"description": "A VSCode extension to support some basic things in my BBlang programming language",
 	"author": "BB",
-	"version": "0.0.1",
-	"displayName": "BBCode",
+	"version": "0.0.2404",
+	"displayName": "BBlang",
 	"private": true,
 	"preview": true,
 	"engines": {
@@ -15,7 +15,7 @@
 		"Snippets"
 	],
 	"pricing": "Free",
-	"publisher": "BB",
+	"publisher": "banszky",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/BBpezsgo/InterpreterVSCodeExtension"
@@ -24,15 +24,15 @@
 	"icon": "icons/extension.png",
 	"homepage": "https://github.com/BBpezsgo/InterpreterVSCodeExtension",
 	"galleryBanner": {
-		"color": "#cc0055",
+		"color": "#5c0f1c",
 		"theme": "dark"
 	},
 	"activationEvents": [
-		"onCommand:bbcode.debug.debugEditorContents",
+		"onCommand:bblang.debug.debugEditorContents",
 		"onLanguage:bbc",
 		"onDebug"
 	],
-	"main": "./out/extension",
+	"main": "./dist/extension",
 	"contributes": {
 		"configuration": {
 			"title": "BBCode configuration",
@@ -106,7 +106,7 @@
 		],
 		"commands": [
 			{
-				"command": "bbcode.debug.debugEditorContents",
+				"command": "bblang.debug.debugEditorContents",
 				"category": "BBCode",
 				"title": "Debug BBC File",
 				"shortTitle": "Debug File",
@@ -129,7 +129,7 @@
 		],
 		"debuggers": [
 			{
-				"type": "bbcode",
+				"type": "bblang",
 				"languages": [
 					"bbc"
 				],
@@ -211,7 +211,7 @@
 				},
 				"initialConfigurations": [
 					{
-						"type": "bbcode",
+						"type": "bblang",
 						"request": "launch",
 						"name": "Ask for file name",
 						"program": "${workspaceFolder}/${command:AskForProgramName}",
@@ -223,7 +223,7 @@
 						"label": "BBCode Debug: Launch",
 						"description": "A new configuration for 'debugging' a user selected file.",
 						"body": {
-							"type": "bbcode",
+							"type": "bblang",
 							"request": "launch",
 							"name": "Ask for file name",
 							"program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
@@ -250,13 +250,13 @@
 			],
 			"editor/title/run": [
 				{
-					"command": "bbcode.debug.debugEditorContents",
-					"group": "bbcode",
+					"command": "bblang.debug.debugEditorContents",
+					"group": "bblang",
 					"when": "resourceLangId == bbc && !isInDiffEditor"
 				},
 				{
 					"command": "bbc.runBbcFile",
-					"group": "bbcode",
+					"group": "bblang",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
 				}
 			]
@@ -267,17 +267,19 @@
 					"id": "bbcodeStack",
 					"name": "Stack",
 					"type": "tree",
-					"when": "debugType == bbcode && inDebugMode && false"
+					"when": "debugType == bblang && inDebugMode && false"
 				}
 			]
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run build",
 		"watch": "tsc -w -p ./",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
 		"build": "tsc --project ./",
-		"package": "echo Bruh >LICENSE.txt && vsce package --target win32-x64 --out BBCodeExtension.vsix && del LICENSE.txt"
+		"package": "echo Bruh >LICENSE.txt && npm run webpack && vsce package --target win32-x64 --out BBCodeExtension.vsix && del LICENSE.txt",
+		"webpack-dev": "webpack --mode development",
+		"webpack-watch": "webpack --mode development --watch",
+		"webpack": "webpack --mode production --devtool hidden-source-map"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
@@ -292,9 +294,12 @@
 		"base64-js": "^1.5.1",
 		"events": "^3.3.0",
 		"path-browserify": "^1.0.1",
+		"ts-loader": "^9.5.1",
 		"typescript": "^5.3.3",
 		"url": "^0.11.3",
-		"vsce": "^2.7.0"
+		"vsce": "^2.7.0",
+		"webpack": "^5.90.3",
+		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
 		"@types/adm-zip": "^0.5.5",
@@ -309,7 +314,7 @@
 	"capabilities": {
 		"virtualWorkspaces": {
 			"supported": false,
-			"description": "BBC runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
+			"description": "BBlang runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
 		}
 	}
 }

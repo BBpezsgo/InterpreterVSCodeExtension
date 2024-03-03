@@ -19,7 +19,7 @@ export function Activate(context: vscode.ExtensionContext) {
 	console.log('[DebugAdapter]: Activating debugger ...')
 	
 	const provider = new ConfigurationProvider()
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bbcode', provider))
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bblang', provider))
 
 	let factory: vscode.DebugAdapterDescriptorFactory
 	switch (runMode) {
@@ -36,7 +36,7 @@ export function Activate(context: vscode.ExtensionContext) {
 			break
 		}
 	
-	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bbcode', factory))
+	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bblang', factory))
 	
 	if ('dispose' in factory &&
 		typeof factory.dispose === 'function' &&
@@ -46,7 +46,7 @@ export function Activate(context: vscode.ExtensionContext) {
 	}
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('bbcode.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
+		vscode.commands.registerCommand('bblang.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
 			console.log('[DebugAdapter]: Try to start debugging ...')
 
 			const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
@@ -61,7 +61,7 @@ export function Activate(context: vscode.ExtensionContext) {
 
 			console.log('[DebugAdapter]: Start debuging ...')
 			vscode.debug.startDebugging(workspaceFolder, {
-				type: 'bbcode',
+				type: 'bblang',
 				name: 'Debug Editor Contents',
 				request: 'launch',
 				program: targetResource.fsPath,
@@ -91,7 +91,7 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor
 			if (editor && editor.document.languageId === 'bbc') {
-				config.type = 'bbcode'
+				config.type = 'bblang'
 				config.name = 'Launch'
 				config.request = 'launch'
 				config.program = '${file}'
