@@ -6,9 +6,10 @@ import * as FileExecutor from './file-executor'
 import * as Updater from './updater'
 import * as Config from './config'
 
-let client: LanguageClientManager | null = null
+export let client: LanguageClientManager | null = null
+const CheckForUpdates = false
 
-function ActivateLanguageClient(context: vscode.ExtensionContext) {
+export function ActivateLanguageClient(context: vscode.ExtensionContext) {
 	if (!fs.existsSync(Config.LanguageServerExecutable)) {
 		console.warn(`[LanguageService]: Language server not found at \"${Config.LanguageServerExecutable}\"`)
 		return
@@ -17,7 +18,7 @@ function ActivateLanguageClient(context: vscode.ExtensionContext) {
 	client = new LanguageClientManager(context, {
 		ServerPath: Config.LanguageServerExecutable,
 		Name: 'BBC Language Server',
-		ID: 'bbcodeServer',
+		ID: 'bblangServer',
 		DocumentSelector: ['**/*.bbc'],
 	})
 	client.Activate()
@@ -39,62 +40,64 @@ export function activate(context: vscode.ExtensionContext) {
 	tokenDebugButton.command = 'editor.action.inspectTMScopes'
 	tokenDebugButton.show()
 
-	Updater.CheckForUpdates(Config.InterpreterUpdateOptions)
-		.then(result => {
-			if (result === Updater.CheckForUpdatesResult.NewVersion) {
-				vscode.window.showInformationMessage('Update avaliable for the interpreter', 'Update', 'Shut up')
-					.then(value => {
-						if (value === 'Update') {
-							vscode.window.withProgress({
-								location: vscode.ProgressLocation.Notification,
-								cancellable: false,
-								title: 'Updating the interpreter',
-							}, (progress) => Updater.Update(Config.InterpreterUpdateOptions, progress, () => {
-								return fs.existsSync(Path.join(Config.InterpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe'))
-							})).then(() => { }, (reason) => vscode.window.showErrorMessage(`Failed to update the interpreter: ${reason}`))
-						}
-					})
-			}
-		})
-		.catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
+	if (CheckForUpdates) {
+		Updater.CheckForUpdates(Config.InterpreterUpdateOptions)
+			.then(result => {
+				if (result === Updater.CheckForUpdatesResult.NewVersion) {
+					vscode.window.showInformationMessage('Update avaliable for the interpreter', 'Update', 'Shut up')
+						.then(value => {
+							if (value === 'Update') {
+								vscode.window.withProgress({
+									location: vscode.ProgressLocation.Notification,
+									cancellable: false,
+									title: 'Updating the interpreter',
+								}, (progress) => Updater.Update(Config.InterpreterUpdateOptions, progress, () => {
+									return fs.existsSync(Path.join(Config.InterpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe'))
+								})).then(() => { }, (reason) => vscode.window.showErrorMessage(`Failed to update the interpreter: ${reason}`))
+							}
+						})
+				}
+			})
+			.catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
 
-	Updater.CheckForUpdates(Config.LanguageServerUpdateOptions)
-		.then(result => {
-			if (result === Updater.CheckForUpdatesResult.NewVersion) {
-				vscode.window.showInformationMessage('Update avaliable for the language server', 'Update', 'Shut up')
-					.then(value => {
-						if (value === 'Update') {
-							client?.Deactivate()
-							client = null
+		Updater.CheckForUpdates(Config.LanguageServerUpdateOptions)
+			.then(result => {
+				if (result === Updater.CheckForUpdatesResult.NewVersion) {
+					vscode.window.showInformationMessage('Update avaliable for the language server', 'Update', 'Shut up')
+						.then(value => {
+							if (value === 'Update') {
+								client?.Deactivate()
+								client = null
 
-							vscode.window.withProgress({
-								location: vscode.ProgressLocation.Notification,
-								cancellable: false,
-								title: 'Updating the language server',
-							}, (progress) => Updater.Update(Config.LanguageServerUpdateOptions, progress, () => {
-								return fs.existsSync(Config.LanguageServerExecutable)
-							})).then(() => ActivateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to update the language server: ${reason}`))
-						}
-					})
-			} else if (result === Updater.CheckForUpdatesResult.Nonexistent) {
-				vscode.window.showWarningMessage('Language server does not exists', 'Download', 'Shut up')
-					.then(value => {
-						if (value === 'Download') {
-							client?.Deactivate()
-							client = null
+								vscode.window.withProgress({
+									location: vscode.ProgressLocation.Notification,
+									cancellable: false,
+									title: 'Updating the language server',
+								}, (progress) => Updater.Update(Config.LanguageServerUpdateOptions, progress, () => {
+									return fs.existsSync(Config.LanguageServerExecutable)
+								})).then(() => ActivateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to update the language server: ${reason}`))
+							}
+						})
+				} else if (result === Updater.CheckForUpdatesResult.Nonexistent) {
+					vscode.window.showWarningMessage('Language server does not exists', 'Download', 'Shut up')
+						.then(value => {
+							if (value === 'Download') {
+								client?.Deactivate()
+								client = null
 
-							vscode.window.withProgress({
-								location: vscode.ProgressLocation.Notification,
-								cancellable: false,
-								title: 'Downloading the language server',
-							}, (progress) => Updater.Update(Config.LanguageServerUpdateOptions, progress, () => {
-								return fs.existsSync(Config.LanguageServerExecutable)
-							})).then(() => ActivateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to download the language server: ${reason}`))
-						}
-					})
-			}
-		})
-		.catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
+								vscode.window.withProgress({
+									location: vscode.ProgressLocation.Notification,
+									cancellable: false,
+									title: 'Downloading the language server',
+								}, (progress) => Updater.Update(Config.LanguageServerUpdateOptions, progress, () => {
+									return fs.existsSync(Config.LanguageServerExecutable)
+								})).then(() => ActivateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to download the language server: ${reason}`))
+							}
+						})
+				}
+			})
+			.catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
+	}
 }
 
 export function deactivate() { return client?.Deactivate() }

@@ -8,6 +8,7 @@
 debug-server/**
 language-server/**
 .vscode/**
+.vscode-test/**
 src/**
 bin/**
 obj/**

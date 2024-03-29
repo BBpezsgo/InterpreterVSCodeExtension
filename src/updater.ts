@@ -103,7 +103,7 @@ export async function Update(options: UpdateOptions, progress: vscode.Progress<{
     })
 
     progress?.report({ message: 'Wait 1 sec', increment: -100 })
-    await (() => { return new Promise(resolve => setTimeout(resolve, 1000)) })()
+    await Utils.Sleep(1000)
 
     progress?.report({ message: 'Extracting' })
     const zip = new AdmZip(downloadToFile)

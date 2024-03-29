@@ -8,7 +8,6 @@ import { Debugger } from './debug-communicator'
 import { DebugInfo } from './types'
 import { StatusItem } from '../status-item'
 import { OutputEventCategory } from './debugger-interface'
-import { StackView } from '../testView'
 import * as vscode from 'vscode'
 
 export type Event =
@@ -83,10 +82,6 @@ export class RuntimeVariable {
 		this._memory = memory
 		this._value = new TextDecoder().decode(memory)
 	}
-}
-
-export function timeout(ms: number) {
-	return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 /**
@@ -246,12 +241,10 @@ export class DebugRuntime extends EventEmitter {
 		await this.ExecuteBaseInstructions()
 		while (this._debugger.IsRunningCode) {
 			if (this.ThereIsBreakpoint()) {
-				this.UpdateStackView()
 				this.SendEvent('stopOnStep')
 				break
 			} else {
 				await this._debugger.ExecuteNext()
-				this.UpdateStackView()
 				this.SendEvent('stopOnStep')
 			}
 		}
@@ -265,7 +258,6 @@ export class DebugRuntime extends EventEmitter {
 		await this.ExecuteBaseInstructions()
 		if (instruction) {
 			await this._debugger.ExecuteNext()
-			this.UpdateStackView()
 			this.SendEvent('stopOnStep')
 		} else {
 			await this.ExecuteNextLine()
@@ -276,7 +268,6 @@ export class DebugRuntime extends EventEmitter {
 	private async ExecuteBaseInstructions() {
 		while (this._debugger.State === 'DisposeGlobalVariables' || this._debugger.State === 'SetGlobalVariables') {
 			await this._debugger.ExecuteNext()
-			this.UpdateStackView()
 		}
 	}
 
@@ -284,20 +275,6 @@ export class DebugRuntime extends EventEmitter {
 		this._debugger.SendAsync('debug/step')
 			.then(() => this.SendEvent('stopOnStep'))
 			.catch(error => console.error(error))
-	}
-
-	private UpdateStackView() {
-		StackView.Instance.List.splice(0)
-		if (this._debugger.Stack) for (let i = 0; i < this._debugger.Stack.length; i++) {
-			const dataItem = this._debugger.Stack[i]
-			StackView.Instance.List.push({
-				"label": dataItem.Value,
-				"description": dataItem.Tag,
-				"tooltip": null,
-				"icon": null,
-			})
-		}
-		StackView.Instance.refresh()
 	}
 
 	private InstructionToDebugInfo(instruction: number): DebugInfo | null {

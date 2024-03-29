@@ -3,7 +3,7 @@ import * as Path from 'path'
 import * as Updater from './updater'
 import * as Utils from './utils'
 
-const ExtensionConfigName = "bbcodeServer"
+const ExtensionConfigName = "bblangServer"
 
 export const InterpreterUpdateOptions: Updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
@@ -59,7 +59,7 @@ export const DebugAdapterServerExecutable = (() => {
 
 export const LanguageServerExecutable = (() => {
     if (true) {
-        return Path.join(__dirname, 'language-server', Utils.Options.LanguageServerMode, 'net8.0', 'BBCodeLanguageServer.exe')
+        return Path.join(__dirname, '..', 'language-server', Utils.Options.LanguageServerMode, 'net8.0', 'BBCodeLanguageServer.exe')
         // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\Release\\net8.0\\publish\\BBCodeLanguageServer.exe`
         // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\${Utils.Options.LanguageServerMode}\\net8.0\\BBCodeLanguageServer.exe`
     } else {

@@ -8,6 +8,7 @@
 /obj
 /out
 /dist
+/.vscode-test
 
 *.user
 *.lnk

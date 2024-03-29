@@ -10,7 +10,6 @@
 		"vscode": "^1.85.0"
 	},
 	"categories": [
-		"Other",
 		"Programming Languages",
 		"Snippets"
 	],
@@ -32,18 +31,18 @@
 		"onLanguage:bbc",
 		"onDebug"
 	],
-	"main": "./dist/extension",
+	"main": "./out/extension",
 	"contributes": {
 		"configuration": {
-			"title": "BBCode configuration",
+			"title": "BBlang configuration",
 			"type": "object",
 			"properties": {
-				"bbcodeServer.maxNumberOfProblems": {
+				"bblangServer.maxNumberOfProblems": {
 					"type": "number",
 					"default": 100,
 					"description": "Controls the maximum number of problems produced by the server"
 				},
-				"bbcodeServer.trace.server": {
+				"bblangServer.trace.server": {
 					"type": "string",
 					"enum": [
 						"off",
@@ -53,7 +52,7 @@
 					"default": "off",
 					"description": "Traces the communication between VSCode and the language server service"
 				},
-				"bbcodeServer.runBbcIn": {
+				"bblangServer.runBbcIn": {
 					"type": "string",
 					"enum": [
 						"Terminal",
@@ -67,7 +66,7 @@
 					"description": "Where to execute the file",
 					"scope": "resource"
 				},
-				"bbcodeServer.cmdPath": {
+				"bblangServer.cmdPath": {
 					"type": "string",
 					"description": "Path to the interpreter",
 					"scope": "machine"
@@ -78,7 +77,7 @@
 			{
 				"id": "bbc",
 				"aliases": [
-					"BBCode",
+					"BBlang",
 					"bbc"
 				],
 				"extensions": [
@@ -89,6 +88,15 @@
 					"dark": "./icons/files/bbc.svg",
 					"light": "./icons/files/bbc.svg"
 				}
+			},
+			{
+				"id": "bbc-test-result",
+				"aliases": [
+					"bbc-test-result"
+				],
+				"extensions": [
+					".result"
+				]
 			}
 		],
 		"grammars": [
@@ -96,6 +104,11 @@
 				"language": "bbc",
 				"scopeName": "source.bbc",
 				"path": "./syntax/bbc.json"
+			},
+			{
+				"language": "bbc-test-result",
+				"scopeName": "source.result",
+				"path": "./syntax/bbc-test-result.json"
 			}
 		],
 		"snippets": [
@@ -107,15 +120,15 @@
 		"commands": [
 			{
 				"command": "bblang.debug.debugEditorContents",
-				"category": "BBCode",
+				"category": "BBlang",
 				"title": "Debug BBC File",
 				"shortTitle": "Debug File",
 				"enablement": "!inDebugMode",
 				"icon": "$(debug-alt)"
 			},
 			{
-				"command": "bbc.runBbcFile",
-				"category": "BBCode",
+				"command": "bblang.executeFile",
+				"category": "BBlang",
 				"title": "Run BBC File",
 				"shortTitle": "Run File",
 				"icon": "$(run)",
@@ -133,7 +146,7 @@
 				"languages": [
 					"bbc"
 				],
-				"label": "BBCode Debug",
+				"label": "BBlang Debug",
 				"program": "C:/Users/bazsi/Documents/GitHub/InterpreterVSCodeExtension/debug-server/Release/net7.0/DebugServer.exe",
 				"configurationAttributes": {
 					"launch": {
@@ -220,7 +233,7 @@
 				],
 				"configurationSnippets": [
 					{
-						"label": "BBCode Debug: Launch",
+						"label": "BBlang Debug: Launch",
 						"description": "A new configuration for 'debugging' a user selected file.",
 						"body": {
 							"type": "bblang",
@@ -236,15 +249,15 @@
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "bbc.runBbcFile",
-					"group": "bbc",
+					"command": "bblang.executeFile",
+					"group": "bblang",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "bbc.runBbcFile",
-					"group": "bbc",
+					"command": "bblang.executeFile",
+					"group": "bblang",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				}
 			],
@@ -255,19 +268,9 @@
 					"when": "resourceLangId == bbc && !isInDiffEditor"
 				},
 				{
-					"command": "bbc.runBbcFile",
+					"command": "bblang.executeFile",
 					"group": "bblang",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
-				}
-			]
-		},
-		"views": {
-			"debug": [
-				{
-					"id": "bbcodeStack",
-					"name": "Stack",
-					"type": "tree",
-					"when": "debugType == bblang && inDebugMode && false"
 				}
 			]
 		}
@@ -275,11 +278,13 @@
 	"scripts": {
 		"watch": "tsc -w -p ./",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
-		"build": "tsc --project ./",
+		"compile": "tsc --project ./",
 		"package": "echo Bruh >LICENSE.txt && npm run webpack && vsce package --target win32-x64 --out BBCodeExtension.vsix && del LICENSE.txt",
 		"webpack-dev": "webpack --mode development",
 		"webpack-watch": "webpack --mode development --watch",
-		"webpack": "webpack --mode production --devtool hidden-source-map"
+		"webpack": "webpack --mode production --devtool hidden-source-map",
+		"pretest": "npm run compile",
+		"test": "vscode-test"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
@@ -289,6 +294,8 @@
 		"@types/vscode-webview": "^1.57.4",
 		"@vscode/debugadapter": "^1.64.0",
 		"@vscode/debugadapter-testsupport": "^1.64.0",
+		"@vscode/test-cli": "^0.0.8",
+		"@vscode/test-electron": "^2.3.9",
 		"@vscode/vsce": "^2.22.0",
 		"await-notify": "^1.0.1",
 		"base64-js": "^1.5.1",

@@ -8,6 +8,10 @@ export const Options = {
     DebugServerMode: 'Debug',
 } as const
 
+export function Sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 500))
+}
+
 export function GetNonce(length: number = 32) {
     let text = ''
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

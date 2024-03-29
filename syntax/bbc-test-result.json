@@ -1,0 +1,48 @@
+{
+	"scopeName": "source.result",
+	"fileTypes": [
+		"bbc-test-result"
+	],
+	"name": "BBC Test Result Language",
+	"patterns": [
+		{
+			"include": "#hash"
+		}
+	],
+	"repository": {
+		"hash": {
+			"patterns": [
+				{
+					"match": "(#[a-zA-Z]*)\\s *([a-zA-Z]+)",
+					"captures": {
+						"1": {
+							"name": "constant.language"
+						},
+						"2": {
+							"name": "entity.name.variable"
+						}
+					}
+				},
+				{
+					"match": "(#[a-zA-Z]*)\\s *([0-9]+)",
+					"captures": {
+						"1": {
+							"name": "constant.language"
+						},
+						"2": {
+							"name": "constant.numeric"
+						}
+					}
+				},
+				{
+					"match": "(#[a-zA-Z]*)",
+					"captures": {
+						"1": {
+							"name": "constant.language"
+						}
+					}
+				}
+			]
+		}
+	}
+}

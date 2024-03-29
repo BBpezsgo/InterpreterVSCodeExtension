@@ -11,14 +11,14 @@
 		"noImplicitReturns": true,
 		"noImplicitAny": false,
 		"removeComments": false,
-		"noUnusedLocals": true,
+		"noUnusedLocals": false,
 		"noImplicitThis": true,
 		"inlineSourceMap": false,
 		"preserveConstEnums": true,
 		"strictNullChecks": true,
 		"noUnusedParameters": false
 	},
-	"exclude": [
-		"node_modules"
+	"include": [
+		"src"
 	]
 }

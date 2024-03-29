@@ -23,6 +23,8 @@ export class LanguageClientManager {
     constructor(context: vscode.ExtensionContext, options: LanguageClientManagerOptions) {
         const commandOptions: ExecutableOptions = { detached: false }
 
+        console.log(`[LanguageClient]: Server is at "${options.ServerPath}"`)
+
         this.serverOptions =
         {
             command: options.ServerPath,
@@ -33,7 +35,7 @@ export class LanguageClientManager {
         const clientOptions: LanguageClientOptions = {
             documentSelector: options.DocumentSelector.map(v => { return { pattern: v } }),
             synchronize: {
-                configurationSection: 'bbcodeServer',
+                configurationSection: 'bblangServer',
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
             }
         }
