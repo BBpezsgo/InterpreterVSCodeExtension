@@ -3,8 +3,6 @@ import * as Path from 'path'
 import * as Updater from './updater'
 import * as Utils from './utils'
 
-const ExtensionConfigName = "bblangServer"
-
 export const InterpreterUpdateOptions: Updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
     GithubRepository: 'Interpreter',
@@ -33,7 +31,7 @@ function GetExtensionConfig(filepath?: string): VSCode.WorkspaceConfiguration {
         workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.window.activeTextEditor.document.uri) ?? null
     }
 
-    return VSCode.workspace.getConfiguration(ExtensionConfigName, workspaceFolder?.uri)
+    return VSCode.workspace.getConfiguration(Utils.ExtensionConfigName, workspaceFolder?.uri)
 }
 
 export function GetConfig() {
@@ -43,13 +41,13 @@ export function GetConfig() {
         trace: {
             server: config.get<'off' | 'messages' | 'verbose'>('trace.server') ?? 'off',
         },
-        runBbcIn: config.get<'Terminal' | 'External'>('runBbcIn') ?? 'Terminal',
+        ExecuteIn: config.get<'Terminal' | 'External'>('execute-in') ?? 'Terminal',
         cmdPath: config.get<string>('cmdPath') ?? null,
     }
 }
 
 export function GoToConfig(config: string) {
-    const searchPath = `${ExtensionConfigName}.${config}`
+    const searchPath = `${Utils.ExtensionConfigName}.${config}`
     VSCode.commands.executeCommand('workbench.action.openSettings', searchPath)
 }
 

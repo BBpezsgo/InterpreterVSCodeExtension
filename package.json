@@ -52,7 +52,7 @@
 					"default": "off",
 					"description": "Traces the communication between VSCode and the language server service"
 				},
-				"bblangServer.runBbcIn": {
+				"bblangServer.execute-in": {
 					"type": "string",
 					"enum": [
 						"Terminal",

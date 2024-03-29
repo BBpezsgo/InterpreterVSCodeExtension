@@ -9,6 +9,7 @@ export const Options = {
 } as const
 
 export const LanguageId = 'bblang'
+export const ExtensionConfigName = "bblangServer"
 
 export function Sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 500))
