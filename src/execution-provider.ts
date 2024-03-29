@@ -9,10 +9,6 @@ if (__dirname.endsWith(Path.sep + 'out') || __dirname.endsWith(Path.sep + 'out' 
     defaultCmdPath = Path.join(__dirname, '..', 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
 }
 
-/**
- * Get the absolute path to 'BBCodeInterpreter.exe'  
- * Returns undefined if the file could not be located
- */
 export async function Get() {
     let cmdPath = Config.GetConfig().cmdPath
 

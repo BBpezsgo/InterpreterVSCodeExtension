@@ -8,6 +8,8 @@ export const Options = {
     DebugServerMode: 'Debug',
 } as const
 
+export const LanguageId = 'bblang'
+
 export function Sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 500))
 }

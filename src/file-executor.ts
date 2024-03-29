@@ -1,5 +1,6 @@
 import * as ExecutionProvider from './execution-provider'
 import * as vscode from 'vscode'
+import { LanguageId } from './utils'
 
 export async function Do(filepath: any, cmdPath: string | null = null, shellArgs: string[] | null = null) {
     if (!cmdPath)
@@ -22,7 +23,7 @@ export async function Do(filepath: any, cmdPath: string | null = null, shellArgs
 
 export function Activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('bblang.executeFile', async args => {
+        vscode.commands.registerCommand(`${LanguageId}.executeFile`, async args => {
             const filepath = GetFilePath(args)
 
             if (!filepath) {

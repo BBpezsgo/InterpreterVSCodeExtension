@@ -4,14 +4,11 @@
 
 'use strict'
 
-import { TextEncoder } from 'node:util'
 import * as vscode from 'vscode'
 import { WorkspaceFolder, DebugConfiguration, ProviderResult, CancellationToken } from 'vscode'
-import { DebugSession } from './debugger-interface'
-import { FileAccessor } from './debugger-runtime'
 import * as Config from '../config'
 import * as fs from 'fs'
-import * as Utils from '../utils'
+import { LanguageId } from '../utils'
 
 const runMode: 'external' | 'server' | 'inline' = 'external'
 
@@ -19,16 +16,14 @@ export function Activate(context: vscode.ExtensionContext) {
 	console.log('[DebugAdapter]: Activating debugger ...')
 	
 	const provider = new ConfigurationProvider()
-	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('bblang', provider))
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(LanguageId, provider))
 
 	let factory: vscode.DebugAdapterDescriptorFactory
 	switch (runMode) {
 		case 'server':
 			throw new Error('Not implemented')
 		case 'inline':
-			console.log('[DebugAdapter]: Configuring debugger as inline')
-			factory = new InlineDebugAdapterFactory()
-			break
+			throw new Error('Not implemented')
 		case 'external':
 		default:
 			console.log('[DebugAdapter]: Configuring debugger as external')
@@ -36,7 +31,7 @@ export function Activate(context: vscode.ExtensionContext) {
 			break
 		}
 	
-	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('bblang', factory))
+	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory(LanguageId, factory))
 	
 	if ('dispose' in factory &&
 		typeof factory.dispose === 'function' &&
@@ -46,7 +41,7 @@ export function Activate(context: vscode.ExtensionContext) {
 	}
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('bblang.debug.debugEditorContents', (resource: vscode.Uri | null | undefined) => {
+		vscode.commands.registerCommand(`${LanguageId}.debug.debugEditorContents`, (resource: vscode.Uri | null | undefined) => {
 			console.log('[DebugAdapter]: Try to start debugging ...')
 
 			const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
@@ -61,7 +56,7 @@ export function Activate(context: vscode.ExtensionContext) {
 
 			console.log('[DebugAdapter]: Start debuging ...')
 			vscode.debug.startDebugging(workspaceFolder, {
-				type: 'bblang',
+				type: LanguageId,
 				name: 'Debug Editor Contents',
 				request: 'launch',
 				program: targetResource.fsPath,
@@ -90,8 +85,8 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor
-			if (editor && editor.document.languageId === 'bbc') {
-				config.type = 'bblang'
+			if (editor && editor.document.languageId === LanguageId) {
+				config.type = LanguageId
 				config.name = 'Launch'
 				config.request = 'launch'
 				config.program = '${file}'
@@ -109,23 +104,6 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 		return config
 	}
-}
-
-const WorkspaceFileAccessor: FileAccessor = {
-	isWindows: false,
-	async readFile(path: string): Promise<Uint8Array> {
-		let uri: vscode.Uri
-		try {
-			uri = Utils.PathToUri(path)
-		} catch (e) {
-			return new TextEncoder().encode(`Cannot read \"${path}\"`)
-		}
-
-		return await vscode.workspace.fs.readFile(uri)
-	},
-	async writeFile(path: string, contents: Uint8Array) {
-		await vscode.workspace.fs.writeFile(Utils.PathToUri(path), contents)
-	},
 }
 
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
@@ -147,13 +125,5 @@ class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFact
 
 		// make VS Code launch the DA executable
 		return executable
-	}
-}
-
-class InlineDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory {
-	createDebugAdapterDescriptor(_session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterDescriptor> {
-		console.log('[DebugAdapter]: Describe debug adapter as inline')
-		
-		return new vscode.DebugAdapterInlineImplementation(new DebugSession(WorkspaceFileAccessor))
 	}
 }
