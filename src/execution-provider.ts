@@ -1,22 +1,22 @@
-import * as Config from './config'
+import * as config from './config'
 import * as fs from 'fs'
-import * as VSCode from 'vscode'
-import * as Path from 'path'
-import * as Updater from './updater'
+import * as vscode from 'vscode'
+import * as path from 'path'
+import * as updater from './updater'
 
-let defaultCmdPath = Path.join(__dirname, 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
-if (__dirname.endsWith(Path.sep + 'out') || __dirname.endsWith(Path.sep + 'out' + Path.sep)) {
-    defaultCmdPath = Path.join(__dirname, '..', 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
+let defaultCmdPath = path.join(__dirname, 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
+if (__dirname.endsWith(path.sep + 'out') || __dirname.endsWith(path.sep + 'out' + path.sep)) {
+    defaultCmdPath = path.join(__dirname, '..', 'interpreter', 'Release', 'net7.0', 'BBCodeInterpreter.exe')
 }
 
-export async function Get() {
-    let cmdPath = Config.GetConfig().cmdPath
+export async function get() {
+    const cmdPath = config.getConfig().cmdPath
 
     if (cmdPath && fs.existsSync(cmdPath)) {
         return cmdPath
     }
 
-    const downloaded = Path.join(Config.InterpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe')
+    const downloaded = path.join(config.interpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe')
 
     if (fs.existsSync(downloaded)) {
         return downloaded
@@ -33,11 +33,11 @@ export async function Get() {
         buttons.push(ButtonTexts.UseDefault)
     }
 
-    const clickedItem = await VSCode.window.showWarningMessage(`Interpreter not specified or not found`, ...buttons)
+    const clickedItem = await vscode.window.showWarningMessage(`Interpreter not specified or not found`, ...buttons)
 
     switch (clickedItem) {
         case ButtonTexts.ShowSettings:
-            Config.GoToConfig('cmdPath')
+            config.goToConfig('cmdPath')
             break
 
         case ButtonTexts.UseDefault:
@@ -46,15 +46,15 @@ export async function Get() {
             break
 
         case ButtonTexts.Download:
-            await VSCode.window.withProgress(
+            await vscode.window.withProgress(
                 {
-                    location: VSCode.ProgressLocation.Notification,
+                    location: vscode.ProgressLocation.Notification,
                     cancellable: false,
                     title: 'Download the interpreter',
                 },
                 (progress) => {
-                    return Updater.Update(
-                        Config.InterpreterUpdateOptions, progress,
+                    return updater.update(
+                        config.interpreterUpdateOptions, progress,
                         () => { return fs.existsSync(downloaded) }
                     )
                 })

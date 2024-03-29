@@ -1,51 +1,30 @@
 import * as fsExtra from 'fs-extra'
 import * as path from 'path'
-import * as vscode from 'vscode'
 import * as fs from 'fs'
 
-export const Options = {
-    LanguageServerMode: 'Debug',
-    DebugServerMode: 'Debug',
+export const options = {
+    languageServerMode: 'Debug',
+    debugServerMode: 'Debug',
 } as const
 
-export const LanguageId = 'bblang'
-export const ExtensionConfigName = "bblangServer"
+export const languageId = 'bblang'
+export const extensionConfigName = "bblangServer"
 
-export function Sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, 500))
+export function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export function GetNonce(length: number = 32) {
+export function getNonce(length = 32): string {
     let text = ''
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
     return text
 }
 
-export function PathToUri(path: string) {
-	try
-	{ return vscode.Uri.file(path) }
-	catch (error)
-	{ return vscode.Uri.parse(path) }
-}
-
-export function IsModuleExists(module: string) {
-    try {
-        const res = require(module)
-        if (res) {
-            return true
-        } else {
-            return false
-        }
-    } catch (error) {
-        return false
-    }
-}
-
 /**
  * Source: https://stackoverflow.com/a/44491963
  */
-async function PromiseAllWait<T>(promises: Promise<T>[]): Promise<(T | null)[]> {
+async function promiseAllWait<T>(promises: Promise<T>[]): Promise<(T | null)[]> {
     // this is the same as Promise.all(), except that it will wait for all promises to fulfill before rejecting
     const allPromises: Promise<({ res: T, err?: null } | { err: any, res?: null })>[] = []
     for (const promise of promises) {
@@ -75,7 +54,7 @@ async function PromiseAllWait<T>(promises: Promise<T>[]): Promise<(T | null)[]> 
 /**
  * Source: https://stackoverflow.com/a/44491963
  */
-async function MovePromiser(from: string, to: string, records: { from: string, to: string }[]) {
+async function movePromiser(from: string, to: string, records: { from: string, to: string }[]): Promise<void> {
     await fsExtra.move(from, to)
     records.push({ from: from, to: to })
 }
@@ -83,15 +62,15 @@ async function MovePromiser(from: string, to: string, records: { from: string, t
 /**
  * Source: https://stackoverflow.com/a/44491963
  */
-export async function MoveDir(fromDir: string, toDir: string) {
+export async function moveDir(fromDir: string, toDir: string): Promise<void> {
     const children = await fsExtra.readdir(fromDir)
 
     await fsExtra.ensureDir(toDir)
 
-    const movePromises: Promise<any>[] = []
-    const moveRecords: any[] = []
+    const movePromises: Array<Promise<any>> = []
+    const moveRecords: Array<any> = []
     for (const child of children) {
-        movePromises.push(MovePromiser(
+        movePromises.push(movePromiser(
             path.join(fromDir, child),
             path.join(toDir, child),
             moveRecords
@@ -99,13 +78,13 @@ export async function MoveDir(fromDir: string, toDir: string) {
     }
 
     try {
-        await PromiseAllWait(movePromises)
+        await promiseAllWait(movePromises)
     } catch (err) {
         const undoMovePromises: Promise<void>[] = []
         for (const moveRecord of moveRecords) {
             undoMovePromises.push(fsExtra.move(moveRecord.to, moveRecord.from))
         }
-        await PromiseAllWait(undoMovePromises)
+        await promiseAllWait(undoMovePromises)
         throw err
     }
 
@@ -113,27 +92,27 @@ export async function MoveDir(fromDir: string, toDir: string) {
 }
 
 export class HttpError extends Error {
-	readonly Code: number
-	readonly StatusMessage?: string
+    readonly Code: number
+    readonly StatusMessage?: string
 
-	constructor(code: number, statusMessage?: string) {
-		super(`HTTP ${code} (\"${statusMessage}\")`)
-		this.Code = code
-		this.StatusMessage = statusMessage
-	}
+    constructor(code: number, statusMessage?: string) {
+        super(statusMessage ? `HTTP ${code} ("${statusMessage}")` : `HTTP ${code}`)
+        this.Code = code
+        this.StatusMessage = statusMessage
+    }
 }
 
-export function Get(lib: typeof import('http') | typeof import('https'), req: string | import('http').RequestOptions | URL): Promise<import('http').IncomingMessage> {
+export function download(lib: typeof import('http') | typeof import('https'), req: string | import('http').RequestOptions | URL): Promise<import('http').IncomingMessage> {
     return new Promise((resolve, reject) => {
         const _req = lib.get(req, res => {
-			if (res.statusCode && res.statusCode >= 400 && res.statusCode < 600) {
-				reject(new HttpError(res.statusCode, res.statusMessage))
-				return
-			}
+            if (res.statusCode && res.statusCode >= 400 && res.statusCode < 600) {
+                reject(new HttpError(res.statusCode, res.statusMessage))
+                return
+            }
 
             if (res.headers.location) {
                 const redirectUrl = new URL(res.headers.location)
-    
+
                 if (typeof req === 'string') {
                     req = redirectUrl.toString()
                 } else if (req instanceof URL) {
@@ -146,9 +125,7 @@ export function Get(lib: typeof import('http') | typeof import('https'), req: st
                     req.protocol = redirectUrl.protocol
                 }
 
-                Get(lib, req)
-                    .then(resolve)
-                    .catch(reject)
+                download(lib, req).then(resolve).catch(reject)
                 return
             }
 
@@ -160,24 +137,24 @@ export function Get(lib: typeof import('http') | typeof import('https'), req: st
     })
 }
 
-export function GetText(res: import('http').IncomingMessage): Promise<string> {
+export function downloadText(res: import('http').IncomingMessage): Promise<string> {
     return new Promise((resolve, reject) => {
         let data = ''
-        res.on('data', chunk => data += chunk)
-        res.on('end', () => resolve(data))
+        res.on('data', (chunk: Buffer) => { data += chunk.toString() })
+        res.on('end', () => { resolve(data) })
     })
 }
 
-export function GetFile<T extends NodeJS.WritableStream>(res: import('http').IncomingMessage, output: T, progress: (increment: number) => void): Promise<void> {
-	return new Promise<void>((resolve) => {
-		progress(0)
+export function downloadFile<T extends NodeJS.WritableStream>(res: import('http').IncomingMessage, output: T, progress: (increment: number) => void): Promise<void> {
+    return new Promise<void>((resolve) => {
+        progress(0)
         res.pipe(output)
 
         const totalBytes = Number.parseInt(res.headers['content-length'] ?? '', 10)
         let downloadedBytes = 0
         let lastDownloadedBytes = 0
-        if (totalBytes != 0) {
-            res.on('data', data => {
+        if (totalBytes > 0) {
+            res.on('data', (data: Buffer) => {
                 downloadedBytes += data.length
                 progress((downloadedBytes - lastDownloadedBytes) / totalBytes)
                 lastDownloadedBytes = downloadedBytes
@@ -188,13 +165,13 @@ export function GetFile<T extends NodeJS.WritableStream>(res: import('http').Inc
             progress(1)
             resolve()
         })
-	})
+    })
 }
 
-export function TryGetJson<T>(_path: string): T | null {
-	if (!fs.existsSync(_path)) {
-		return null
-	}
-	const content = fs.readFileSync(_path, 'utf8')
-	return JSON.parse(content)
+export function tryGetJson<T>(_path: string): T | null {
+    if (!fs.existsSync(_path)) {
+        return null
+    }
+    const content = fs.readFileSync(_path, 'utf8')
+    return JSON.parse(content)
 }

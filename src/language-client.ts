@@ -9,45 +9,45 @@ import {
 } from 'vscode-languageclient/node'
 
 export type LanguageClientManagerOptions = {
-    ServerPath: string,
-    Name: string,
-    ID: string,
-    DocumentSelector: string[],
-    Args?: string[],
+    serverPath: string,
+    name: string,
+    id: string,
+    documentSelector: string[],
+    args?: string[],
 }
 
 export class LanguageClientManager {
-    private readonly Client: LanguageClient
+    private readonly client: LanguageClient
     private readonly serverOptions: Executable
 
     constructor(context: vscode.ExtensionContext, options: LanguageClientManagerOptions) {
         const commandOptions: ExecutableOptions = { detached: false }
 
-        console.log(`[LanguageClient]: Server is at "${options.ServerPath}"`)
+        console.log(`[LanguageClient]: Server is at "${options.serverPath}"`)
 
         this.serverOptions =
         {
-            command: options.ServerPath,
-            args: options.Args ?? [],
+            command: options.serverPath,
+            args: options.args ?? [],
             options: commandOptions,
         }
 
         const clientOptions: LanguageClientOptions = {
-            documentSelector: options.DocumentSelector.map(v => { return { pattern: v } }),
+            documentSelector: options.documentSelector.map(v => { return { pattern: v } }),
             synchronize: {
                 configurationSection: 'bblangServer',
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
             }
         }
 
-        this.Client = new LanguageClient(
-            options.ID,
-            options.Name,
+        this.client = new LanguageClient(
+            options.id,
+            options.name,
             this.serverOptions,
             clientOptions
         )
 
-        this.Client.onNotification(LogMessageNotification.type, (params) => {
+        this.client.onNotification(LogMessageNotification.type, (params) => {
             switch (params.type) {
                 case MessageType.Debug:
                     console.debug('[LanguageServer]:', params.message)
@@ -71,13 +71,13 @@ export class LanguageClientManager {
         })
     }
 
-    public Activate() {
+    public activate() {
         console.log(`[LanguageService]: Language server:`, this.serverOptions)
 
         console.log(`[LanguageService]: Starting language server ...`)
-        this.Client.start().then(() => {
+        this.client.start().then(() => {
             console.log(`[LanguageClient]: Language server started`)
-            this.Client.onNotification('custom/test', arg => {
+            this.client.onNotification('custom/test', arg => {
                 vscode.window.showInformationMessage(arg)
             })
         }).catch(error => {
@@ -86,8 +86,8 @@ export class LanguageClientManager {
         })
     }
 
-    public Deactivate() {
-        this.Client?.stop()
+    public deactivate() {
+        this.client?.stop()
         console.error(`[LanguageClient]: Language server stopped`)
     }
 }

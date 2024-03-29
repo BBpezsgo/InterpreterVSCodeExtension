@@ -1,46 +1,45 @@
-import * as ExecutionProvider from './execution-provider'
+import * as executionProvider from './execution-provider'
 import * as vscode from 'vscode'
-import { LanguageId } from './utils'
+import { languageId } from './utils'
 
-export async function Do(filepath: any, cmdPath: string | null = null, shellArgs: string[] | null = null) {
-    if (!cmdPath)
-    { cmdPath = await ExecutionProvider.Get() }
-    if (!cmdPath) { return null }
+export async function execute(filepath: string, cmdPath: string | null = null, shellArgs: string[] | null = null) {
+	if (!cmdPath) { cmdPath = await executionProvider.get() }
+	if (!cmdPath) { return null }
 
-    if (!shellArgs) shellArgs = []
+	if (!shellArgs) shellArgs = []
 
-    shellArgs.push('--hide-debug')
-    shellArgs.push(`"${filepath}"`)
+	shellArgs.push('--hide-debug')
+	shellArgs.push(`"${filepath}"`)
 
-    const terminal = vscode.window.createTerminal({
-        name: 'BBC Terminal',
-        shellPath: cmdPath,
-        shellArgs: shellArgs,
-    })
-    terminal.show()
-    return terminal
+	const terminal = vscode.window.createTerminal({
+		name: 'BBC Terminal',
+		shellPath: cmdPath,
+		shellArgs: shellArgs,
+	})
+	terminal.show()
+	return terminal
 }
 
-export function Activate(context: vscode.ExtensionContext) {
-    context.subscriptions.push(
-        vscode.commands.registerCommand(`${LanguageId}.executeFile`, async args => {
-            const filepath = GetFilePath(args)
+export function activate(context: vscode.ExtensionContext) {
+	context.subscriptions.push(
+		vscode.commands.registerCommand(`${languageId}.executeFile`, async args => {
+			const filepath = getFilePath(args)
 
-            if (!filepath) {
-                vscode.window.showErrorMessage(`No path specified`)
-                return
-            }
+			if (!filepath) {
+				vscode.window.showErrorMessage(`No path specified`)
+				return
+			}
 
-            Do(filepath)
-        })
-    )
+			execute(filepath)
+		})
+	)
 }
 
-function GetFilePath(args: any) {
-    if (args) {
-        const filepath: string = args["path"]
-        if (filepath && filepath.startsWith("/")) { return filepath.replace("/", "") }
-        return filepath
-    }
-    return vscode.window.activeTextEditor?.document.uri.fsPath ?? null
+function getFilePath(args: object) {
+	if (args) {
+		const filepath: string = args["path"]
+		if (filepath && filepath.startsWith("/")) { return filepath.replace("/", "") }
+		return filepath
+	}
+	return vscode.window.activeTextEditor?.document.uri.fsPath ?? null
 }

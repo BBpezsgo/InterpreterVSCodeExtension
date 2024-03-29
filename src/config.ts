@@ -1,41 +1,41 @@
-import * as VSCode from 'vscode'
-import * as Path from 'path'
-import * as Updater from './updater'
-import * as Utils from './utils'
+import * as vscode from 'vscode'
+import * as path from 'path'
+import * as updater from './updater'
+import * as utils from './utils'
 
-export const InterpreterUpdateOptions: Updater.UpdateOptions = {
+export const interpreterUpdateOptions: updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
     GithubRepository: 'Interpreter',
     GithubAssetName: 'Windows_x64_RuntimeIndependent.zip',
-    LocalPath: Path.join(__dirname, 'interpreter')
+    LocalPath: path.join(__dirname, 'interpreter')
 }
 
-export const LanguageServerUpdateOptions: Updater.UpdateOptions = {
+export const languageServerUpdateOptions: updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
     GithubRepository: 'Interpreter',
     GithubAssetName: 'LanguageServer_Windows_x64_RuntimeIndependent.zip',
-    LocalPath: Path.join(__dirname, 'language-server')
+    LocalPath: path.join(__dirname, 'language-server')
 }
 
 /**
  * @param filepath If provided it'll use the file's workspace folder as scope, otherwise it'll try to get the current active filepath.
  * @returns The workspace configuration for this extension _('batchrunner')_
  */
-function GetExtensionConfig(filepath?: string): VSCode.WorkspaceConfiguration {
+function getExtensionConfig(filepath?: string): vscode.WorkspaceConfiguration {
     // Try to get the active workspace folder first, to have it read Folder Settings
-    let workspaceFolder: VSCode.WorkspaceFolder | null = null
+    let workspaceFolder: vscode.WorkspaceFolder | null = null
     if (filepath) {
-        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.Uri.file(filepath)) ?? null
+        workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filepath)) ?? null
     }
-    else if (VSCode.window.activeTextEditor) {
-        workspaceFolder = VSCode.workspace.getWorkspaceFolder(VSCode.window.activeTextEditor.document.uri) ?? null
+    else if (vscode.window.activeTextEditor) {
+        workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri) ?? null
     }
 
-    return VSCode.workspace.getConfiguration(Utils.ExtensionConfigName, workspaceFolder?.uri)
+    return vscode.workspace.getConfiguration(utils.extensionConfigName, workspaceFolder?.uri)
 }
 
-export function GetConfig() {
-    const config = GetExtensionConfig()
+export function getConfig() {
+    const config = getExtensionConfig()
     return {
         maxNumberOfProblems: config.get<number>('maxNumberOfProblems') ?? 100,
         trace: {
@@ -46,21 +46,21 @@ export function GetConfig() {
     }
 }
 
-export function GoToConfig(config: string) {
-    const searchPath = `${Utils.ExtensionConfigName}.${config}`
-    VSCode.commands.executeCommand('workbench.action.openSettings', searchPath)
+export function goToConfig(config: string) {
+    const searchPath = `${utils.extensionConfigName}.${config}`
+    vscode.commands.executeCommand('workbench.action.openSettings', searchPath)
 }
 
-export const DebugAdapterServerExecutable = (() => {
-    return Path.join(__dirname, '..', 'debug-server', Utils.Options.DebugServerMode, 'net8.0', 'DebugServer.exe')
+export const debugAdapterServerExecutable = (() => {
+    return path.join(__dirname, '..', 'debug-server', utils.options.debugServerMode, 'net8.0', 'DebugServer.exe')
 })()
 
-export const LanguageServerExecutable = (() => {
+export const languageServerExecutable = (() => {
     if (true) {
-        return Path.join(__dirname, '..', 'language-server', Utils.Options.LanguageServerMode, 'net8.0', 'BBCodeLanguageServer.exe')
+        return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net8.0', 'BBCodeLanguageServer.exe')
         // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\Release\\net8.0\\publish\\BBCodeLanguageServer.exe`
         // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\${Utils.Options.LanguageServerMode}\\net8.0\\BBCodeLanguageServer.exe`
     } else {
-        return Path.join(__dirname, 'language-server', 'BBCodeLanguageServer.exe')
+        return path.join(__dirname, 'language-server', 'BBCodeLanguageServer.exe')
     }
 })()
