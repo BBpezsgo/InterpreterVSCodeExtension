@@ -117,7 +117,7 @@
 					}
 				},
 				{
-					"match": "\\b(byte|char|int|float)\\b\\*+",
+					"match": "\\b(byte|char|int|float|void)\\b\\*+",
 					"captures": {
 						"1": { "name": "entity.name.tag" }
 					}
@@ -126,12 +126,6 @@
 					"match": "\\b(\\w+)\\b(\\*+)",
 					"captures": {
 						"1": { "name": "entity.name.type" }
-					}
-				},
-				{
-					"match": "\\b(byte|char|int|float)\\b",
-					"captures": {
-						"1": { "name": "entity.name.tag" }
 					}
 				}
 			]

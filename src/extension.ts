@@ -5,7 +5,6 @@ import { LanguageClientManager } from './language-client'
 import * as fileExecutor from './file-executor'
 import * as updater from './updater'
 import * as config from './config'
-import { extensionConfigName } from './utils'
 
 export let client: LanguageClientManager | null = null
 const checkForUpdates = false
@@ -16,12 +15,7 @@ export function activateLanguageClient(context: vscode.ExtensionContext) {
         return
     }
 
-    client = new LanguageClientManager(context, {
-        serverPath: config.languageServerExecutable,
-        name: 'BBC Language Server',
-        id: extensionConfigName,
-        documentSelector: ['**/*.bbc'],
-    })
+    client = new LanguageClientManager(context, config.languageServerExecutable)
     client.activate()
 }
 

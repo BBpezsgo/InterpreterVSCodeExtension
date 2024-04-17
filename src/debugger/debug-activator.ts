@@ -64,17 +64,21 @@ export function activate(context: vscode.ExtensionContext) {
                 .then(result => {
                     if (!result) {
                         vscode.window.showErrorMessage('Failed to start debugging')
+                        console.warn('[DebugAdapter]: Failed to start debugging')
+                    } else {
+                        console.log('[DebugAdapter]: Debugging started')
                     }
-                    console.log('[DebugAdapter]: Debugging started:', result)
                 }, error => {
                     console.error('[DebugAdapter]:', error)
                 })
         })
     )
 
-    vscode.debug.onDidStartDebugSession(e => {
-        console.log(e)
-    })
+    vscode.debug.onDidStartDebugSession(e => console.log('[DebugAdapter]: Debug session started:', e))
+    vscode.debug.onDidChangeActiveDebugSession(e => console.log('[DebugAdapter]: Active debug session changed:', e))
+    vscode.debug.onDidTerminateDebugSession(e => console.log('[DebugAdapter]: Debug session terminated:', e))
+    vscode.debug.onDidReceiveDebugSessionCustomEvent(e => console.log('[DebugAdapter]: Custom event received:', e))
+    vscode.debug.onDidChangeBreakpoints(e => console.log('[DebugAdapter]: Breakpoints changed:', e))
 
     console.log('[DebugAdapter]: Debugger activated')
 }

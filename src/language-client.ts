@@ -3,49 +3,52 @@ import {
     LanguageClient,
     LanguageClientOptions,
     ExecutableOptions,
-    Executable,
     LogMessageNotification,
-    MessageType
+    MessageType,
+    ServerOptions
 } from 'vscode-languageclient/node'
+import { extensionConfigName } from './utils'
 
 export type LanguageClientManagerOptions = {
     serverPath: string,
-    name: string,
-    id: string,
-    documentSelector: string[],
     args?: string[],
 }
 
 export class LanguageClientManager {
     private readonly client: LanguageClient
-    private readonly serverOptions: Executable
+    private readonly context: vscode.ExtensionContext
 
-    constructor(context: vscode.ExtensionContext, options: LanguageClientManagerOptions) {
+    constructor(context: vscode.ExtensionContext, serverPath: string, args: string[] = []) {
         const commandOptions: ExecutableOptions = { detached: false }
 
-        console.log(`[LanguageClient]: Server is at "${options.serverPath}"`)
+        console.log(`[LanguageClient]: Server at "${serverPath}"`)
 
-        this.serverOptions =
+        const serverOptions: ServerOptions =
         {
-            command: options.serverPath,
-            args: options.args ?? [],
+            run: { command: serverPath },
+            debug: { command: serverPath },
+            args: args,
             options: commandOptions,
         }
 
         const clientOptions: LanguageClientOptions = {
-            documentSelector: options.documentSelector.map(v => { return { pattern: v } }),
+            documentSelector: [{
+                pattern: '**/*.bbc',
+            }],
             synchronize: {
                 configurationSection: 'bblangServer',
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-            }
+            },
         }
 
         this.client = new LanguageClient(
-            options.id,
-            options.name,
-            this.serverOptions,
+            extensionConfigName,
+            'BBC Language Server',
+            serverOptions,
             clientOptions
         )
+
+        console.log(`[LanguageService]: Language server:`, serverOptions)
 
         this.client.onNotification(LogMessageNotification.type, (params) => {
             switch (params.type) {
@@ -69,17 +72,19 @@ export class LanguageClientManager {
                     break
             }
         })
+
+        this.client.onNotification('custom/test', arg => {
+            vscode.window.showInformationMessage(arg)
+        })
+
+        this.context = context
     }
 
     public activate() {
-        console.log(`[LanguageService]: Language server:`, this.serverOptions)
-
         console.log(`[LanguageService]: Starting language server ...`)
         this.client.start().then(() => {
+            this.context.subscriptions.push(this.client)
             console.log(`[LanguageClient]: Language server started`)
-            this.client.onNotification('custom/test', arg => {
-                vscode.window.showInformationMessage(arg)
-            })
         }).catch(error => {
             console.error(`[LanguageClient]: Failed to start language server:`, error)
             vscode.window.showErrorMessage(error)
