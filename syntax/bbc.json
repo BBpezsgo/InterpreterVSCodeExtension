@@ -12,6 +12,7 @@
 		{ "include": "#hash" },
 		{ "include": "#struct-definition" },
 		{ "include": "#enum-definition" },
+		{ "include": "#function-definition" },
 		{ "include": "#using" },
 
 		{ "include": "#attribute" },
@@ -117,7 +118,7 @@
 					}
 				},
 				{
-					"match": "\\b(byte|char|int|float|void)\\b\\*+",
+					"match": "\\b(byte|char|int|float|void)\\b",
 					"captures": {
 						"1": { "name": "entity.name.tag" }
 					}
@@ -285,13 +286,15 @@
 			}
 		},
 		"new-instance": {
-			"match": "(new)[\\s]+([a-zA-Z0-9_]+)",
+			"match": "(new)[\\s]+([a-zA-Z0-9_*<>]+)",
 			"captures": {
 				"1": {
 					"name": "entity.name.tag"
 				},
 				"2": {
-					"name": "entity.name.class"
+					"patterns": [{
+						"include": "#type"
+					}]
 				}
 			}
 		},
@@ -358,12 +361,35 @@
 				{
 					"match": "(?<!\\[)\\b([a-zA-Z_]+[a-zA-Z0-9_]*)\\b\\s*\\(",
 					"captures": {
-						"1": {
-							"name": "entity.name.function"
-						}
+						"1": { "name": "entity.name.function" }
 					}
 				}
 			]
+		},
+		"function-definition": {
+			"patterns": [
+				{
+					"match": "(\\w+)(?<!export|new|this|temp|enum|struct|return|as|delete)\\s+(\\w+)\\s?\\(([\\w\\s,]?)\\)",
+					"captures": {
+						"1": { "patterns": [{ "include": "#type" }] },
+						"2": { "name": "entity.name.function" },
+						"3": { "patterns": [{ "include": "#parameter-definitions" }] }
+					}
+				}
+			]
+		},
+		"parameter-definitions": {
+			"patterns": [
+				{ "include": "#parameter-definition" }
+			]
+		},
+		"parameter-definition": {
+			"match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+(\\w+)(,|$)",
+			"captures": {
+				"1": { "patterns": [ { "include": "#keyword" } ] },
+				"2": { "patterns": [ { "include": "#type" } ] },
+				"3": { "name": "variable.parameter" }
+			}
 		},
 		"strings": {
 			"patterns": [

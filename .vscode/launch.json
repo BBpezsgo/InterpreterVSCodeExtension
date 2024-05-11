@@ -12,7 +12,7 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"D:/Program Files/BBCodeProject/BBCode/TestFiles"
+				"C:/Users/bazsi/Projects/BBLang/Core/TestFiles"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
