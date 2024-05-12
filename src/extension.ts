@@ -5,6 +5,7 @@ import { LanguageClientManager } from './language-client'
 import * as fileExecutor from './file-executor'
 import * as updater from './updater'
 import * as config from './config'
+import { TestProvider } from './test-provider'
 
 export let client: LanguageClientManager | null = null
 const checkForUpdates = false
@@ -28,6 +29,9 @@ export function activate(context: vscode.ExtensionContext) {
     }
     fileExecutor.activate(context)
 
+    const testProvider = new TestProvider(context)
+    testProvider.activate()
+
     activateLanguageClient(context)
 
     const tokenDebugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0)
@@ -47,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
                                     cancellable: false,
                                     title: 'Updating the interpreter',
                                 }, (progress) => updater.update(config.interpreterUpdateOptions, progress, () => {
-                                    return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe'))
+                                    return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang.exe'))
                                 })).then(undefined, (reason) => vscode.window.showErrorMessage(`Failed to update the interpreter: ${reason}`))
                             }
                         })

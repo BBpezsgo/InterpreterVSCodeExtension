@@ -1,9 +1,9 @@
 {
 	"scopeName": "source.result",
 	"fileTypes": [
-		"bbc-test-result"
+		"bblang-test-result"
 	],
-	"name": "BBC Test Result Language",
+	"name": "BBLang Test Result Language",
 	"patterns": [
 		{
 			"include": "#hash"

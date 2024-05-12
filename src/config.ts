@@ -56,11 +56,5 @@ export const debugAdapterServerExecutable = (() => {
 })()
 
 export const languageServerExecutable = (() => {
-    if (true) {
-        return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net8.0', 'BBCodeLanguageServer.exe')
-        // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\Release\\net8.0\\publish\\BBCodeLanguageServer.exe`
-        // return `D:\\Program Files\\BBCodeProject\\LanguageServer\\BBCode-LanguageServer\\bin\\${Utils.Options.LanguageServerMode}\\net8.0\\BBCodeLanguageServer.exe`
-    } else {
-        return path.join(__dirname, 'language-server', 'BBCodeLanguageServer.exe')
-    }
+    return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net8.0', 'LanguageServer.exe')
 })()

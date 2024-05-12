@@ -1,23 +1,15 @@
-
 **/*.map
 **/*.ts
-
-*.njsproj
-*.njsproj.user
 
 debug-server/**
 language-server/**
 .vscode/**
-.vscode-test/**
 src/**
-bin/**
-obj/**
 node_modules/**
 out/**
 
 .gitignore
-DebugServerLog.lnk
 .github
 
 tsconfig.json
-BBCodeExtension.vsix
+BBLangExtension.vsix

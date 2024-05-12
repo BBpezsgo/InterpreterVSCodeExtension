@@ -12,7 +12,7 @@ export async function execute(filepath: string, cmdPath: string | null = null, s
 	shellArgs.push(`"${filepath}"`)
 
 	const terminal = vscode.window.createTerminal({
-		name: 'BBC Terminal',
+		name: 'BBLang Terminal',
 		shellPath: cmdPath,
 		shellArgs: shellArgs,
 	})

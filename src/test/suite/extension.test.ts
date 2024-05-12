@@ -42,12 +42,12 @@ suite('Extension Test Suite', () => {
       cancellable: false,
       title: 'Downloading the interpreter',
     }, async (progress) => updater.update(config.interpreterUpdateOptions, progress, () => {
-      return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe'))
+      return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang.exe'))
     }))
 
     const terminal = await fileExecutor.execute(
       'C:\\Users\\bazsi\\Documents\\GitHub\\InterpreterVSCodeExtension\\src\\test\\suite\\script.txt',
-      path.join(config.interpreterUpdateOptions.LocalPath, 'BBCodeInterpreter.exe'), [
+      path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang.exe'), [
       // '--no-pause'
     ])
 

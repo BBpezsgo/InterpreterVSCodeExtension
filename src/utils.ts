@@ -7,7 +7,8 @@ export const options = {
     debugServerMode: 'Debug',
 } as const
 
-export const languageId = 'bblang'
+export const languageExtension = 'bbc'
+export const languageId = 'bbc'
 export const extensionConfigName = "bblangServer"
 
 export function sleep(ms: number): Promise<void> {

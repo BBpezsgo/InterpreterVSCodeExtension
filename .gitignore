@@ -1,16 +1,8 @@
 /node_modules
 
 /debug-server
-/interpreter
 /language-server
 
-/bin
-/obj
 /out
-/dist
-/.vscode-test
 
-*.user
-*.lnk
-
-/BBCodeExtension.vsix
+/BBLangExtension.vsix

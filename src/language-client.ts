@@ -7,7 +7,7 @@ import {
     MessageType,
     ServerOptions
 } from 'vscode-languageclient/node'
-import { extensionConfigName } from './utils'
+import * as utils from './utils'
 
 export type LanguageClientManagerOptions = {
     serverPath: string,
@@ -33,17 +33,17 @@ export class LanguageClientManager {
 
         const clientOptions: LanguageClientOptions = {
             documentSelector: [{
-                pattern: '**/*.bbc',
+                pattern: `**/*.${utils.languageExtension}`
             }],
             synchronize: {
-                configurationSection: 'bblangServer',
+                configurationSection: utils.extensionConfigName,
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
             },
         }
 
         this.client = new LanguageClient(
-            extensionConfigName,
-            'BBC Language Server',
+            utils.extensionConfigName,
+            'BBLang Language Server',
             serverOptions,
             clientOptions
         )
