@@ -12,12 +12,12 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"C:/Users/bazsi/Projects/BBLang/Core/TestFiles"
+				"/home/BB/Projects/BBLang/Core/TestFiles"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],
-			"preLaunchTask": "npm: watch",
+			// "preLaunchTask": "npm: watch",
 			"sourceMaps": true
 		}
 	]

@@ -10,6 +10,7 @@
 		{ "include": "#comment-block" },
 
 		{ "include": "#hash" },
+		{ "include": "#alias-definition" },
 		{ "include": "#struct-definition" },
 		{ "include": "#enum-definition" },
 		{ "include": "#function-definition" },
@@ -118,7 +119,7 @@
 					}
 				},
 				{
-					"match": "\\b(byte|char|int|float|void)\\b",
+					"match": "\\b(u8|u16|i32|f32|void|any)\\b",
 					"captures": {
 						"1": { "name": "entity.name.tag" }
 					}
@@ -266,6 +267,22 @@
 				}
 			}
 		},
+		"alias-definition": {
+			"match": "(alias)[\\s]+([a-zA-Z0-8_]+)[\\s]+([a-zA-Z0-9_*<>]+)",
+			"captures": {
+				"1": {
+					"name": "entity.name.tag"
+				},
+				"2": {
+					"name": "entity.name.type"
+				},
+				"3": {
+					"patterns": [{
+						"include": "#type"
+					}]
+				}
+			}
+		},
 		"enum-definition": {
 			"match": "(enum)[\\s]+([a-zA-Z0-9_]+)",
 			"captures": {
@@ -301,7 +318,7 @@
 		"variable-definition": {
 			"patterns": [
 				{
-					"match": "\\b(int|char|byte|float)\\b\\s+(\\w*+)(?!\\()",
+					"match": "\\b(u8|u16|i32|f32)\\b\\s+(\\w*+)(?!\\()",
 					"captures": {
 						"1": {
 							"name": "entity.name.tag"
@@ -312,7 +329,7 @@
 					}
 				},
 				{
-					"match": "\\b([\\w*<>]+)(?<!export|new|this|temp|enum|struct|return|as|delete)[\\t ]+\\b(?!as)(\\w*+)(?!\\()",
+					"match": "\\b([\\w*<>]+)(?<!export|new|this|temp|enum|struct|alias|return|as|delete)[\\t ]+\\b(?!as)(\\w*+)(?!\\()",
 					"captures": {
 						"1": {
 							"patterns": [
@@ -343,7 +360,7 @@
 		"keyword": {
 			"patterns": [
 				{
-					"match": "\\b(void|int|byte|float|char|private|inline|template|var|this|delete|temp|as|sizeof|enum|struct|ref|destructor|indexer_get|indexer_set|type|const)\\b",
+					"match": "\\b(void|u8|u16|i32|f32|private|inline|template|var|this|delete|temp|as|sizeof|enum|struct|alias|ref|destructor|indexer_get|indexer_set|type|const)\\b",
 					"captures": {
 						"1": { "name": "entity.name.tag" }
 					}
@@ -369,7 +386,7 @@
 		"function-definition": {
 			"patterns": [
 				{
-					"match": "(\\w+)(?<!export|new|this|temp|enum|struct|return|as|delete)\\s+(\\w+)\\s?\\(([\\w\\s,]?)\\)",
+					"match": "(\\w+)(?<!export|new|this|temp|enum|struct|return|as|delete|alias)\\s+(\\w+)\\s?\\(([\\w\\s,]?)\\)",
 					"captures": {
 						"1": { "patterns": [{ "include": "#type" }] },
 						"2": { "name": "entity.name.function" },
@@ -418,7 +435,7 @@
 		"string_escaped_char": {
 			"patterns": [
 				{
-					"match": "(?x)\\\\(\\\\|[ntr\\\"]|0|(u[0-9a-fA-F]{4}))",
+					"match": "(?x)\\\\(\\\\|[ntr\\\"e]|0|(u[0-9a-fA-F]{4}))",
 					"name": "constant.character.escape"
 				},
 				{

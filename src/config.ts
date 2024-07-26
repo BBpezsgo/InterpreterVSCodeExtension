@@ -52,9 +52,9 @@ export function goToConfig(config: string) {
 }
 
 export const debugAdapterServerExecutable = (() => {
-    return path.join(__dirname, '..', 'debug-server', utils.options.debugServerMode, 'net8.0', 'DebugServer.exe')
+    return path.join(__dirname, '..', 'debug-server', utils.options.debugServerMode, 'net9.0', 'DebugServer')
 })()
 
 export const languageServerExecutable = (() => {
-    return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net8.0', 'LanguageServer.exe')
+    return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net9.0', 'LanguageServer')
 })()

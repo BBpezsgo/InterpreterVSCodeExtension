@@ -4,9 +4,9 @@ import * as vscode from 'vscode'
 import * as path from 'path'
 import * as updater from './updater'
 
-let defaultCmdPath = path.join(__dirname, 'interpreter', 'Release', 'net8.0', 'BBLang.exe')
+let defaultCmdPath = path.join(__dirname, 'interpreter', 'Release', 'net8.0', 'BBLang')
 if (__dirname.endsWith(path.sep + 'out') || __dirname.endsWith(path.sep + 'out' + path.sep)) {
-    defaultCmdPath = path.join(__dirname, '..', 'interpreter', 'Release', 'net8.0', 'BBLang.exe')
+    defaultCmdPath = path.join(__dirname, '..', 'interpreter', 'Release', 'net8.0', 'BBLang')
 }
 
 export async function get() {
@@ -16,7 +16,7 @@ export async function get() {
         return cmdPath
     }
 
-    const downloaded = path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang.exe')
+    const downloaded = path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang')
 
     if (fs.existsSync(downloaded)) {
         return downloaded

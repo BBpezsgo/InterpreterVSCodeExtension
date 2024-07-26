@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
                                     cancellable: false,
                                     title: 'Updating the interpreter',
                                 }, (progress) => updater.update(config.interpreterUpdateOptions, progress, () => {
-                                    return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang.exe'))
+                                    return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang'))
                                 })).then(undefined, (reason) => vscode.window.showErrorMessage(`Failed to update the interpreter: ${reason}`))
                             }
                         })
