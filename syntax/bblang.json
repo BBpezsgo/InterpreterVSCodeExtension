@@ -1,448 +1,536 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"scopeName": "source.bbc",
-	"fileTypes": [
-		"bbc"
-	],
-	"name": "BBLang Language",
-	"patterns": [
-		{ "include": "#comment" },
-		{ "include": "#comment-block" },
-
-		{ "include": "#hash" },
-		{ "include": "#alias-definition" },
-		{ "include": "#struct-definition" },
-		{ "include": "#enum-definition" },
-		{ "include": "#function-definition" },
-		{ "include": "#using" },
-
-		{ "include": "#attribute" },
-		{ "include": "#template" },
-		{ "include": "#keyword" },
-
-		{ "include": "#any-statement" },
-		{ "include": "#scope" }
-	],
-	"repository": {
-		"scope": {
-			"begin": "{",
-			"end": "}",
-
-			"patterns": [
-				{ "include": "#comment" },
-				{ "include": "#comment-block" },
-
-				{ "include": "#attribute" },
-				{ "include": "#template" },
-				{ "include": "#keyword" },
-		
-				{ "include": "#any-statement" },
-				{ "include": "#scope" }
-			]
-		},
-		"hash": {
-			"match": "(#[a-zA-Z]*)\\s *([a-zA-Z]*)",
-			"captures": {
-				"1": {
-					"name": "constant.language"
-				},
-				"2": {
-					"name": "entity.name.variable"
-				}
-			}
-		},
-		"literal": {
-			"patterns": [
-				{ "include": "#strings" },
-				{ "include": "#number" }
-			]
-		},
-		"any-statement": {
-			"patterns": [
-				{ "include": "#comment" },
-				{ "include": "#comment-block" },
-
-				{ "include": "#as" },
-				{ "include": "#variable-definition" },
-				{ "include": "#flow-control-statement" },
-				{ "include": "#new-instance" },
-				{ "include": "#sizeof" },
-				{ "include": "#function-calls" },
-				{ "include": "#literal" },
-				{ "include": "#hover-popup" },
-				{ "include": "#keyword" },
-				{ "include": "#field" },
-				{ "include": "#type" },
-				{ "include": "#identifier" }
-			]
-		},
-		"sizeof": {
-			"begin": "\\b(sizeof)\\s*\\(",
-			"beginCaptures": {
-				"1": { "name": "entity.name.tag" }
-			},
-
-			"end": "\\)",
-
-			"patterns": [
-				{ "include": "#type" },
-				{
-					"match": "\\b(\\w+)\\b",
-					"captures": {
-						"1": { "name": "entity.name.type" }
-					}
-				}
-			]
-		},
-		"as": {
-			"match": "\\b(as)\\b\\s+([\\w\\*<>, ]+)",
-			"captures": {
-				"1": { "name": "entity.name.tag" },
-				"2": {
-					"patterns": [
-						{ "include": "#type" }
-					]
-				}
-			}
-		},
-		"type": {
-			"patterns": [
-				{
-					"match": "\\b(\\w*)\\b[\t ]*<([\\w<>*]+)>",
-					"captures": {
-						"1": { "name": "entity.name.type" },
-						"2": {
-							"patterns": [
-								{ "include": "#type" }
-							]
-						}
-					}
-				},
-				{
-					"match": "\\b(u8|u16|i32|f32|void|any)\\b",
-					"captures": {
-						"1": { "name": "entity.name.tag" }
-					}
-				},
-				{
-					"match": "\\b(\\w+)\\b(\\*+)",
-					"captures": {
-						"1": { "name": "entity.name.type" }
-					}
-				}
-			]
-		},
-		"hover-popup": {
-			"match": "^\\(\\w+\\)",
-			"name": "emphasis"
-		},
-		"flow-control-statement": {
-			"patterns": [
-				{
-					"match": "\\breturn\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\bthrow\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\bif\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\belse\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\belseif\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\bwhile\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\bfor\\b",
-					"name": "keyword.control"
-				},
-				{
-					"match": "\\bbreak\\b",
-					"name": "keyword.control"
-				}
-			]
-		},
-		"keyword-calls": {
-			"patterns": [
-				{
-					"match": "\\b(delete|temp|type)\\b",
-					"captures": {
-						"1": { "name": "entity.name.tag" }
-					}
-				}
-			]
-		},
-		"template": {
-			"begin": "\\b(template)\\b\\s*\\<",
-			"beginCaptures": {
-				"1": { "name": "entity.name.tag" }
-			},
-			"end": "\\>",
-
-			"patterns": [
-				{
-					"match": "(\\w+)",
-					"captures": {
-						"1": { "name": "entity.name.type" }
-					}
-				}
-			]
-		},
-		"comment": {
-			"patterns": [
-				{
-					"match": "\\/\\/[^\\n]*\\n",
-					"name": "comment.line"
-				}
-			]
-		},
-		"comment-block": {
-			"patterns": [
-				{
-					"begin": "/\\*",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.definition.comment.begin.bbc"
-						}
-					},
-					"end": "\\*/",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.definition.comment.end.bbc"
-						}
-					},
-					"name": "comment.block"
-				},
-				{
-					"match": "\\*/.*\\n",
-					"name": "invalid.illegal.stray-comment-end.bbc"
-				}
-			]
-		},
-		"number": {
-			"patterns": [
-				{
-					"match": "(\\.[0-9]+f?\\b|\\b[0-9]+f?\\b|\\b0x[0-9a-fA-F_]+\\b|\\b0b[01_]+\\b|\\b[0-9]e[0-9]f?\\b)",
-					"name": "constant.numeric"
-				}
-			]
-		},
-		"field": {
-			"match": "\\.\\w*\\b([a-zA-Z][a-zA-Z0-9]*)\\b(?!\\s*\\()"
-		},
-		"identifier": {
-			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?!\\s*\\()",
-			"captures": {
-				"1": {
-					"name": "variable.name"
-				}
-			}
-		},
-		"string": {
-			"patterns": [
-				{
-					"name": "string.quoted.double.ulog",
-					"match": "\"[\\s\\S]*\""
-				}
-			]
-		},
-		"struct-definition": {
-			"match": "(struct)[\\s]+([a-zA-Z0-9_]+)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				},
-				"2": {
-					"name": "entity.name.class"
-				}
-			}
-		},
-		"alias-definition": {
-			"match": "(alias)[\\s]+([a-zA-Z0-8_]+)[\\s]+([a-zA-Z0-9_*<>]+)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				},
-				"2": {
-					"name": "entity.name.type"
-				},
-				"3": {
-					"patterns": [{
-						"include": "#type"
-					}]
-				}
-			}
-		},
-		"enum-definition": {
-			"match": "(enum)[\\s]+([a-zA-Z0-9_]+)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				},
-				"2": {
-					"name": "entity.name.class"
-				}
-			}
-		},
-		"using": {
-			"match": "\\b(using)\\b\\s*([\\w\\.]*)",
-			"captures": {
-				"1": {
-					"name": "keyword.control"
-				}
-			}
-		},
-		"new-instance": {
-			"match": "(new)[\\s]+([a-zA-Z0-9_*<>]+)",
-			"captures": {
-				"1": {
-					"name": "entity.name.tag"
-				},
-				"2": {
-					"patterns": [{
-						"include": "#type"
-					}]
-				}
-			}
-		},
-		"variable-definition": {
-			"patterns": [
-				{
-					"match": "\\b(u8|u16|i32|f32)\\b\\s+(\\w*+)(?!\\()",
-					"captures": {
-						"1": {
-							"name": "entity.name.tag"
-						},
-						"2": {
-							"name": "entity.name.variable"
-						}
-					}
-				},
-				{
-					"match": "\\b([\\w*<>]+)(?<!export|new|this|temp|enum|struct|alias|return|as|delete)[\\t ]+\\b(?!as)(\\w*+)(?!\\()",
-					"captures": {
-						"1": {
-							"patterns": [
-								{ "include": "#type" },
-								{
-									"match": "\\b(\\w+)\\b",
-									"captures": {
-										"1": { "name": "entity.name.type" }
-									}
-								}
-							]
-						},
-						"2": {
-							"name": "entity.name.variable"
-						}
-					}
-				}
-			]
-		},
-		"attribute": {
-			"match": "\\s\\[\\s*(\\w+)\\s*(\\]|\\()",
-			"captures": {
-				"1": {
-					"name": "entity.name.class"
-				}
-			}
-		},
-		"keyword": {
-			"patterns": [
-				{
-					"match": "\\b(void|u8|u16|i32|f32|private|inline|template|var|this|delete|temp|as|sizeof|enum|struct|alias|ref|destructor|indexer_get|indexer_set|type|const)\\b",
-					"captures": {
-						"1": { "name": "entity.name.tag" }
-					}
-				},
-				{
-					"match": "\\b(export)\\b",
-					"captures": {
-						"1": { "name": "keyword.control" }
-					}
-				}
-			]
-		},
-		"function-calls": {
-			"patterns": [
-				{
-					"match": "(?<!\\[)\\b([a-zA-Z_]+[a-zA-Z0-9_]*)\\b\\s*\\(",
-					"captures": {
-						"1": { "name": "entity.name.function" }
-					}
-				}
-			]
-		},
-		"function-definition": {
-			"patterns": [
-				{
-					"match": "(\\w+)(?<!export|new|this|temp|enum|struct|return|as|delete|alias)\\s+(\\w+)\\s?\\(([\\w\\s,]?)\\)",
-					"captures": {
-						"1": { "patterns": [{ "include": "#type" }] },
-						"2": { "name": "entity.name.function" },
-						"3": { "patterns": [{ "include": "#parameter-definitions" }] }
-					}
-				}
-			]
-		},
-		"parameter-definitions": {
-			"patterns": [
-				{ "include": "#parameter-definition" }
-			]
-		},
-		"parameter-definition": {
-			"match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+(\\w+)(,|$)",
-			"captures": {
-				"1": { "patterns": [ { "include": "#keyword" } ] },
-				"2": { "patterns": [ { "include": "#type" } ] },
-				"3": { "name": "variable.parameter" }
-			}
-		},
-		"strings": {
-			"patterns": [
-				{
-					"begin": "\"",
-					"end": "\"",
-					"name": "string.quoted.double",
-					"patterns": [
-						{
-							"include": "#string_escaped_char"
-						}
-					]
-				},
-				{
-					"begin": "'",
-					"end": "'",
-					"name": "string.quoted.single",
-					"patterns": [
-						{
-							"include": "#string_escaped_char"
-						}
-					]
-				}
-			]
-		},
-		"string_escaped_char": {
-			"patterns": [
-				{
-					"match": "(?x)\\\\(\\\\|[ntr\\\"e]|0|(u[0-9a-fA-F]{4}))",
-					"name": "constant.character.escape"
-				},
-				{
-					"match": "\\\\(u[0-9a-zA-Z]{4}|.)",
-					"name": "invalid.illegal.unknown-escape.bbc"
-				}
-			]
-		}
-	}
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#comment-block"
+    },
+    {
+      "include": "#hash"
+    },
+    {
+      "include": "#alias-definition"
+    },
+    {
+      "include": "#struct-definition"
+    },
+    {
+      "include": "#enum-definition"
+    },
+    {
+      "include": "#function-definition"
+    },
+    {
+      "include": "#using"
+    },
+    {
+      "include": "#attribute"
+    },
+    {
+      "include": "#template"
+    },
+    {
+      "include": "#keyword"
+    },
+    {
+      "include": "#any-statement"
+    },
+    {
+      "include": "#scope"
+    }
+  ],
+  "repository": {
+    "scope": {
+      "begin": "{",
+      "end": "}",
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#comment-block"
+        },
+        {
+          "include": "#attribute"
+        },
+        {
+          "include": "#template"
+        },
+        {
+          "include": "#keyword"
+        },
+        {
+          "include": "#any-statement"
+        },
+        {
+          "include": "#scope"
+        }
+      ]
+    },
+    "hash": {
+      "captures": {
+        "1": {
+          "name": "constant.language"
+        },
+        "2": {
+          "name": "entity.name.variable"
+        }
+      },
+      "match": "(#[a-zA-Z]*)\\s *([a-zA-Z]*)"
+    },
+    "literal": {
+      "patterns": [
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#number"
+        }
+      ]
+    },
+    "any-statement": {
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#comment-block"
+        },
+        {
+          "include": "#as"
+        },
+        {
+          "include": "#flow-control-statement"
+        },
+        {
+          "include": "#variable-definition"
+        },
+        {
+          "include": "#new-instance"
+        },
+        {
+          "include": "#sizeof"
+        },
+        {
+          "include": "#function-calls"
+        },
+        {
+          "include": "#literal"
+        },
+        {
+          "include": "#hover-popup"
+        },
+        {
+          "include": "#keyword"
+        },
+        {
+          "include": "#field"
+        },
+        {
+          "include": "#type"
+        },
+        {
+          "include": "#identifier"
+        }
+      ]
+    },
+    "sizeof": {
+      "begin": "\\b(sizeof)\\s*\\(",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.tag"
+        }
+      },
+      "end": "\\)",
+      "patterns": [
+        {
+          "include": "#type"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.type"
+            }
+          },
+          "match": "\\b(\\w+)\\b"
+        }
+      ]
+    },
+    "as": {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        }
+      },
+      "match": "\\b(as)\\b\\s+((?!(?:struct|using|template|alias|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
+    },
+    "type": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.type"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "include": "#type"
+                }
+              ]
+            }
+          },
+          "match": "\\b((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b[\\t ]*<((?!(?:struct|using|template|alias|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)>"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.tag"
+            }
+          },
+          "match": "\\b(void|any|u8|i8|u16|i16|u32|i32|f32)\\b"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.type"
+            }
+          },
+          "match": "\\b((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b(\\*+)"
+        }
+      ]
+    },
+    "hover-popup": {
+      "match": "^\\(\\w+\\)",
+      "name": "emphasis"
+    },
+    "flow-control-statement": {
+      "patterns": [
+        {
+          "match": "\\breturn\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\bthrow\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\bif\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\belse\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\belseif\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\bwhile\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\bfor\\b",
+          "name": "keyword.control"
+        },
+        {
+          "match": "\\bbreak\\b",
+          "name": "keyword.control"
+        }
+      ]
+    },
+    "keyword-call": {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag"
+        }
+      },
+      "match": "\\b(delete|temp|type)\\b"
+    },
+    "template": {
+      "begin": "\\b(template)\\b\\s*\\<",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.tag"
+        }
+      },
+      "end": "\\>",
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.type"
+            }
+          },
+          "match": "((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)"
+        }
+      ]
+    },
+    "comment": {
+      "match": "\\/\\/[^\\n]*\\n",
+      "name": "comment.line"
+    },
+    "comment-block": {
+      "patterns": [
+        {
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.begin.bbc"
+            }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.end.bbc"
+            }
+          },
+          "name": "comment.block"
+        },
+        {
+          "match": "\\*/.*\\n",
+          "name": "invalid.illegal.stray-comment-end.bbc"
+        }
+      ]
+    },
+    "number": {
+      "match": "(\\.[0-9]+f?\\b|\\b[0-9]+f?\\b|\\b0x[0-9a-fA-F_]+\\b|\\b0b[01_]+\\b|\\b[0-9]e[0-9]f?\\b)",
+      "name": "constant.numeric"
+    },
+    "field": {
+      "match": "\\.\\w*\\b((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b(?!\\s*\\()"
+    },
+    "identifier": {
+      "captures": {
+        "1": {
+          "name": "variable.name"
+        }
+      },
+      "match": "\\b((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b(?!\\s*\\()"
+    },
+    "string": {
+      "match": "\"[\\s\\S]*\"",
+      "name": "string.quoted.double.ulog"
+    },
+    "struct-definition": {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag"
+        },
+        "2": {
+          "name": "entity.name.class"
+        }
+      },
+      "match": "(struct)[\\s]+((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)"
+    },
+    "alias-definition": {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag"
+        },
+        "2": {
+          "name": "entity.name.class"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        }
+      },
+      "match": "(alias)\\s+((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s+((?!(?:struct|using|template|alias|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
+    },
+    "using": {
+      "captures": {
+        "1": {
+          "name": "keyword.control"
+        }
+      },
+      "match": "\\b(using)\\b\\s*([\\w\\.]*)"
+    },
+    "new-instance": {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        }
+      },
+      "match": "(new)[\\s]+((?!(?:struct|using|template|alias|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
+    },
+    "variable-definition": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.tag"
+            },
+            "2": {
+              "name": "entity.name.variable"
+            }
+          },
+          "match": "\\b(void|any|u8|i8|u16|i16|u32|i32|f32)\\b\\s+((?!(?:void|any|u8|i8|u16|i16|u32|i32|f32))\\w+)(?!\\()"
+        },
+        {
+          "captures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#type"
+                },
+                {
+                  "captures": {
+                    "1": {
+                      "name": "entity.name.type"
+                    }
+                  },
+                  "match": "\\b(\\w+)\\b"
+                }
+              ]
+            },
+            "2": {
+              "name": "entity.name.variable"
+            }
+          },
+          "match": "\\b([\\w*<>]+)(?<!struct|using|template|alias|private|export|as)[\\t ]+\\b(?!as)(\\w+)(?!\\()"
+        }
+      ]
+    },
+    "attribute": {
+      "captures": {
+        "1": {
+          "name": "entity.name.class"
+        }
+      },
+      "match": "\\s\\[\\s*((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*(\\]|\\()"
+    },
+    "keyword": {
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "entity.name.tag"
+            }
+          },
+          "match": "\\b(struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b"
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.control"
+            }
+          },
+          "match": "\\b(export)\\b"
+        }
+      ]
+    },
+    "function-call": {
+      "captures": {
+        "1": {
+          "name": "entity.name.function"
+        }
+      },
+      "match": "(?<!\\[)\\b((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b\\s*\\("
+    },
+    "function-definition": {
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        },
+        "2": {
+          "name": "entity.name.function"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#parameter-definitions"
+            }
+          ]
+        }
+      },
+      "match": "(\\w+)(?<!struct|using|template|alias|private|export|as)\\s+((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s?\\(([\\w\\s,]?)\\)"
+    },
+    "parameter-definitions": {
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#keyword"
+            }
+          ]
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        },
+        "3": {
+          "name": "variable.parameter"
+        }
+      },
+      "match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+((?!(?:struct|using|template|alias|void|any|u8|i8|u16|i16|u32|i32|f32|private|export|as)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)(,|$)"
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double",
+          "patterns": [
+            {
+              "include": "#string-escaped-char"
+            }
+          ]
+        },
+        {
+          "begin": "'",
+          "end": "'",
+          "name": "string.quoted.single",
+          "patterns": [
+            {
+              "include": "#string-escaped-char"
+            }
+          ]
+        }
+      ]
+    },
+    "string-escaped-char": {
+      "patterns": [
+        {
+          "match": "(?x)\\\\(\\\\|[ntr\\\"e]|0|(u[0-9a-fA-F]{4}))",
+          "name": "constant.character.escape"
+        },
+        {
+          "match": "\\\\(u[0-9a-zA-Z]{4}|.)",
+          "name": "invalid.illegal.unknown-escape.bbc"
+        }
+      ]
+    }
+  },
+  "fileTypes": [
+    "bbc"
+  ],
+  "name": "BBLang Language",
+  "scopeName": "source.bbc"
 }

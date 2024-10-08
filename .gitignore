@@ -5,3 +5,6 @@
 
 /BBLangExtension.vsix
 /package-lock.json
+
+syntax_generator/bin
+syntax_generator/obj
