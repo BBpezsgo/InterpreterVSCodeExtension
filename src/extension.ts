@@ -34,11 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     activateLanguageClient(context)
 
-    const tokenDebugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0)
-    tokenDebugButton.text = 'Inspect Token'
-    tokenDebugButton.command = 'editor.action.inspectTMScopes'
-    tokenDebugButton.show()
-
     if (checkForUpdates) {
         updater.checkForUpdates(config.interpreterUpdateOptions)
             .then(result => {
@@ -99,4 +94,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
 }
 
-export function deactivate() { return client?.deactivate() }
+export function deactivate() {
+    client?.deactivate()
+}
