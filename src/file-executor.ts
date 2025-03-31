@@ -21,6 +21,7 @@ export async function execute(filepath: string, cmdPath: string | null = null, s
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	console.log(`[BBLang]: Registering file executor`)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(`${languageId}.executeFile`, async args => {
 			const filepath = getFilePath(args)

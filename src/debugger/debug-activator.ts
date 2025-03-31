@@ -111,18 +111,11 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 class DebugAdapterExecutableFactory implements vscode.DebugAdapterDescriptorFactory {
     createDebugAdapterDescriptor(_session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): ProviderResult<vscode.DebugAdapterDescriptor> {
-        if (!fs.existsSync(config.debugAdapterServerExecutable)) {
-            console.error(`[DebugAdapter]: Debug server "${config.debugAdapterServerExecutable}" not found`)
+        if (!fs.existsSync(config.debugServerOptions.LocalPath)) {
+            console.error(`[DebugAdapter]: Debug server "${config.debugServerOptions.LocalPath}" not found`)
         }
 
-        const command = config.debugAdapterServerExecutable
-        const args = [
-
-        ]
-        const options: vscode.DebugAdapterExecutableOptions = {
-
-        }
-        executable = new vscode.DebugAdapterExecutable(command, args, options)
+        executable = new vscode.DebugAdapterExecutable(config.debugServerOptions.LocalPath)
 
         console.log('[DebugAdapter]: Describe debug adapter as external', executable)
 

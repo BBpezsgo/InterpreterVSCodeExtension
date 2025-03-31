@@ -16,7 +16,7 @@ export async function get() {
         return cmdPath
     }
 
-    const downloaded = path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang')
+    const downloaded = path.join(config.interpreterOptions.LocalPath, 'BBLang')
 
     if (fs.existsSync(downloaded)) {
         return downloaded
@@ -54,8 +54,7 @@ export async function get() {
                 },
                 (progress) => {
                     return updater.update(
-                        config.interpreterUpdateOptions, progress,
-                        () => { return fs.existsSync(downloaded) }
+                        config.interpreterOptions, progress
                     )
                 })
 

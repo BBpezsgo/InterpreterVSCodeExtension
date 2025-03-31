@@ -14,7 +14,7 @@ export class TestProvider {
 	}
 
 	async activate() {
-		console.log(`[Tests]: Activate`)
+		console.log(`[BBLang Tests]: Activate`)
 
 		this.controller = vscode.tests.createTestController('bblangTests', 'BBLang Tests')
 		this.context.subscriptions.push(this.controller)
@@ -71,7 +71,7 @@ export class TestProvider {
 	}
 
 	private async discoverAllFilesInWorkspace() {
-		console.log(`[Tests]: Discovering files in workspace ...`)
+		console.log(`[BBLang Tests]: Discovering files in workspace ...`)
 
 		const files = await vscode.workspace.findFiles(`*.${utils.languageExtension}`)
 

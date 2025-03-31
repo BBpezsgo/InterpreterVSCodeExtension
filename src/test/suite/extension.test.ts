@@ -33,21 +33,17 @@ suite('Extension Test Suite', () => {
       location: vscode.ProgressLocation.Notification,
       cancellable: false,
       title: 'Downloading the language server',
-    }, (progress) => updater.update(config.languageServerUpdateOptions, progress, () => {
-      return fs.existsSync(config.languageServerExecutable)
-    }))
+    }, (progress) => updater.update(config.languageServerOptions, progress))
 
     await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       cancellable: false,
       title: 'Downloading the interpreter',
-    }, async (progress) => updater.update(config.interpreterUpdateOptions, progress, () => {
-      return fs.existsSync(path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang'))
-    }))
+    }, async (progress) => updater.update(config.interpreterOptions, progress))
 
     const terminal = await fileExecutor.execute(
       '/home/BB/Projects/BBLang/InterpreterVSCodeExtension/src/test/suite/script.txt',
-      path.join(config.interpreterUpdateOptions.LocalPath, 'BBLang'), [
+      path.join(config.interpreterOptions.LocalPath, 'BBLang'), [
       // '--no-pause'
     ])
 

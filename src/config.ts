@@ -3,18 +3,52 @@ import * as path from 'path'
 import * as updater from './updater'
 import * as utils from './utils'
 
-export const interpreterUpdateOptions: updater.UpdateOptions = {
+const dotnetRID = (() => {
+    switch (process.platform) {
+        case 'linux':
+            switch (process.arch) {
+                case 'x64': return 'linux-x64'
+                case 'arm': return 'linux-arm'
+                case 'arm64': return 'linux-arm64'
+            }
+        case 'win32':
+            switch (process.arch) {
+                case 'x64': return 'win-x64'
+            }
+    }
+    vscode.window.showErrorMessage(`The current platform ${process.platform}-${process.arch} is not supported`)
+    return ''
+})()
+
+const executableFileExtension = (() => {
+    switch (process.platform) {
+        case 'win32':
+            return '.exe'
+        case 'linux':
+        default:
+            return ''
+    }
+})()
+
+export const interpreterOptions: updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
     GithubRepository: 'Interpreter',
-    GithubAssetName: 'Windows_x64_RuntimeIndependent.zip',
-    LocalPath: path.join(__dirname, 'interpreter')
+    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+    LocalPath: path.join(__dirname, 'interpreter'),
 }
 
-export const languageServerUpdateOptions: updater.UpdateOptions = {
+export const debugServerOptions: updater.UpdateOptions = {
     GithubUsername: 'BBpezsgo',
-    GithubRepository: 'Interpreter',
-    GithubAssetName: 'LanguageServer_Windows_x64_RuntimeIndependent.zip',
-    LocalPath: path.join(__dirname, 'language-server')
+    GithubRepository: '',
+    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+    LocalPath: path.join(__dirname, 'debug-server'),
+}
+
+export const languageServerOptions: updater.UpdateOptions = {
+    GithubUsername: 'BBpezsgo',
+    GithubRepository: 'BBCode-LanguageServer',
+    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+    LocalPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
 }
 
 /**
@@ -50,11 +84,3 @@ export function goToConfig(config: string) {
     const searchPath = `${utils.extensionConfigName}.${config}`
     vscode.commands.executeCommand('workbench.action.openSettings', searchPath)
 }
-
-export const debugAdapterServerExecutable = (() => {
-    return path.join(__dirname, '..', 'debug-server', utils.options.debugServerMode, 'net9.0', 'DebugServer')
-})()
-
-export const languageServerExecutable = (() => {
-    return path.join(__dirname, '..', 'language-server', utils.options.languageServerMode, 'net9.0', 'LanguageServer')
-})()
