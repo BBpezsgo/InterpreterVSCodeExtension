@@ -1,15 +1,14 @@
 **/*.map
 **/*.ts
 
-debug-server/**
-language-server/**
+.github/**
 .vscode/**
-src/**
 node_modules/**
-out/**
+syntax_generator/**
+src/**
+out/language-server/**
+out/test/**
 
 .gitignore
-.github
-
+.vscode-test.mjs
 tsconfig.json
-BBLangExtension.vsix

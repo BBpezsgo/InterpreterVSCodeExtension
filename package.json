@@ -1,8 +1,8 @@
 {
 	"name": "bblang",
-	"description": "A VSCode extension to support some basic things in my BBlang programming language",
+	"description": "Language client for my programming language",
 	"author": "BB",
-	"version": "0.0.2404",
+	"version": "0.0.2405",
 	"displayName": "BBlang",
 	"private": true,
 	"preview": true,
@@ -23,7 +23,7 @@
 	"icon": "icons/extension.png",
 	"homepage": "https://github.com/BBpezsgo/InterpreterVSCodeExtension",
 	"galleryBanner": {
-		"color": "#5c0f1c",
+		"color": "#2d1d37",
 		"theme": "dark"
 	},
 	"activationEvents": [
@@ -242,9 +242,10 @@
 		"watch": "tsc -w --project ./",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
 		"compile": "tsc --project ./",
-		"package": "echo Bruh >LICENSE.txt && npm run webpack && vsce package --target win32-x64 --out BBLangExtension.vsix && del LICENSE.txt",
+		"package": "echo Bruh > LICENSE.txt && npm run compile && vsce package --out BBLangExtension.vsix && rm LICENSE.txt",
 		"pretest": "npm run compile",
-		"test": "vscode-test"
+		"test": "vscode-test",
+		"list": "vsce ls"
 	},
 	"devDependencies": {
 		"@types/adm-zip": "latest",
