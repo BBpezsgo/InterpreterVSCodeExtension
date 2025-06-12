@@ -67,7 +67,7 @@ static partial class Program
                 new() { Include = "#variable-definition" },
                 new() { Include = "#new-instance" },
                 new() { Include = "#sizeof" },
-                new() { Include = "#function-calls" },
+                new() { Include = "#function-call" },
                 new() { Include = "#literal" },
                 new() { Include = "#hover-popup" },
                 new() { Include = "#keyword" },
@@ -84,7 +84,7 @@ static partial class Program
 
             BeginCaptures = new()
             {
-                { 1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
             },
 
             Patterns = [
@@ -105,7 +105,7 @@ static partial class Program
             Match = @$"\b({StatementKeywords.As})\b\s+({typeRegex})\b",
             Captures = new()
             {
-                { 1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
                 { 2, new() { Patterns = [ new() { Include = "#type" } ] } },
             }
         };
@@ -125,7 +125,7 @@ static partial class Program
                 {
                     Match = @$"\b({builtinTypes})\b",
                     Captures = new() {
-                        { 1, SyntaxToken.EntityNameTag },
+                        { 1, SyntaxToken.KeywordControl },
                     },
                 },
                 new()
@@ -206,7 +206,7 @@ static partial class Program
 
             BeginCaptures = new()
             {
-                { 1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
             },
 
             Patterns = [
@@ -259,11 +259,14 @@ static partial class Program
             Name = "constant.numeric"
         };
 
+        /*
         repository["field"] = new Pattern()
         {
             Match = @$"\.\w*\b({identifier})\b(?!\s*\()"
         };
+        */
 
+        /*
         repository["identifier"] = new Pattern()
         {
             Match = @$"\b({identifier})\b(?!\s*\()",
@@ -272,6 +275,7 @@ static partial class Program
                 { 1, SyntaxToken.VariableName }
             }
         };
+        */
 
         repository["string"] = new Pattern()
         {
@@ -284,7 +288,7 @@ static partial class Program
             Match = @$"({DeclarationKeywords.Struct})[\s]+({identifier})",
             Captures = new()
             {
-                { 1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
                 { 2, SyntaxToken.EntityNameClass },
             }
         };
@@ -294,7 +298,7 @@ static partial class Program
             Match = @$"({DeclarationKeywords.Alias})\s+({identifier})\s+({typeRegex})\b",
             Captures = new()
             {
-                { 1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
                 { 2, SyntaxToken.EntityNameClass },
                 { 3, new() { Patterns = [ new() { Include = "#type" } ] } },
             }
@@ -309,6 +313,7 @@ static partial class Program
             }
         };
 
+        /*
         repository["new-instance"] = new Pattern()
         {
             Match = @$"({StatementKeywords.New})[\s]+({typeRegex})\b",
@@ -359,6 +364,7 @@ static partial class Program
                 }
             ]
         };
+        */
 
         repository["attribute"] = new Pattern()
         {
@@ -378,7 +384,7 @@ static partial class Program
                     Match = @$"\b({keywords})\b",
                     Captures = new()
                     {
-                        { 1, SyntaxToken.EntityNameTag },
+                        { 1, SyntaxToken.KeywordControl },
                     }
                 },
                 new()
@@ -394,7 +400,7 @@ static partial class Program
 
         repository["function-call"] = new Pattern()
         {
-            Match = @$"(?<!\[)\b({identifier})\b\s*\(",
+            Match = @$"(?<!\[)\b({identifier})\b\s*(?=\()",
             Captures = new()
             {
                 { 1, SyntaxToken.EntityNameFunction },
