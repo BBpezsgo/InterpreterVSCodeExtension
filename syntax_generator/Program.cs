@@ -28,7 +28,6 @@ static partial class Program
                 new() { Include = "#comment-block" },
 
                 new() { Include = "#attribute" },
-                new() { Include = "#template" },
                 new() { Include = "#keyword" },
 
                 new() { Include = "#any-statement" },
@@ -197,28 +196,6 @@ static partial class Program
             {
                 {1, SyntaxToken.EntityNameTag },
             }
-        };
-
-        repository["template"] = new Pattern()
-        {
-            Begin = @$"\b({DeclarationKeywords.Template})\b\s*\<",
-            End = @"\>",
-
-            BeginCaptures = new()
-            {
-                { 1, SyntaxToken.KeywordControl },
-            },
-
-            Patterns = [
-                new()
-                {
-                    Match = @$"({identifier})",
-                    Captures = new()
-                    {
-                        { 1, SyntaxToken.EntityNameType },
-                    }
-                }
-            ],
         };
 
         repository["comment"] = new Pattern()
@@ -491,7 +468,6 @@ static partial class Program
                 new() { Include = "#using" },
 
                 new() { Include = "#attribute" },
-                new() { Include = "#template" },
                 new() { Include = "#keyword" },
 
                 new() { Include = "#any-statement" },
