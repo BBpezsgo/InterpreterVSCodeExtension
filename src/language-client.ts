@@ -33,11 +33,16 @@ export class LanguageClientManager {
 
         const clientOptions: LanguageClientOptions = {
             documentSelector: [{
-                pattern: `**/*.${utils.languageExtension}`
+                language: utils.languageExtension,
             }],
             synchronize: {
                 configurationSection: utils.extensionConfigName,
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+            },
+            diagnosticPullOptions: {
+                onChange: true,
+                onTabs: true,
+                onSave: true,
             },
         }
 

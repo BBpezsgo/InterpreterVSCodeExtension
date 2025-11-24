@@ -286,7 +286,8 @@ static partial class Program
             Match = @$"\b({DeclarationKeywords.Using})\s+([a-zA-Z0-9_\.]+)",
             Captures = new()
             {
-                { 1, SyntaxToken.KeywordControl }
+                { 1, SyntaxToken.KeywordControl },
+                { 2, SyntaxToken.String },
             }
         };
 
