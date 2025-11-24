@@ -29,9 +29,6 @@
       "include": "#attribute"
     },
     {
-      "include": "#template"
-    },
-    {
       "include": "#keyword"
     },
     {
@@ -54,9 +51,6 @@
         },
         {
           "include": "#attribute"
-        },
-        {
-          "include": "#template"
         },
         {
           "include": "#keyword"
@@ -171,7 +165,7 @@
           ]
         }
       },
-      "match": "\\b(as)\\b\\s+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
+      "match": "\\b(as)\\b\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
     },
     "type": {
       "patterns": [
@@ -188,7 +182,7 @@
               ]
             }
           },
-          "match": "\\b((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b[\\t ]*<((?!(?:struct|using|template|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)>"
+          "match": "\\b((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b[\\t ]*<((?!(?:struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)>"
         },
         {
           "captures": {
@@ -204,7 +198,7 @@
               "name": "entity.name.type"
             }
           },
-          "match": "\\b((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b(\\*+)"
+          "match": "\\b((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b(\\*+)"
         }
       ]
     },
@@ -256,25 +250,6 @@
       },
       "match": "\\b(delete|temp|type)\\b"
     },
-    "template": {
-      "begin": "\\b(template)\\b\\s*\\<",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.control"
-        }
-      },
-      "end": "\\>",
-      "patterns": [
-        {
-          "captures": {
-            "1": {
-              "name": "entity.name.type"
-            }
-          },
-          "match": "((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)"
-        }
-      ]
-    },
     "comment": {
       "match": "\\/\\/[^\\n]*\\n",
       "name": "comment.line"
@@ -319,7 +294,7 @@
           "name": "entity.name.class"
         }
       },
-      "match": "(struct)[\\s]+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)"
+      "match": "(struct)[\\s]+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)"
     },
     "alias-definition": {
       "captures": {
@@ -337,12 +312,15 @@
           ]
         }
       },
-      "match": "(alias)\\s+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
+      "match": "(alias)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@\\*\\[\\]\\<\\>\\,\\s]*)\\b"
     },
     "using": {
       "captures": {
         "1": {
           "name": "keyword.control"
+        },
+        "2": {
+          "name": "string"
         }
       },
       "match": "\\b(using)\\s+([a-zA-Z0-9_\\.]+)"
@@ -353,7 +331,7 @@
           "name": "entity.name.class"
         }
       },
-      "match": "\\s\\[\\s*((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*(\\]|\\()"
+      "match": "\\s\\[\\s*((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*(\\]|\\()"
     },
     "keyword": {
       "patterns": [
@@ -363,7 +341,7 @@
               "name": "keyword.control"
             }
           },
-          "match": "\\b(struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b"
+          "match": "\\b(struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b"
         },
         {
           "captures": {
@@ -381,7 +359,7 @@
           "name": "entity.name.function"
         }
       },
-      "match": "(?<!\\[)\\b((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b\\s*(?=\\()"
+      "match": "(?<!\\[)\\b((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b\\s*(?=\\()"
     },
     "function-definition": {
       "captures": {
@@ -403,7 +381,7 @@
           ]
         }
       },
-      "match": "(\\w+)(?<!struct|using|template|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\s+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s?\\(([\\w\\s,]?)\\)"
+      "match": "(\\w+)(?<!struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s?\\(([\\w\\s,]?)\\)"
     },
     "parameter-definitions": {
       "captures": {
@@ -425,7 +403,7 @@
           "name": "variable.parameter"
         }
       },
-      "match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+((?!(?:struct|using|template|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)(,|$)"
+      "match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)(,|$)"
     },
     "strings": {
       "patterns": [
