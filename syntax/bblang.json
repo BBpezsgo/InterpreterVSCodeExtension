@@ -8,7 +8,7 @@
       "include": "#comment-block"
     },
     {
-      "include": "#hash"
+      "include": "#preprocessor"
     },
     {
       "include": "#alias-definition"
@@ -17,7 +17,7 @@
       "include": "#struct-definition"
     },
     {
-      "include": "#enum-definition"
+      "include": "#any-statement"
     },
     {
       "include": "#function-definition"
@@ -26,16 +26,10 @@
       "include": "#using"
     },
     {
-      "include": "#attribute"
+      "include": "#scope"
     },
     {
       "include": "#keyword"
-    },
-    {
-      "include": "#any-statement"
-    },
-    {
-      "include": "#scope"
     }
   ],
   "repository": {
@@ -63,7 +57,7 @@
         }
       ]
     },
-    "hash": {
+    "preprocessor": {
       "captures": {
         "1": {
           "name": "constant.language"
@@ -99,12 +93,6 @@
           "include": "#flow-control-statement"
         },
         {
-          "include": "#variable-definition"
-        },
-        {
-          "include": "#new-instance"
-        },
-        {
           "include": "#sizeof"
         },
         {
@@ -118,9 +106,6 @@
         },
         {
           "include": "#keyword"
-        },
-        {
-          "include": "#field"
         },
         {
           "include": "#type"
@@ -207,48 +192,12 @@
       "name": "emphasis"
     },
     "flow-control-statement": {
-      "patterns": [
-        {
-          "match": "\\breturn\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\bcrash\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\bif\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\belseif\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\belse\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\bwhile\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\bfor\\b",
-          "name": "keyword.control"
-        },
-        {
-          "match": "\\bbreak\\b",
-          "name": "keyword.control"
-        }
-      ]
-    },
-    "keyword-call": {
       "captures": {
         "1": {
-          "name": "entity.name.tag"
+          "name": "keyword.control"
         }
       },
-      "match": "\\b(delete|temp|type)\\b"
+      "match": "\\b(return|crash|if|elseif|else|while|for|break)\\b"
     },
     "comment": {
       "match": "\\/\\/[^\\n]*\\n",
@@ -280,10 +229,6 @@
     "number": {
       "match": "(\\.[0-9]+f?\\b|\\b[0-9]+f?\\b|\\b0x[0-9a-fA-F_]+\\b|\\b0b[01_]+\\b|\\b[0-9]e[0-9]f?\\b)",
       "name": "constant.numeric"
-    },
-    "string": {
-      "match": "\"[\\s\\S]*\"",
-      "name": "string.quoted.double.ulog"
     },
     "struct-definition": {
       "captures": {
@@ -325,33 +270,13 @@
       },
       "match": "\\b(using)\\s+([a-zA-Z0-9_\\.]+)"
     },
-    "attribute": {
+    "keyword": {
       "captures": {
         "1": {
-          "name": "entity.name.class"
+          "name": "keyword.control"
         }
       },
-      "match": "\\s\\[\\s*((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*(\\]|\\()"
-    },
-    "keyword": {
-      "patterns": [
-        {
-          "captures": {
-            "1": {
-              "name": "keyword.control"
-            }
-          },
-          "match": "\\b(struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b"
-        },
-        {
-          "captures": {
-            "1": {
-              "name": "keyword.control"
-            }
-          },
-          "match": "\\b(export)\\b"
-        }
-      ]
+      "match": "\\b(struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b"
     },
     "function-call": {
       "captures": {
@@ -359,51 +284,41 @@
           "name": "entity.name.function"
         }
       },
-      "match": "(?<!\\[)\\b((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b\\s*(?=\\()"
+      "match": "\\b((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\b\\s*(?=\\()"
     },
     "function-definition": {
-      "captures": {
-        "1": {
-          "patterns": [
-            {
-              "include": "#type"
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#type"
+                }
+              ]
+            },
+            "2": {
+              "name": "entity.name.function"
             }
-          ]
+          },
+          "match": "(\\w+)(?<!struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*(?=\\()"
         },
-        "2": {
-          "name": "entity.name.function"
-        },
-        "3": {
-          "patterns": [
-            {
-              "include": "#parameter-definitions"
+        {
+          "captures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#type"
+                }
+              ]
+            },
+            "2": {
+              "name": "entity.name.function"
             }
-          ]
+          },
+          "match": "(\\w+)(?<!struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s*<.*>\\s*(?=\\()"
         }
-      },
-      "match": "(\\w+)(?<!struct|using|alias|temp|ref|this|const|inline|private|export|as|new|delete)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)\\s?\\(([\\w\\s,]?)\\)"
-    },
-    "parameter-definitions": {
-      "captures": {
-        "1": {
-          "patterns": [
-            {
-              "include": "#keyword"
-            }
-          ]
-        },
-        "2": {
-          "patterns": [
-            {
-              "include": "#type"
-            }
-          ]
-        },
-        "3": {
-          "name": "variable.parameter"
-        }
-      },
-      "match": "((this|ref|temp)*\\s+)?([\\w]+)\\s+((?!(?:struct|using|alias|temp|ref|this|const|inline|void|any|u8|i8|u16|i16|u32|i32|u64|i64|f32|private|export|as|new|delete)\\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*)(,|$)"
+      ]
     },
     "strings": {
       "patterns": [

@@ -35,7 +35,7 @@ static partial class Program
             ]
         };
 
-        repository["hash"] = new Pattern()
+        repository["preprocessor"] = new Pattern()
         {
             Match = @"(#[a-zA-Z]*)\s *([a-zA-Z]*)",
             Captures = new()
@@ -63,14 +63,11 @@ static partial class Program
 
                 new() { Include = "#as" },
                 new() { Include = "#flow-control-statement" },
-                new() { Include = "#variable-definition" },
-                new() { Include = "#new-instance" },
                 new() { Include = "#sizeof" },
                 new() { Include = "#function-call" },
                 new() { Include = "#literal" },
                 new() { Include = "#hover-popup" },
                 new() { Include = "#keyword" },
-                new() { Include = "#field" },
                 new() { Include = "#type" },
                 new() { Include = "#identifier" }
             ]
@@ -145,56 +142,18 @@ static partial class Program
 
         repository["flow-control-statement"] = new Pattern()
         {
-            Patterns = [
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.Return}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.Crash}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.If}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.ElseIf}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.Else}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.While}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.For}\b",
-                    Name = "keyword.control",
-                },
-                new()
-                {
-                    Match = @$"\b{StatementKeywords.Break}\b",
-                    Name = "keyword.control",
-                },
-            ]
-        };
-
-        repository["keyword-call"] = new Pattern()
-        {
-            Match = @"\b(delete|temp|type)\b",
+            Match = @$"\b({string.Join('|',
+                StatementKeywords.Return,
+                StatementKeywords.Crash,
+                StatementKeywords.If,
+                StatementKeywords.ElseIf,
+                StatementKeywords.Else,
+                StatementKeywords.While,
+                StatementKeywords.For,
+                StatementKeywords.Break)})\b",
             Captures = new()
             {
-                {1, SyntaxToken.EntityNameTag },
+                { 1, SyntaxToken.KeywordControl },
             }
         };
 
@@ -236,30 +195,6 @@ static partial class Program
             Name = "constant.numeric"
         };
 
-        /*
-        repository["field"] = new Pattern()
-        {
-            Match = @$"\.\w*\b({identifier})\b(?!\s*\()"
-        };
-        */
-
-        /*
-        repository["identifier"] = new Pattern()
-        {
-            Match = @$"\b({identifier})\b(?!\s*\()",
-            Captures = new()
-            {
-                { 1, SyntaxToken.VariableName }
-            }
-        };
-        */
-
-        repository["string"] = new Pattern()
-        {
-            Name = "string.quoted.double.ulog",
-            Match = @"""[\s\S]*"""
-        };
-
         repository["struct-definition"] = new Pattern()
         {
             Match = @$"({DeclarationKeywords.Struct})[\s]+({identifier})",
@@ -291,94 +226,18 @@ static partial class Program
             }
         };
 
-        /*
-        repository["new-instance"] = new Pattern()
-        {
-            Match = @$"({StatementKeywords.New})[\s]+({typeRegex})\b",
-            Captures = new()
-            {
-                { 1, SyntaxToken.EntityNameTag },
-                { 2, new() { Patterns = [ new() { Include = "#type" } ] } },
-            }
-        };
-
-        repository["variable-definition"] = new Pattern()
-        {
-            Patterns = [
-                new()
-                {
-                    Match = @$"\b({builtinTypes})\b\s+((?!(?:{builtinTypes}))\w+)(?!\()",
-                    Captures = new()
-                    {
-                        { 1,SyntaxToken.EntityNameTag },
-                        { 2, SyntaxToken.EntityNameVariable },
-                    }
-                },
-                new()
-                {
-                    Match = @$"\b([\w*<>]+)(?<!{typeExcludedKeywords})[\t ]+\b(?!as)(\w+)(?!\()",
-                    Captures = new()
-                    {
-                        {
-                            1,
-                            new()
-                            {
-                                Patterns =
-                                [
-                                    new() { Include = "#type" },
-                                    new()
-                                    {
-                                        Match = @"\b(\w+)\b",
-                                        Captures = new()
-                                        {
-                                            { 1, SyntaxToken.EntityNameType }
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        { 2, SyntaxToken.EntityNameVariable },
-                    }
-                }
-            ]
-        };
-        */
-
-        repository["attribute"] = new Pattern()
-        {
-            Match = @$"\s\[\s*({identifier})\s*(\]|\()",
-            Captures = new()
-            {
-                { 1, SyntaxToken.EntityNameClass },
-            }
-        };
-
         repository["keyword"] = new Pattern()
         {
-            Patterns =
-            [
-                new()
-                {
-                    Match = @$"\b({keywords})\b",
-                    Captures = new()
-                    {
-                        { 1, SyntaxToken.KeywordControl },
-                    }
-                },
-                new()
-                {
-                    Match = @"\b(export)\b",
-                    Captures = new()
-                    {
-                        { 1, SyntaxToken.KeywordControl },
-                    }
-                }
-            ]
+            Match = @$"\b({keywords})\b",
+            Captures = new()
+            {
+                { 1, SyntaxToken.KeywordControl },
+            }
         };
 
         repository["function-call"] = new Pattern()
         {
-            Match = @$"(?<!\[)\b({identifier})\b\s*(?=\()",
+            Match = @$"\b({identifier})\b\s*(?=\()",
             Captures = new()
             {
                 { 1, SyntaxToken.EntityNameFunction },
@@ -387,24 +246,26 @@ static partial class Program
 
         repository["function-definition"] = new Pattern()
         {
-            Match = @$"(\w+)(?<!{typeExcludedKeywords})\s+({identifier})\s?\(([\w\s,]?)\)",
-            Captures = new()
-            {
-                { 1, new() { Patterns = [ new() { Include = "#type" } ] } },
-                { 2, SyntaxToken.EntityNameFunction },
-                { 3, new() { Patterns = [ new() { Include = "#parameter-definitions" } ] } },
-            }
-        };
-
-        repository["parameter-definitions"] = new Pattern()
-        {
-            Match = @$"((this|ref|temp)*\s+)?([\w]+)\s+({identifier})(,|$)",
-            Captures = new()
-            {
-                { 1, new() { Patterns = [ new() { Include = "#keyword" } ] } },
-                { 2, new() { Patterns = [ new() { Include = "#type" } ] } },
-                { 3, SyntaxToken.VariableParameter },
-            }
+            Patterns = [
+                new()
+                {
+                    Match = @$"(\w+)(?<!{typeExcludedKeywords})\s+({identifier})\s*(?=\()",
+                    Captures = new()
+                    {
+                        { 1, new() { Patterns = [ new() { Include = "#type" } ] } },
+                        { 2, SyntaxToken.EntityNameFunction },
+                    }
+                },
+                new()
+                {
+                    Match = @$"(\w+)(?<!{typeExcludedKeywords})\s+({identifier})\s*<.*>\s*(?=\()",
+                    Captures = new()
+                    {
+                        { 1, new() { Patterns = [ new() { Include = "#type" } ] } },
+                        { 2, SyntaxToken.EntityNameFunction },
+                    }
+                },
+            ]
         };
 
         repository["strings"] = new Pattern()
@@ -460,21 +321,16 @@ static partial class Program
             Patterns = [
                 new() { Include = "#comment" },
                 new() { Include = "#comment-block" },
-
-                new() { Include = "#hash" },
+                new() { Include = "#preprocessor" },
                 new() { Include = "#alias-definition" },
                 new() { Include = "#struct-definition" },
-                new() { Include = "#enum-definition" },
+                new() { Include = "#any-statement" },
                 new() { Include = "#function-definition" },
                 new() { Include = "#using" },
-
-                new() { Include = "#attribute" },
+                new() { Include = "#scope" },
                 new() { Include = "#keyword" },
-
-                new() { Include = "#any-statement" },
-                new() { Include = "#scope" }
             ]
         }, Converter.JsonOptions);
-        File.WriteAllText("/home/BB/Projects/BBLang/VSCodeExtension/syntax/bblang.json", json);
+        File.WriteAllText("/home/bb/Projects/BBLang/VSCodeExtension/syntax/bblang.json", json);
     }
 }
