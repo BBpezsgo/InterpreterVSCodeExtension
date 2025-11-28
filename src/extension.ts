@@ -10,16 +10,21 @@ import { TestProvider } from './test-provider'
 export let client: LanguageClientManager | null = null
 
 export function activateLanguageClient(context: vscode.ExtensionContext) {
-    if (!fs.existsSync(config.languageServerOptions.LocalPath)) {
-        console.warn(`[LanguageService]: Language server not found at "${config.languageServerOptions.LocalPath}"`)
+    const extConfig = config.getConfig()
+
+    if (!fs.existsSync(extConfig.languageServer.path)) {
+        console.warn(`[LanguageService]: Language server not found at "${extConfig.languageServer.path}"`)
+        vscode.window.showErrorMessage(`Language server not found at "${extConfig.languageServer.path}"`)
         return
     }
 
-    client = new LanguageClientManager(context, config.languageServerOptions.LocalPath)
+    client = new LanguageClientManager(context, extConfig.languageServer.path)
     client.activate()
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    const extConfig = config.getConfig()
+
     // try {
     //     const debugActivator: (typeof import('./debugger/debug-activator')) = require('./debugger/debug-activator')
     //     debugActivator.activate(context)
@@ -55,39 +60,43 @@ export function activate(context: vscode.ExtensionContext) {
         .catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
     */
 
-    updater.checkForUpdates(config.languageServerOptions)
-        .then(result => {
-            if (result === updater.CheckForUpdatesResult.NewVersion) {
-                vscode.window.showInformationMessage('Update avaliable for the language server', 'Update', 'Shut up')
-                    .then(value => {
-                        if (value === 'Update') {
-                            client?.deactivate()
-                            client = null
+    if (!fs.existsSync(extConfig.languageServer.path)) {
+        updater.checkForUpdates(extConfig.languageServer)
+            .then(result => {
+                if (result === updater.CheckForUpdatesResult.NewVersion) {
+                    vscode.window.showInformationMessage('Update avaliable for the language server', 'Update', 'Shut up')
+                        .then(value => {
+                            if (value === 'Update') {
+                                client?.deactivate()
+                                client = null
 
-                            vscode.window.withProgress({
-                                location: vscode.ProgressLocation.Notification,
-                                cancellable: false,
-                                title: 'Updating the language server',
-                            }, (progress) => updater.update(config.languageServerOptions, progress)).then(() => activateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to update the language server: ${reason}`))
-                        }
-                    })
-            } else if (result === updater.CheckForUpdatesResult.Nonexistent) {
-                vscode.window.showWarningMessage('Language server does not exists', 'Download', 'Shut up')
-                    .then(value => {
-                        if (value === 'Download') {
-                            client?.deactivate()
-                            client = null
+                                vscode.window.withProgress({
+                                    location: vscode.ProgressLocation.Notification,
+                                    cancellable: false,
+                                    title: 'Updating the language server',
+                                }, (progress) => updater.update(extConfig.languageServer, progress)).then(() => activateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to update the language server: ${reason}`))
+                            }
+                        })
+                } else if (result === updater.CheckForUpdatesResult.Nonexistent) {
+                    vscode.window.showWarningMessage('Language server does not exists', 'Download', 'Show Settings', 'Shut up')
+                        .then(value => {
+                            if (value === 'Download') {
+                                client?.deactivate()
+                                client = null
 
-                            vscode.window.withProgress({
-                                location: vscode.ProgressLocation.Notification,
-                                cancellable: false,
-                                title: 'Downloading the language server',
-                            }, (progress) => updater.update(config.languageServerOptions, progress)).then(() => activateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to download the language server: ${reason}`))
-                        }
-                    })
-            }
-        })
-        .catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
+                                vscode.window.withProgress({
+                                    location: vscode.ProgressLocation.Notification,
+                                    cancellable: false,
+                                    title: 'Downloading the language server',
+                                }, (progress) => updater.update(extConfig.languageServer, progress)).then(() => activateLanguageClient(context), (reason) => vscode.window.showErrorMessage(`Failed to download the language server: ${reason}`))
+                            } else if (value === 'Show Settings') {
+                                config.goToConfig('server.path')
+                            }
+                        })
+                }
+            })
+            .catch(error => vscode.window.showWarningMessage('Failed to check for updates: ' + error))
+    }
 }
 
 export function deactivate() {

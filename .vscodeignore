@@ -3,12 +3,12 @@
 
 .github/**
 .vscode/**
-node_modules/**
 syntax_generator/**
 src/**
-out/language-server/**
+out/language-server
 out/test/**
 
+install
 .gitignore
 .vscode-test.mjs
 tsconfig.json

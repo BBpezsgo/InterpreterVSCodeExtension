@@ -34,15 +34,16 @@
 	"main": "./out/extension",
 	"contributes": {
 		"configuration": {
-			"title": "BBlang configuration",
+			"title": "BBlang",
 			"type": "object",
 			"properties": {
-				"bblangServer.maxNumberOfProblems": {
+				"bblang.server.maxNumberOfProblems": {
 					"type": "number",
 					"default": 100,
-					"description": "Controls the maximum number of problems produced by the server"
+					"description": "Controls the maximum number of problems produced by the server",
+					"scope": "resource"
 				},
-				"bblangServer.trace.server": {
+				"bblang.server.trace": {
 					"type": "string",
 					"enum": [
 						"off",
@@ -50,9 +51,15 @@
 						"verbose"
 					],
 					"default": "off",
-					"description": "Traces the communication between VSCode and the language server service"
+					"description": "Traces the communication between VSCode and the language server service",
+					"scope": "resource"
 				},
-				"bblangServer.execute-in": {
+				"bblang.server.path": {
+					"type": "string",
+					"description": "Sets the path of the language server binary",
+					"scope": "machine"
+				},
+				"bblang.runtime.executein": {
 					"type": "string",
 					"enum": [
 						"Terminal",
@@ -63,12 +70,12 @@
 						"Run the files in an external window"
 					],
 					"default": "Terminal",
-					"description": "Where to execute the file",
+					"description": "Specifies the terminal to use when executing a script",
 					"scope": "resource"
 				},
-				"bblangServer.cmdPath": {
+				"bblang.runtime.path": {
 					"type": "string",
-					"description": "Path to the interpreter",
+					"description": "Sets the path of the runtime binary",
 					"scope": "machine"
 				}
 			}
@@ -116,133 +123,13 @@
 				"language": "bbc",
 				"path": "./snippets/bblang.json"
 			}
-		],
-		"commands": [
-			{
-				"command": "bblang.debug.debugEditorContents",
-				"category": "BBlang",
-				"title": "Debug File",
-				"shortTitle": "Debug File",
-				"enablement": "!inDebugMode",
-				"icon": "$(debug-alt)"
-			},
-			{
-				"command": "bblang.executeFile",
-				"category": "BBlang",
-				"title": "Run File",
-				"shortTitle": "Run File",
-				"icon": "$(run)",
-				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
-			}
-		],
-		"breakpoints": [
-			{
-				"language": "bbc"
-			}
-		],
-		"debuggers": [
-			{
-				"type": "bbc",
-				"languages": [
-					"bbc"
-				],
-				"label": "BBlang Debug",
-				"configurationAttributes": {
-					"launch": {
-						"required": [
-							"program"
-						],
-						"properties": {
-							"program": {
-								"type": "string",
-								"description": "Absolute path to a text file.",
-								"default": "${workspaceFolder}/${command:AskForProgramName}"
-							},
-							"stopOnEntry": {
-								"type": "boolean",
-								"description": "Automatically stop after launch.",
-								"default": true
-							},
-							"trace": {
-								"type": "boolean",
-								"description": "Enable logging of the Debug Adapter Protocol.",
-								"default": true
-							},
-							"compileError": {
-								"type": "string",
-								"description": "Simulates a compile error in 'launch' request.",
-								"enum": [
-									"default",
-									"show",
-									"hide"
-								],
-								"enumDescriptions": [
-									"default: show compile error to user",
-									"show compile error to user",
-									"do not show compile error to user"
-								]
-							}
-						}
-					}
-				},
-				"initialConfigurations": [
-					{
-						"type": "bblang",
-						"request": "launch",
-						"name": "Ask for file name",
-						"program": "${workspaceFolder}/${command:AskForProgramName}",
-						"stopOnEntry": true
-					}
-				],
-				"configurationSnippets": [
-					{
-						"label": "BBlang Debug: Launch",
-						"description": "A new configuration for 'debugging' a user selected file.",
-						"body": {
-							"type": "bblang",
-							"request": "launch",
-							"name": "Ask for file name",
-							"program": "^\"\\${workspaceFolder}/\\${command:AskForProgramName}\"",
-							"stopOnEntry": true
-						}
-					}
-				]
-			}
-		],
-		"menus": {
-			"explorer/context": [
-				{
-					"command": "bblang.executeFile",
-					"group": "bblang",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
-				}
-			],
-			"editor/title/context": [
-				{
-					"command": "bblang.executeFile",
-					"group": "bblang",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
-				}
-			],
-			"editor/title/run": [
-				{
-					"command": "bblang.debug.debugEditorContents",
-					"group": "bblang",
-					"when": "resourceLangId == bbc && !isInDiffEditor"
-				},
-				{
-					"command": "bblang.executeFile",
-					"group": "bblang",
-					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
-				}
-			]
-		}
+		]
 	},
 	"scripts": {
 		"watch": "tsc -w --project ./",
 		"update-vscode": "node ./node_modules/vscode/bin/install",
-		"compile": "tsc --project ./",
-		"package": "echo Bruh > LICENSE.txt && npm run compile && vsce package --out BBLangExtension.vsix && rm LICENSE.txt",
+		"compile": "./clean && tsc --project ./",
+		"package": "vsce package --out BBLangExtension.vsix",
 		"pretest": "npm run compile",
 		"test": "vscode-test",
 		"list": "vsce ls"
@@ -265,8 +152,7 @@
 	},
 	"capabilities": {
 		"virtualWorkspaces": {
-			"supported": false,
-			"description": "BBlang runner does currently not support virtual workspaces. Because it needs to have the files on disk to execute them."
+			"supported": false
 		}
 	}
 }

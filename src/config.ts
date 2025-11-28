@@ -1,6 +1,5 @@
 import * as vscode from 'vscode'
 import * as path from 'path'
-import * as updater from './updater'
 import * as utils from './utils'
 
 const dotnetRID = (() => {
@@ -30,27 +29,6 @@ const executableFileExtension = (() => {
     }
 })()
 
-export const interpreterOptions: updater.UpdateOptions = {
-    GithubUsername: 'BBpezsgo',
-    GithubRepository: 'Interpreter',
-    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-    LocalPath: path.join(__dirname, 'interpreter'),
-}
-
-export const debugServerOptions: updater.UpdateOptions = {
-    GithubUsername: 'BBpezsgo',
-    GithubRepository: '',
-    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-    LocalPath: path.join(__dirname, 'debug-server'),
-}
-
-export const languageServerOptions: updater.UpdateOptions = {
-    GithubUsername: 'BBpezsgo',
-    GithubRepository: 'BBCode-LanguageServer',
-    GithubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-    LocalPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
-}
-
 /**
  * @param filepath If provided it'll use the file's workspace folder as scope, otherwise it'll try to get the current active filepath.
  * @returns The workspace configuration for this extension _('batchrunner')_
@@ -70,17 +48,34 @@ function getExtensionConfig(filepath?: string): vscode.WorkspaceConfiguration {
 
 export function getConfig() {
     const config = getExtensionConfig()
-    return {
-        maxNumberOfProblems: config.get<number>('maxNumberOfProblems') ?? 100,
-        trace: {
-            server: config.get<'off' | 'messages' | 'verbose'>('trace.server') ?? 'off',
+    return Object.freeze({
+        runtime: {
+            githubUsername: 'BBpezsgo',
+            githubRepository: 'Interpreter',
+            githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+            defaultPath: path.join(__dirname, 'interpreter'),
+            path: config.get<string>('runtime.path', path.join(__dirname, 'interpreter')),
+            executeIn: config.get<'Terminal' | 'External'>('runtime.executein', 'Terminal'),
         },
-        ExecuteIn: config.get<'Terminal' | 'External'>('execute-in') ?? 'Terminal',
-        cmdPath: config.get<string>('cmdPath') ?? null,
-    }
+        languageServer: {
+            githubUsername: 'BBpezsgo',
+            githubRepository: 'BBCode-LanguageServer',
+            githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+            defaultPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
+            path: config.get<string>('server.path', path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`)),
+            server: config.get<'off' | 'messages' | 'verbose'>('server.trace', 'off'),
+            maxNumberOfProblems: config.get<number>('server.maxNumberOfProblems', 100),
+        },
+        debugServer: {
+            githubUsername: 'BBpezsgo',
+            githubRepository: '',
+            githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
+            defaultPath: path.join(__dirname, 'debug-server'),
+            path: path.join(__dirname, 'debug-server'),
+        }
+    })
 }
 
 export function goToConfig(config: string) {
-    const searchPath = `${utils.extensionConfigName}.${config}`
-    vscode.commands.executeCommand('workbench.action.openSettings', searchPath)
+    vscode.commands.executeCommand('workbench.action.openSettings', `${utils.extensionConfigName}.${config}`)
 }

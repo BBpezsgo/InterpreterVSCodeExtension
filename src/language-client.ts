@@ -36,7 +36,7 @@ export class LanguageClientManager {
                 language: utils.languageExtension,
             }],
             synchronize: {
-                configurationSection: utils.extensionConfigName,
+                configurationSection: `${utils.extensionConfigName}.server`,
                 fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
             },
             diagnosticPullOptions: {
@@ -55,32 +55,28 @@ export class LanguageClientManager {
 
         console.log(`[LanguageService]: Language server:`, serverOptions)
 
-        this.client.onNotification(LogMessageNotification.type, (params) => {
-            switch (params.type) {
-                case MessageType.Debug:
-                    console.debug('[LanguageServer]:', params.message)
-                    break
-                case MessageType.Log:
-                    console.log('[LanguageServer]:', params.message)
-                    break
-                case MessageType.Info:
-                    console.info('[LanguageServer]:', params.message)
-                    break
-                case MessageType.Warning:
-                    console.warn('[LanguageServer]:', params.message)
-                    break
-                case MessageType.Error:
-                    console.error('[LanguageServer]:', params.message)
-                    break
-                default:
-                    console.log('[LanguageServer]:', params.message)
-                    break
-            }
-        })
-
-        this.client.onNotification('custom/test', arg => {
-            vscode.window.showInformationMessage(arg)
-        })
+        //this.client.onNotification(LogMessageNotification.type, (params) => {
+        //    switch (params.type) {
+        //        case MessageType.Debug:
+        //            console.debug('[LanguageServer]:', params.message)
+        //            break
+        //        case MessageType.Log:
+        //            console.log('[LanguageServer]:', params.message)
+        //            break
+        //        case MessageType.Info:
+        //            console.info('[LanguageServer]:', params.message)
+        //            break
+        //        case MessageType.Warning:
+        //            console.warn('[LanguageServer]:', params.message)
+        //            break
+        //        case MessageType.Error:
+        //            console.error('[LanguageServer]:', params.message)
+        //            break
+        //        default:
+        //            console.log('[LanguageServer]:', params.message)
+        //            break
+        //    }
+        //})
 
         this.context = context
     }

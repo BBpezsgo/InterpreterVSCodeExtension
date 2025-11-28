@@ -1,0 +1,11 @@
+#!/bin/sh
+
+npm run compile
+
+set -e
+
+dotnet build ../LanguageServer/LanguageServer.csproj
+
+npm run package
+
+code --profile "bb" --install-extension BBLangExtension.vsix --force
