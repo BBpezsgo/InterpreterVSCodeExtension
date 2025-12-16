@@ -10,10 +10,12 @@ const dotnetRID = (() => {
                 case 'arm': return 'linux-arm'
                 case 'arm64': return 'linux-arm64'
             }
+            break
         case 'win32':
             switch (process.arch) {
                 case 'x64': return 'win-x64'
             }
+            break
     }
     vscode.window.showErrorMessage(`The current platform ${process.platform}-${process.arch} is not supported`)
     return ''
@@ -64,15 +66,14 @@ export function getConfig() {
             defaultPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
             path: config.get<string>('server.path', path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`)),
             server: config.get<'off' | 'messages' | 'verbose'>('server.trace', 'off'),
-            maxNumberOfProblems: config.get<number>('server.maxNumberOfProblems', 100),
         },
         debugServer: {
             githubUsername: 'BBpezsgo',
             githubRepository: '',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-            defaultPath: path.join(__dirname, 'debug-server'),
-            path: path.join(__dirname, 'debug-server'),
-        }
+            defaultPath: path.join(__dirname, 'debug-server', `DebugServer${executableFileExtension}`),
+            path: config.get<string>('debug.server.path', path.join(__dirname, 'debug-server', `DebugServer${executableFileExtension}`)),
+        },
     })
 }
 

@@ -1,7 +1,6 @@
 import * as config from './config'
 import * as fs from 'fs'
 import * as vscode from 'vscode'
-import * as path from 'path'
 import * as updater from './updater'
 
 export async function get() {

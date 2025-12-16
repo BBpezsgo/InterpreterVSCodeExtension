@@ -1,6 +1,7 @@
 import * as executionProvider from './execution-provider'
 import * as vscode from 'vscode'
 import { languageId } from './utils'
+import { log } from './extension'
 
 export async function execute(filepath: string, cmdPath: string | null = null, shellArgs: string[] | null = null) {
 	if (!cmdPath) { cmdPath = await executionProvider.get() }
@@ -21,7 +22,7 @@ export async function execute(filepath: string, cmdPath: string | null = null, s
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log(`[BBLang]: Registering file executor`)
+	log.debug(`Registering file executor`)
 	context.subscriptions.push(
 		vscode.commands.registerCommand(`${languageId}.executeFile`, async args => {
 			const filepath = getFilePath(args)
@@ -36,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 	)
 }
 
-function getFilePath(args: object) {
+function getFilePath(args: any) {
 	if (args) {
 		const filepath: string = args["path"]
 		if (filepath && filepath.startsWith("/")) { return filepath.replace("/", "") }

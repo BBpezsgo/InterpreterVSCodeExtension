@@ -23,7 +23,7 @@ export type LatestRelease = {
         received_events_url: string
         type: string
         site_admin: boolean
-    },
+    }
     node_id: string
     tag_name: string
     target_commitish: string
@@ -63,7 +63,7 @@ export type LatestReleaseAsset = {
         received_events_url: string
         type: string
         site_admin: boolean
-    },
+    }
     content_type: string
     state: string
     size: number

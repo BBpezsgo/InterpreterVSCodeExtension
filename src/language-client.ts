@@ -3,11 +3,10 @@ import {
     LanguageClient,
     LanguageClientOptions,
     ExecutableOptions,
-    LogMessageNotification,
-    MessageType,
     ServerOptions
 } from 'vscode-languageclient/node'
 import * as utils from './utils'
+import { log } from './extension'
 
 export type LanguageClientManagerOptions = {
     serverPath: string,
@@ -21,7 +20,7 @@ export class LanguageClientManager {
     constructor(context: vscode.ExtensionContext, serverPath: string, args: string[] = []) {
         const commandOptions: ExecutableOptions = { detached: false }
 
-        console.log(`[LanguageClient]: Server at "${serverPath}"`)
+        log.debug(`[Language] Language server is at "${serverPath}"`)
 
         const serverOptions: ServerOptions =
         {
@@ -53,7 +52,7 @@ export class LanguageClientManager {
             clientOptions
         )
 
-        console.log(`[LanguageService]: Language server:`, serverOptions)
+        log.debug(`[Language] Language server created`, serverOptions)
 
         //this.client.onNotification(LogMessageNotification.type, (params) => {
         //    switch (params.type) {
@@ -82,18 +81,18 @@ export class LanguageClientManager {
     }
 
     public activate() {
-        console.log(`[LanguageService]: Starting language server ...`)
+        log.debug(`[Language] Starting language server ...`)
         this.client.start().then(() => {
             this.context.subscriptions.push(this.client)
-            console.log(`[LanguageClient]: Language server started`)
+            log.debug(`[Language] Language server started`)
         }).catch(error => {
-            console.error(`[LanguageClient]: Failed to start language server:`, error)
+            log.error(`[Language] Failed to start language server`, error)
             vscode.window.showErrorMessage(error)
         })
     }
 
     public deactivate() {
         this.client?.stop()
-        console.error(`[LanguageClient]: Language server stopped`)
+        log.debug(`[Language] Language server stopped`)
     }
 }

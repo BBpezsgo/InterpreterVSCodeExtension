@@ -1,19 +1,18 @@
 import * as vscode from 'vscode'
-import * as path from 'path'
 import * as fs from 'fs'
 import { LanguageClientManager } from './language-client'
-import * as fileExecutor from './file-executor'
 import * as updater from './updater'
 import * as config from './config'
 import { TestProvider } from './test-provider'
 
 export let client: LanguageClientManager | null = null
+export let log: vscode.LogOutputChannel
 
 export function activateLanguageClient(context: vscode.ExtensionContext) {
     const extConfig = config.getConfig()
 
     if (!fs.existsSync(extConfig.languageServer.path)) {
-        console.warn(`[LanguageService]: Language server not found at "${extConfig.languageServer.path}"`)
+        log.warn(`[Language] Language server not found at "${extConfig.languageServer.path}"`)
         vscode.window.showErrorMessage(`Language server not found at "${extConfig.languageServer.path}"`)
         return
     }
@@ -23,14 +22,16 @@ export function activateLanguageClient(context: vscode.ExtensionContext) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    log = vscode.window.createOutputChannel("BBLang Extension", { log: true })
+
     const extConfig = config.getConfig()
 
-    // try {
-    //     const debugActivator: (typeof import('./debugger/debug-activator')) = require('./debugger/debug-activator')
-    //     debugActivator.activate(context)
-    // } catch (error) {
-    //     console.error(`[DebugAdapter]:`, error)
-    // }
+    try {
+        const debugActivator: (typeof import('./debug-activator')) = require('./debug-activator')
+        debugActivator.activate(context)
+    } catch (error) {
+        log.error(`[Debugger] Failed to activate the debug client`, error)
+    }
 
     // fileExecutor.activate(context)
 

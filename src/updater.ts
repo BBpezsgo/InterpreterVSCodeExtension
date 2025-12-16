@@ -4,6 +4,7 @@ import * as path from 'path'
 import * as admZip from 'adm-zip'
 import * as vscode from 'vscode'
 import * as utils from './utils'
+import { log } from './extension'
 
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 const localUpdateInfoSuffix = '.update.json'
@@ -34,17 +35,17 @@ async function getLatestRelease(options: UpdateOptions): Promise<import('./githu
 }
 
 export async function checkForUpdates(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null): Promise<CheckForUpdatesResult> {
-    console.log(`[BBLang Updater] Checking updates for ${options.defaultPath} ...`)
+    log.debug(`[Updater] Checking updates for ${options.defaultPath} ...`)
 
     progress?.report({ message: 'Do stuff' })
     const local = utils.tryGetJson<import('./github-api-schemas').LatestReleaseAsset>(options.defaultPath + localUpdateInfoSuffix)
 
     if (!local) {
-        console.log(`[BBLang Updater] File ${options.defaultPath + localUpdateInfoSuffix} not found`)
+        log.debug(`[Updater] File ${options.defaultPath + localUpdateInfoSuffix} not found`)
         return CheckForUpdatesResult.Nonexistent
     }
 
-    console.log(`[BBLang Updater] Getting latest release from ${options.githubRepository}`)
+    log.debug(`[Updater] Getting latest release from ${options.githubRepository}`)
     progress?.report({ message: 'Get latest release info' })
     const latest = await getLatestRelease(options)
 
@@ -59,7 +60,7 @@ export async function checkForUpdates(options: UpdateOptions, progress: vscode.P
         throw new Error(`Asset "${options.githubAssetName}" doesn't exists in the latest release`)
     }
 
-    console.log(`[BBLang Updater] Local version: ${local.updated_at} Latest version: ${latestAsset.updated_at}`)
+    log.debug(`[Updater] Local version: ${local.updated_at} Latest version: ${latestAsset.updated_at}`)
 
     if (local.updated_at !== latestAsset.updated_at) {
         return CheckForUpdatesResult.NewVersion
@@ -69,9 +70,9 @@ export async function checkForUpdates(options: UpdateOptions, progress: vscode.P
 }
 
 export async function update(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null) {
-    console.log(`[BBLang Updater] Updating ${options.defaultPath}`)
+    log.debug(`[Updater] Updating ${options.defaultPath}`)
 
-    console.log(`[BBLang Updater] Getting latest release from ${options.githubRepository}`)
+    log.debug(`[Updater] Getting latest release from ${options.githubRepository}`)
     progress?.report({ message: 'Getting the latest release' })
     const latest = await getLatestRelease(options)
 
@@ -93,18 +94,18 @@ export async function update(options: UpdateOptions, progress: vscode.Progress<{
     const downloadToFile = path.join(downloadToDir, latestAsset.name)
 
     if (!fs.existsSync(downloadToDir)) {
-        console.log(`[BBLang Updater] Creating directory \"${downloadToDir}\"`)
+        log.debug(`[Updater] Creating directory \"${downloadToDir}\"`)
         fs.mkdirSync(downloadToDir, { recursive: true })
     }
 
-    console.log(`[BBLang Updater] Opening file \"${downloadToFile}\" for writing`)
+    log.debug(`[Updater] Opening file \"${downloadToFile}\" for writing`)
     const file = fs.createWriteStream(downloadToFile)
     if (file.errored) {
-        console.error(`[BBLang Updater]`, file.errored)
+        log.error(`[Updater]`, file.errored)
         throw new Error(`Stream writer for file "${downloadToFile}" failed to create`)
     }
 
-    console.log(`[BBLang Updater] Downloading file from \"${latestAsset.browser_download_url}\"`)
+    log.debug(`[Updater] Downloading file from \"${latestAsset.browser_download_url}\"`)
     progress?.report({ message: 'Downloading release asset' })
     const assetRes = await utils.download(https, latestAsset.browser_download_url)
     await utils.downloadFile(assetRes, file, (percent) => {
@@ -114,19 +115,19 @@ export async function update(options: UpdateOptions, progress: vscode.Progress<{
     progress?.report({ message: 'Wait 1 sec', increment: -100 })
     await utils.sleep(1000)
 
-    console.log(`[BBLang Updater] Deleting directory \"${options.defaultPath}\"`)
+    log.debug(`[Updater] Deleting directory \"${options.defaultPath}\"`)
     progress?.report({ message: 'Removing existing files' })
     fs.rmSync(options.defaultPath, { force: true, recursive: true })
 
-    console.log(`[BBLang Updater] Extracting \"${downloadToFile}\" to \"${options.defaultPath}\"`)
+    log.debug(`[Updater] Extracting \"${downloadToFile}\" to \"${options.defaultPath}\"`)
     progress?.report({ message: 'Extracting' })
     const zip = new admZip(downloadToFile)
     zip.extractAllTo(path.join(options.defaultPath, '..'), true, true)
 
-    console.log(`[BBLang Updater] Deleting directory \"${downloadToDir}\"`)
+    log.debug(`[Updater] Deleting directory \"${downloadToDir}\"`)
     progress?.report({ message: 'Removing downloaded files' })
     fs.rmSync(downloadToDir, { force: true, recursive: true })
 
-    console.log(`[BBLang Updater] Writing update info to \"${options.defaultPath + localUpdateInfoSuffix}\"`)
+    log.debug(`[Updater] Writing update info to \"${options.defaultPath + localUpdateInfoSuffix}\"`)
     fs.writeFileSync(options.defaultPath + localUpdateInfoSuffix, JSON.stringify(latestAsset), 'utf8')
 }
