@@ -92,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(trackerFactory as { dispose(): void })
     }
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${languageId}.debug.debugEditorContents`, (resource: vscode.Uri | null | undefined) => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${languageId}.debugEditorContents`, (resource: vscode.Uri | null | undefined) => {
         log.debug('[Debugger] Try to start debugging ...')
 
         const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
