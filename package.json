@@ -27,7 +27,7 @@
 		"theme": "dark"
 	},
 	"activationEvents": [
-		"onCommand:bbc.debug.debugEditorContents",
+		"onCommand:bbc.debugEditorContents",
 		"onLanguage:bbc",
 		"onDebug"
 	],
@@ -125,7 +125,7 @@
 		],
 		"commands": [
 			{
-				"command": "bbc.debug.debugEditorContents",
+				"command": "bbc.debugEditorContents",
 				"category": "BBlang",
 				"title": "Debug File",
 				"shortTitle": "Debug File",
@@ -133,7 +133,7 @@
 				"icon": "$(debug-alt)"
 			},
 			{
-				"command": "bbc.executeFile",
+				"command": "bbc.executeEditorContents",
 				"category": "BBlang",
 				"title": "Run File",
 				"shortTitle": "Run File",
@@ -168,6 +168,11 @@
 								"type": "boolean",
 								"description": "Automatically stop after launch.",
 								"default": true
+							},
+							"noDebug": {
+								"type": "boolean",
+								"description": "Launch the session in no-debug mode",
+								"default": false
 							}
 						}
 					}
@@ -199,26 +204,26 @@
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "bbc.executeFile",
+					"command": "bbc.executeEditorContents",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				}
 			],
 			"editor/title/context": [
 				{
-					"command": "bbc.executeFile",
+					"command": "bbc.executeEditorContents",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && shellExecutionSupported"
 				}
 			],
 			"editor/title/run": [
 				{
-					"command": "bbc.debug.debugEditorContents",
+					"command": "bbc.debugEditorContents",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && !isInDiffEditor"
 				},
 				{
-					"command": "bbc.executeFile",
+					"command": "bbc.executeEditorContents",
 					"group": "bbc",
 					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
 				}
@@ -229,8 +234,6 @@
 		"watch": "tsc -w --project ./",
 		"compile": "./clean && tsc --project ./",
 		"package": "vsce package --out BBLangExtension.vsix",
-		"pretest": "npm run compile",
-		"test": "vscode-test",
 		"list": "vsce ls"
 	},
 	"devDependencies": {

@@ -3,7 +3,6 @@ import * as fs from 'fs'
 import { LanguageClientManager } from './language-client'
 import * as updater from './updater'
 import * as config from './config'
-import { TestProvider } from './test-provider'
 
 export let client: LanguageClientManager | null = null
 export let log: vscode.LogOutputChannel
@@ -32,11 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
     } catch (error) {
         log.error(`[Debugger] Failed to activate the debug client`, error)
     }
-
-    // fileExecutor.activate(context)
-
-    const testProvider = new TestProvider(context)
-    testProvider.activate()
 
     activateLanguageClient(context)
 

@@ -1,3 +1,0 @@
-using "https://raw.githubusercontent.com/BBpezsgo/Interpreter/master/StandardLibrary/System.bbc";
-
-printline("hello, world");

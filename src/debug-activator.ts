@@ -53,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                     log.info('[Debugger] Describe debug adapter as external')
 
-                    return new vscode.DebugAdapterExecutable(path)
+                    return new vscode.DebugAdapterExecutable(path, ['--log', '/home/bb/Projects/BBLang/DebugServer/latest.log'])
                 }
             }()
             break
@@ -63,9 +63,9 @@ export function activate(context: vscode.ExtensionContext) {
         createDebugAdapterTracker(session: vscode.DebugSession): ProviderResult<vscode.DebugAdapterTracker> {
             log.trace(`[Debugger] Registering debug adapter tracker`, session)
             return {
-                onDidSendMessage(message: any): void {
-                    log.trace(`[Debugger] ${message}`)
-                },
+                //onDidSendMessage(message: any): void {
+                //    log.trace(`[Debugger] ${message}`)
+                //},
                 onError(error: Error): void {
                     log.error(`[Debugger] Error`)
                     log.error(error)
@@ -111,7 +111,8 @@ export function activate(context: vscode.ExtensionContext) {
             name: 'Debug Editor Contents',
             request: 'launch',
             program: targetResource.fsPath,
-            stopOnEntry: true,
+            stopOnEntry: false,
+            noDebug: false,
         })
             .then(result => {
                 if (!result) {
@@ -122,6 +123,40 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             }, error => {
                 log.error(`[Debugger] Failed to start debugging`, error)
+            })
+    }))
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${languageId}.executeEditorContents`, (resource: vscode.Uri | null | undefined) => {
+        log.debug('[Debugger] Try to start debugging (no debug) ...')
+
+        const targetResource = resource ?? vscode.window.activeTextEditor?.document.uri ?? null
+        if (!targetResource) {
+            vscode.window.showErrorMessage(`No document opened for debugging`)
+            return
+        }
+
+        log.trace('[Debugger] Resource:', targetResource)
+
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(targetResource)
+
+        log.trace('[Debugger] Start debuging (no debug) ...')
+        vscode.debug.startDebugging(workspaceFolder, {
+            type: languageId,
+            name: 'Debug Editor Contents',
+            request: 'launch',
+            program: targetResource.fsPath,
+            stopOnEntry: false,
+            noDebug: true,
+        })
+            .then(result => {
+                if (!result) {
+                    vscode.window.showErrorMessage('Failed to start debugging')
+                    log.warn('[Debugger] Failed to start debugging (no debug)')
+                } else {
+                    log.info('[Debugger] Debugging started (no debug)')
+                }
+            }, error => {
+                log.error(`[Debugger] Failed to start debugging (no debug)`, error)
             })
     }))
 
@@ -144,7 +179,6 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
                 config.name = 'Launch'
                 config.request = 'launch'
                 config['program'] = '${file}'
-                config['stopOnEntry'] = true
             }
         }
 
