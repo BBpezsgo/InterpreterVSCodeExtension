@@ -63,75 +63,12 @@ static partial class Program
 
                 new() { Include = "#as" },
                 new() { Include = "#flow-control-statement" },
-                new() { Include = "#sizeof" },
                 new() { Include = "#function-call" },
                 new() { Include = "#literal" },
                 new() { Include = "#hover-popup" },
                 new() { Include = "#keyword" },
-                new() { Include = "#type" },
                 new() { Include = "#identifier" }
             ]
-        };
-
-        repository["sizeof"] = new Pattern()
-        {
-            Begin = @"\b(sizeof)\s*\(",
-            End = @"\)",
-
-            BeginCaptures = new()
-            {
-                { 1, SyntaxToken.KeywordControl },
-            },
-
-            Patterns = [
-                new() { Include = "#type" },
-                new()
-                {
-                    Match = @"\b(\w+)\b",
-                    Captures = new()
-                    {
-                        { 1, SyntaxToken.EntityNameType },
-                    }
-                }
-            ]
-        };
-
-        repository["as"] = new Pattern()
-        {
-            Match = @$"\b({StatementKeywords.As})\b\s+({typeRegex})\b",
-            Captures = new()
-            {
-                { 1, SyntaxToken.KeywordControl },
-                { 2, new() { Patterns = [ new() { Include = "#type" } ] } },
-            }
-        };
-
-        repository["type"] = new Pattern()
-        {
-            Patterns = [
-                new()
-                {
-                    Match = @$"\b({identifier})\b[\t ]*<({typeRegex})>",
-                    Captures = new() {
-                        { 1, SyntaxToken.EntityNameType },
-                        { 2, new() { Patterns = [ new() { Include = "#type" } ] } },
-                    },
-                },
-                new()
-                {
-                    Match = @$"\b({builtinTypes})\b",
-                    Captures = new() {
-                        { 1, SyntaxToken.KeywordControl },
-                    },
-                },
-                new()
-                {
-                    Match = @$"\b({identifier})\b(\*+)",
-                    Captures = new() {
-                        { 1, SyntaxToken.EntityNameType },
-                    },
-                },
-            ],
         };
 
         repository["hover-popup"] = new Pattern()
@@ -201,18 +138,17 @@ static partial class Program
             Captures = new()
             {
                 { 1, SyntaxToken.KeywordControl },
-                { 2, SyntaxToken.EntityNameClass },
+                { 2, SyntaxToken.EntityNameType },
             }
         };
 
         repository["alias-definition"] = new Pattern()
         {
-            Match = @$"({DeclarationKeywords.Alias})\s+({identifier})\s+({typeRegex})\b",
+            Match = @$"({DeclarationKeywords.Alias})\s+({identifier})\s+",
             Captures = new()
             {
                 { 1, SyntaxToken.KeywordControl },
-                { 2, SyntaxToken.EntityNameClass },
-                { 3, new() { Patterns = [ new() { Include = "#type" } ] } },
+                { 2, SyntaxToken.EntityNameType },
             }
         };
 
@@ -252,7 +188,6 @@ static partial class Program
                     Match = @$"(\w+)(?<!{typeExcludedKeywords})\s+({identifier})\s*(?=\()",
                     Captures = new()
                     {
-                        { 1, new() { Patterns = [ new() { Include = "#type" } ] } },
                         { 2, SyntaxToken.EntityNameFunction },
                     }
                 },
@@ -261,7 +196,6 @@ static partial class Program
                     Match = @$"(\w+)(?<!{typeExcludedKeywords})\s+({identifier})\s*<.*>\s*(?=\()",
                     Captures = new()
                     {
-                        { 1, new() { Patterns = [ new() { Include = "#type" } ] } },
                         { 2, SyntaxToken.EntityNameFunction },
                     }
                 },
