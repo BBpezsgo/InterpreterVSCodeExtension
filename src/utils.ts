@@ -1,6 +1,7 @@
 import * as fsExtra from 'fs-extra'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as vscode from 'vscode'
 
 export const options = {
     languageServerMode: 'Debug',
@@ -10,6 +11,10 @@ export const options = {
 export const languageExtension = 'bbc'
 export const languageId = 'bbc'
 export const extensionConfigName = "bblang"
+
+export function isVirtualWorkspace(): boolean {
+    return !!vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.every(f => f.uri.scheme !== 'file')
+}
 
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))

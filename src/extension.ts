@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import { LanguageClientManager } from './language-client'
 import * as updater from './updater'
 import * as config from './config'
+import { isVirtualWorkspace } from './utils'
 
 export let client: LanguageClientManager | null = null
 export let log: vscode.LogOutputChannel
@@ -24,12 +25,16 @@ export function activate(context: vscode.ExtensionContext) {
     log = vscode.window.createOutputChannel("BBLang Extension", { log: true })
 
     const extConfig = config.getConfig()
+    
+    const isVirtual = isVirtualWorkspace()
 
-    try {
-        const debugActivator: (typeof import('./debug-activator')) = require('./debug-activator')
-        debugActivator.activate(context)
-    } catch (error) {
-        log.error(`[Debugger] Failed to activate the debug client`, error)
+    if (!isVirtual) {
+        try {
+            const debugActivator: (typeof import('./debug-activator')) = require('./debug-activator')
+            debugActivator.activate(context)
+        } catch (error) {
+            log.error(`[Debugger] Failed to activate the debug client`, error)
+        }
     }
 
     activateLanguageClient(context)

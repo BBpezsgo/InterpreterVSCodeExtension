@@ -18,7 +18,6 @@ export class LanguageClientManager {
     private readonly context: vscode.ExtensionContext
 
     constructor(context: vscode.ExtensionContext, serverPath: string, args: string[] = []) {
-        const commandOptions: ExecutableOptions = { detached: false }
 
         log.debug(`[Language] Language server is at "${serverPath}"`)
 
@@ -27,7 +26,9 @@ export class LanguageClientManager {
             run: { command: serverPath },
             debug: { command: serverPath },
             args: args,
-            options: commandOptions,
+            options: {
+                detached: false,
+            },
         }
 
         const clientOptions: LanguageClientOptions = {
@@ -36,7 +37,7 @@ export class LanguageClientManager {
             }],
             synchronize: {
                 configurationSection: `${utils.extensionConfigName}.server`,
-                fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+                fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc'),
             },
             diagnosticPullOptions: {
                 onChange: true,

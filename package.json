@@ -130,7 +130,8 @@
 				"title": "Debug File",
 				"shortTitle": "Debug File",
 				"enablement": "!inDebugMode",
-				"icon": "$(debug-alt)"
+				"icon": "$(debug-alt)",
+		        "when": "resourceLangId == bbc && !virtualWorkspace"
 			},
 			{
 				"command": "bbc.executeEditorContents",
@@ -138,12 +139,13 @@
 				"title": "Run File",
 				"shortTitle": "Run File",
 				"icon": "$(run)",
-				"enablement": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+		        "when": "resourceLangId == bbc && !virtualWorkspace"
 			}
 		],
 		"breakpoints": [
 			{
-				"language": "bbc"
+				"language": "bbc",
+				"when": "!virtualWorkspace"
 			}
 		],
 		"debuggers": [
@@ -198,7 +200,8 @@
 							"stopOnEntry": true
 						}
 					}
-				]
+				],
+				"when": "!virtualWorkspace"
 			}
 		],
 		"menus": {
@@ -206,26 +209,26 @@
 				{
 					"command": "bbc.executeEditorContents",
 					"group": "bbc",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
+					"when": "resourceLangId == bbc && !virtualWorkspace"
 				}
 			],
 			"editor/title/context": [
 				{
 					"command": "bbc.executeEditorContents",
 					"group": "bbc",
-					"when": "resourceLangId == bbc && shellExecutionSupported"
+					"when": "resourceLangId == bbc && !virtualWorkspace"
 				}
 			],
 			"editor/title/run": [
 				{
 					"command": "bbc.debugEditorContents",
 					"group": "bbc",
-					"when": "resourceLangId == bbc && !isInDiffEditor"
+					"when": "resourceLangId == bbc && !virtualWorkspace"
 				},
 				{
 					"command": "bbc.executeEditorContents",
 					"group": "bbc",
-					"when": "resourceLangId == bbc && !isInDiffEditor && shellExecutionSupported"
+					"when": "resourceLangId == bbc && !virtualWorkspace"
 				}
 			]
 		}
@@ -254,7 +257,8 @@
 	},
 	"capabilities": {
 		"virtualWorkspaces": {
-			"supported": false
+			"supported": "limited",
+			"description": "Debugging and advanced language features are not avaliable in virtual workspaces"
 		}
 	}
 }
