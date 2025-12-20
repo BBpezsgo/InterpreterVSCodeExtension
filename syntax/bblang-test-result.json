@@ -5,29 +5,21 @@
 	],
 	"name": "BBLang Test Result Language",
 	"patterns": [
-		{
-			"include": "#hash"
-		}
+		{ "include": "#escaped" },
+		{ "include": "#hash" }
 	],
 	"repository": {
+		"escaped": {
+			"match": "(\\.)",
+			"name": "constant.character.escape"
+		},
 		"hash": {
 			"patterns": [
 				{
-					"match": "(#[a-zA-Z]*)\\s *([a-zA-Z]+)",
+					"match": "(#exitcode)\\s+(-?\\d+)\n",
 					"captures": {
 						"1": {
-							"name": "constant.language"
-						},
-						"2": {
-							"name": "entity.name.variable"
-						}
-					}
-				},
-				{
-					"match": "(#[a-zA-Z]*)\\s *([0-9]+)",
-					"captures": {
-						"1": {
-							"name": "constant.language"
+							"name": "keyword"
 						},
 						"2": {
 							"name": "constant.numeric"
@@ -35,10 +27,10 @@
 					}
 				},
 				{
-					"match": "(#[a-zA-Z]*)",
+					"match": "(#.*)\n",
 					"captures": {
 						"1": {
-							"name": "constant.language"
+							"name": "invalid"
 						}
 					}
 				}
