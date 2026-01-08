@@ -119,7 +119,7 @@
           "name": "keyword.control"
         }
       },
-      "match": "\\b(return|crash|if|elseif|else|while|for|break)\\b"
+      "match": "\\b(return|crash|if|else|while|for|break)\\b"
     },
     "comment": {
       "match": "\\/\\/[^\\n]*\\n",

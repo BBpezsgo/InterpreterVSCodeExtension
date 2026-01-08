@@ -83,7 +83,6 @@ static partial class Program
                 StatementKeywords.Return,
                 StatementKeywords.Crash,
                 StatementKeywords.If,
-                StatementKeywords.ElseIf,
                 StatementKeywords.Else,
                 StatementKeywords.While,
                 StatementKeywords.For,
