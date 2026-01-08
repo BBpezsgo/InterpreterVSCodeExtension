@@ -53,7 +53,7 @@ export function getConfig() {
     return Object.freeze({
         runtime: {
             githubUsername: 'BBpezsgo',
-            githubRepository: 'Interpreter',
+            githubRepository: 'BBLang',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
             defaultPath: path.join(__dirname, 'interpreter'),
             path: config.get<string>('runtime.path', path.join(__dirname, 'interpreter')),
