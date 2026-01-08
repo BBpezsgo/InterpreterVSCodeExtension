@@ -61,7 +61,7 @@ export function getConfig() {
         },
         languageServer: {
             githubUsername: 'BBpezsgo',
-            githubRepository: 'BBCode-LanguageServer',
+            githubRepository: 'BBLang-LanguageServer',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
             defaultPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
             path: config.get<string>('server.path', path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`)),
