@@ -14,7 +14,8 @@ static partial class Program
         string builtinTypes = string.Join('|', TypeKeywords.List);
         string keywords = string.Join('|', LanguageConstants.KeywordList);
         string typeExcludedKeywords = string.Join('|', LanguageConstants.KeywordList.Except(TypeKeywords.List));
-        string identifier = @$"(?!(?:{keywords})\b)[a-zA-Z_@]+[a-zA-Z0-9_@]*";
+        string anyIdentifier = @$"[a-zA-Z_@]+[a-zA-Z0-9_@]*";
+        string identifier = @$"(?!(?:{keywords})\b){anyIdentifier}";
         string typeRegex = @$"(?!(?:{typeExcludedKeywords})\b)[a-zA-Z_@]+[a-zA-Z0-9_@\*\[\]\<\>\,\s]*";
 
         repository["scope"] = new Pattern()
@@ -37,12 +38,23 @@ static partial class Program
 
         repository["preprocessor"] = new Pattern()
         {
-            Match = @"(#[a-zA-Z]*)\s *([a-zA-Z]*)",
-            Captures = new()
-            {
-                { 1, SyntaxToken.ConstantLanguage },
-                { 2, SyntaxToken.EntityNameVariable },
-            },
+            Patterns = [
+                new Pattern(){
+                    Match = @$"(#if)\s *({anyIdentifier})",
+                    Captures = new()
+                    {
+                        { 1, SyntaxToken.Comment },
+                        { 2, SyntaxToken.Comment },
+                    },
+                },
+                new Pattern(){
+                    Match = @"(#endif)",
+                    Captures = new()
+                    {
+                        { 1, SyntaxToken.Comment },
+                    },
+                }
+            ]
         };
 
         repository["literal"] = new Pattern()

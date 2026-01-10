@@ -58,15 +58,27 @@
       ]
     },
     "preprocessor": {
-      "captures": {
-        "1": {
-          "name": "constant.language"
+      "patterns": [
+        {
+          "captures": {
+            "1": {
+              "name": "comment"
+            },
+            "2": {
+              "name": "comment"
+            }
+          },
+          "match": "(#if)\\s *([a-zA-Z_@]+[a-zA-Z0-9_@]*)"
         },
-        "2": {
-          "name": "entity.name.variable"
+        {
+          "captures": {
+            "1": {
+              "name": "comment"
+            }
+          },
+          "match": "(#endif)"
         }
-      },
-      "match": "(#[a-zA-Z]*)\\s *([a-zA-Z]*)"
+      ]
     },
     "literal": {
       "patterns": [
