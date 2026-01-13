@@ -166,6 +166,22 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.debug.onDidReceiveDebugSessionCustomEvent(e => log.trace('[Debugger] Custom event received:', e))
     vscode.debug.onDidChangeBreakpoints(e => log.trace('[Debugger] Breakpoints changed:', e))
 
+    const outputChannel = vscode.window.createOutputChannel("BBLang Debug Host", { log: true })
+
+    vscode.debug.onDidReceiveDebugSessionCustomEvent(e => {
+        if (e.event === "adapterLog") {
+            switch (e.body.level) {
+                case 'trace': outputChannel.trace(e.body.message); break
+                case 'debug': outputChannel.debug(e.body.message); break
+                case 'info': outputChannel.info(e.body.message); break
+                case 'warn': outputChannel.warn(e.body.message); break
+                case 'error': outputChannel.error(e.body.message); break
+                default: outputChannel.appendLine(e.body.message); break
+            }
+        }
+    })
+
+
     log.info('[Debugger] Debugger activated')
 }
 
