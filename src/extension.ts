@@ -101,4 +101,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
     client?.deactivate()
+    client?.dispose()
+    client = null
 }

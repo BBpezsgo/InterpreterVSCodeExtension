@@ -2,8 +2,8 @@ import * as vscode from 'vscode'
 import {
     LanguageClient,
     LanguageClientOptions,
-    ExecutableOptions,
-    ServerOptions
+    ServerOptions,
+    Disposable
 } from 'vscode-languageclient/node'
 import * as utils from './utils'
 import { log } from './extension'
@@ -13,9 +13,10 @@ export type LanguageClientManagerOptions = {
     args?: string[],
 }
 
-export class LanguageClientManager {
+export class LanguageClientManager implements Disposable {
     private readonly client: LanguageClient
     private readonly context: vscode.ExtensionContext
+    private readonly outputChannel: vscode.LogOutputChannel
 
     constructor(context: vscode.ExtensionContext, serverPath: string, args: string[] = []) {
 
@@ -31,6 +32,8 @@ export class LanguageClientManager {
             },
         }
 
+        this.outputChannel = vscode.window.createOutputChannel('BBLang Language Server', { log: true })
+
         const clientOptions: LanguageClientOptions = {
             documentSelector: [{
                 language: utils.languageExtension,
@@ -44,14 +47,40 @@ export class LanguageClientManager {
                 onTabs: true,
                 onSave: true,
             },
+            outputChannel: this.outputChannel,
         }
 
         this.client = new LanguageClient(
             utils.extensionConfigName,
-            'BBLang Language Server',
+            'BBLang Language Client',
             serverOptions,
             clientOptions
         )
+
+        this.client.onNotification('window/logMessage', (message) => {
+            switch (message.type) {
+                case 1:
+                    this.outputChannel.error(message.message)
+                    break
+                case 2:
+                    this.outputChannel.warn(message.message)
+                    break
+                case 3:
+                    this.outputChannel.info(message.message)
+                    break
+                case 4:
+                    this.outputChannel.debug(message.message)
+                    break
+                default:
+                    this.outputChannel.appendLine(message.message)
+                    break
+            }
+        });
+
+        this.client.error = () => { }
+        this.client.warn = () => { }
+        this.client.info = () => { }
+        this.client.debug = () => { }
 
         log.debug(`[Language] Language server created`, serverOptions)
 
@@ -95,5 +124,12 @@ export class LanguageClientManager {
     public deactivate() {
         this.client?.stop()
         log.debug(`[Language] Language server stopped`)
+    }
+
+    [Symbol.dispose]() { this.dispose() }
+
+    public dispose() {
+        this.client?.dispose()
+        this.outputChannel?.dispose()
     }
 }

@@ -1,6 +1,8 @@
 {
     "comments": {
-        "lineComment": "//",
+        "lineComment": {
+            "comment": "//",
+        },
         "blockComment": [
             "/*",
             "*/"
@@ -58,6 +60,10 @@
         [
             "\"",
             "\""
+        ],
+        [
+            "'",
+            "'"
         ]
     ],
     "folding": {
