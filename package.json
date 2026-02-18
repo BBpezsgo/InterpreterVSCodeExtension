@@ -231,7 +231,18 @@
 					"when": "resourceLangId == bbc && !virtualWorkspace"
 				}
 			]
-		}
+		},
+        "notebooks": [
+            {
+                "type": "bblang-notebook",
+                "displayName": "BBLang Notebook",
+                "selector": [
+                    {
+                        "filenamePattern": "*.bbnb"
+                    }
+                ]
+            }
+        ]
 	},
 	"scripts": {
 		"watch": "tsc -w --project ./",

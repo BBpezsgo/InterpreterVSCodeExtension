@@ -4,6 +4,7 @@ import { LanguageClientManager } from './language-client'
 import * as updater from './updater'
 import * as config from './config'
 import { isVirtualWorkspace } from './utils'
+import * as notebookSerializer from './notebook-serializer'
 
 export let client: LanguageClientManager | null = null
 export let log: vscode.LogOutputChannel
@@ -25,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     log = vscode.window.createOutputChannel("BBLang Extension", { log: true })
 
     const extConfig = config.getConfig()
-    
+
     const isVirtual = isVirtualWorkspace()
 
     if (!isVirtual) {
@@ -38,6 +39,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     activateLanguageClient(context)
+
+    notebookSerializer.activate(context)
 
     /*
     updater.checkForUpdates(config.interpreterUpdateOptions)
