@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace LanguageCore.SyntaxGenerator;
 
 static partial class Program
 {
+    static string? _projectPath;
+    public static string ProjectPath => _projectPath ??= GetProjectPath();
+    static string GetProjectPath([CallerFilePath] string? callerFilePath = null) => Path.GetDirectoryName(callerFilePath ?? throw new Exception($"Failed to get the project path"))!;
+
     static void Main()
     {
         Dictionary<string, Pattern> repository = new();
@@ -276,6 +282,7 @@ static partial class Program
                 new() { Include = "#keyword" },
             ]
         }, Converter.JsonOptions);
-        File.WriteAllText("/home/bb/Projects/BBLang/VSCodeExtension/syntax/bblang.json", json);
+
+        File.WriteAllText(Path.Combine(GetProjectPath(), "..", "syntax", "bblang.json"), json);
     }
 }

@@ -5,51 +5,82 @@ import * as admZip from 'adm-zip'
 import * as vscode from 'vscode'
 import * as utils from './utils'
 import { log } from './extension'
+import { LatestRelease, LatestReleaseAsset } from './github-api-schemas'
 
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 const localUpdateInfoSuffix = '.update.json'
 
-export enum CheckForUpdatesResult {
+export interface FetchUpdateResult {
+    status: FetchUpdateStatus
+    release: null | LatestRelease
+}
+
+export enum FetchUpdateStatus {
     Nonexistent,
     NewVersion,
     UpToDate,
+    Untracked,
 }
 
 export type UpdateOptions = {
     githubUsername: string
     githubRepository: string
     githubAssetName: string
-    defaultPath: string
+    path: string
+    pathConfigKey: string
 }
 
-async function getLatestRelease(options: UpdateOptions): Promise<import('./github-api-schemas').LatestRelease> {
+export interface LocalUpdateMetadata {
+    updated_at: string
+}
+
+async function getLatestRelease(options: UpdateOptions, token: vscode.CancellationToken | null = null): Promise<LatestRelease> {
     const res = await utils.download(https, {
         hostname: 'api.github.com',
         path: `/repos/${options.githubUsername}/${options.githubRepository}/releases/latest`,
         headers: {
             'user-agent': userAgent
         }
-    })
-    const data = await utils.downloadText(res)
-    return JSON.parse(data)
+    }, token)
+    return await utils.downloadJson<LatestRelease>(res, token)
 }
 
-export async function checkForUpdates(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null): Promise<CheckForUpdatesResult> {
-    log.debug(`[Updater] Checking updates for ${options.defaultPath} ...`)
+export async function checkForUpdates(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null, token: vscode.CancellationToken | null = null): Promise<FetchUpdateResult> {
+    log.trace(`[Updater] Checking updates for "${options.path}" ...`)
 
-    progress?.report({ message: 'Do stuff' })
-    const local = utils.tryGetJson<import('./github-api-schemas').LatestReleaseAsset>(options.defaultPath + localUpdateInfoSuffix)
+    progress?.report({ message: 'Checking for local files' })
 
-    if (!local) {
-        log.debug(`[Updater] File ${options.defaultPath + localUpdateInfoSuffix} not found`)
-        return CheckForUpdatesResult.Nonexistent
+    if (!fs.existsSync(options.path)) {
+        log.debug(`[Updater] File "${options.path}" doesn't exists`)
+        return {
+            status: FetchUpdateStatus.Nonexistent,
+            release: null,
+        }
     }
 
-    log.debug(`[Updater] Getting latest release from ${options.githubRepository}`)
-    progress?.report({ message: 'Get latest release info' })
-    const latest = await getLatestRelease(options)
+    const metaFilename = options.path + localUpdateInfoSuffix
 
-    let latestAsset: import('./github-api-schemas').LatestReleaseAsset | null = null
+    if (!fs.existsSync(metaFilename)) {
+        log.trace(`[Updater] File "${metaFilename}" doesn't exists`)
+        return {
+            status: FetchUpdateStatus.Untracked,
+            release: null,
+        }
+    }
+
+    const local = fs.existsSync(metaFilename) ? JSON.parse(fs.readFileSync(metaFilename, 'utf8')) : null
+
+    if (!local) {
+        log.trace(`[Updater] File "${options.path + localUpdateInfoSuffix}" doesn't exists`)
+    }
+
+    progress?.report({ message: 'Get latest release info' })
+    log.trace(`[Updater] Getting latest release from "${options.githubRepository}"`)
+    const latest = await getLatestRelease(options, token)
+
+    log.trace(`[Updater]`, latest)
+
+    let latestAsset: LatestReleaseAsset | null = null
     for (const asset of latest.assets) {
         if (asset.name === options.githubAssetName) {
             latestAsset = asset
@@ -57,26 +88,35 @@ export async function checkForUpdates(options: UpdateOptions, progress: vscode.P
     }
 
     if (!latestAsset) {
+        log.warn(`[Updater] Asset "${options.githubAssetName}" doesn't exists in the latest release`)
         throw new Error(`Asset "${options.githubAssetName}" doesn't exists in the latest release`)
     }
 
-    log.debug(`[Updater] Local version: ${local.updated_at} Latest version: ${latestAsset.updated_at}`)
+    log.trace(`[Updater] Local version: \`${local?.updated_at}\` Latest version: \`${latestAsset.updated_at}\``)
 
-    if (local.updated_at !== latestAsset.updated_at) {
-        return CheckForUpdatesResult.NewVersion
+    if (!local || local.updated_at !== latestAsset.updated_at) {
+        return {
+            status: FetchUpdateStatus.NewVersion,
+            release: latest,
+        }
     } else {
-        return CheckForUpdatesResult.UpToDate
+        return {
+            status: FetchUpdateStatus.UpToDate,
+            release: latest,
+        }
     }
 }
 
-export async function update(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null) {
-    log.debug(`[Updater] Updating ${options.defaultPath}`)
+export async function update(options: UpdateOptions, progress: vscode.Progress<{ message?: string | undefined; increment?: number | undefined }> | null = null, token: vscode.CancellationToken | null = null) {
+    log.debug(`[Updater] Updating "${options.path}"`)
 
-    log.debug(`[Updater] Getting latest release from ${options.githubRepository}`)
     progress?.report({ message: 'Getting the latest release' })
-    const latest = await getLatestRelease(options)
+    log.trace(`[Updater] Getting latest release from "${options.githubRepository}"`)
+    const latest = await getLatestRelease(options, token)
 
-    let latestAsset: import('./github-api-schemas').LatestReleaseAsset | null = null
+    log.trace(`[Updater]\n${JSON.stringify(latest, null, ' ')}`)
+
+    let latestAsset: LatestReleaseAsset | null = null
     for (const asset of latest.assets) {
         if (asset.name === options.githubAssetName) {
             latestAsset = asset
@@ -85,6 +125,7 @@ export async function update(options: UpdateOptions, progress: vscode.Progress<{
     }
 
     if (!latestAsset) {
+        log.warn(`[Updater] Asset "${options.githubAssetName}" doesn't exists in the latest release`)
         throw new Error(`Asset "${options.githubAssetName}" doesn't exists in the latest release`)
     }
 
@@ -98,16 +139,17 @@ export async function update(options: UpdateOptions, progress: vscode.Progress<{
         fs.mkdirSync(downloadToDir, { recursive: true })
     }
 
-    log.debug(`[Updater] Opening file \"${downloadToFile}\" for writing`)
+    log.trace(`[Updater] Opening file \"${downloadToFile}\" for writing`)
     const file = fs.createWriteStream(downloadToFile)
     if (file.errored) {
         log.error(`[Updater]`, file.errored)
         throw new Error(`Stream writer for file "${downloadToFile}" failed to create`)
     }
 
-    log.debug(`[Updater] Downloading file from \"${latestAsset.browser_download_url}\"`)
     progress?.report({ message: 'Downloading release asset' })
-    const assetRes = await utils.download(https, latestAsset.browser_download_url)
+    log.trace(`[Updater] Downloading file from \"${latestAsset.browser_download_url}\"`)
+    const assetRes = await utils.download(https, latestAsset.browser_download_url, token)
+    log.trace(`[Updater] ${assetRes.statusCode} ${assetRes.statusMessage}`)
     await utils.downloadFile(assetRes, file, (percent) => {
         progress?.report({ message: 'Downloading release asset', increment: percent * 100 })
     })
@@ -115,19 +157,20 @@ export async function update(options: UpdateOptions, progress: vscode.Progress<{
     progress?.report({ message: 'Wait 1 sec', increment: -100 })
     await utils.sleep(1000)
 
-    log.debug(`[Updater] Deleting directory \"${options.defaultPath}\"`)
     progress?.report({ message: 'Removing existing files' })
-    fs.rmSync(options.defaultPath, { force: true, recursive: true })
+    log.trace(`[Updater] Removing directory \"${options.path}\"`)
+    fs.rmSync(options.path, { force: true, recursive: true })
 
-    log.debug(`[Updater] Extracting \"${downloadToFile}\" to \"${options.defaultPath}\"`)
     progress?.report({ message: 'Extracting' })
+    log.trace(`[Updater] Extracting \"${downloadToFile}\" to \"${options.path}\"`)
     const zip = new admZip(downloadToFile)
-    zip.extractAllTo(path.join(options.defaultPath, '..'), true, true)
+    zip.extractAllTo(path.join(options.path, '..'), true, true)
 
-    log.debug(`[Updater] Deleting directory \"${downloadToDir}\"`)
-    progress?.report({ message: 'Removing downloaded files' })
+    progress?.report({ message: 'Removing temporary files' })
+    log.trace(`[Updater] Removing temporary directory \"${downloadToDir}\"`)
     fs.rmSync(downloadToDir, { force: true, recursive: true })
 
-    log.debug(`[Updater] Writing update info to \"${options.defaultPath + localUpdateInfoSuffix}\"`)
-    fs.writeFileSync(options.defaultPath + localUpdateInfoSuffix, JSON.stringify(latestAsset), 'utf8')
+    log.trace(`[Updater] Writing update info to \"${options.path + localUpdateInfoSuffix}\"`)
+    const localUpdateInfo: LocalUpdateMetadata = latestAsset
+    fs.writeFileSync(options.path + localUpdateInfoSuffix, JSON.stringify(localUpdateInfo), 'utf8')
 }

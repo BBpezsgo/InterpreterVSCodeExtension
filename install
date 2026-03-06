@@ -1,10 +1,10 @@
 #!/bin/sh
 
-npm run compile
-
 set -e
 
-dotnet build ../LanguageServer/LanguageServer.csproj
+dotnet run --norestore --project ./syntax_generator/SyntaxGenerator.csproj
+
+npm run compile
 
 npm run package
 

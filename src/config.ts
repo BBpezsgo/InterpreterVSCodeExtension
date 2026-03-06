@@ -55,24 +55,24 @@ export function getConfig() {
             githubUsername: 'BBpezsgo',
             githubRepository: 'BBLang',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-            defaultPath: path.join(__dirname, 'interpreter'),
-            path: config.get<string>('runtime.path', path.join(__dirname, 'interpreter')),
+            path: config.get<string>('runtime.path', path.join(__dirname, 'runtime', `interpreter${executableFileExtension}`)),
             executeIn: config.get<'Terminal' | 'External'>('runtime.executein', 'Terminal'),
+            pathConfigKey: 'runtime.path',
         },
         languageServer: {
             githubUsername: 'BBpezsgo',
             githubRepository: 'BBLang-LanguageServer',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-            defaultPath: path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`),
             path: config.get<string>('server.path', path.join(__dirname, 'language-server', `LanguageServer${executableFileExtension}`)),
             server: config.get<'off' | 'messages' | 'verbose'>('server.trace', 'off'),
+            pathConfigKey: 'server.path',
         },
         debugServer: {
             githubUsername: 'BBpezsgo',
             githubRepository: '',
             githubAssetName: dotnetRID ? `${dotnetRID}.zip` : '',
-            defaultPath: path.join(__dirname, 'debug-server', `DebugServer${executableFileExtension}`),
             path: config.get<string>('debug.server.path', path.join(__dirname, 'debug-server', `DebugServer${executableFileExtension}`)),
+            pathConfigKey: 'debug.server.path',
         },
     })
 }

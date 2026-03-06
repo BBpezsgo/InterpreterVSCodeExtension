@@ -32,28 +32,16 @@ export function activate(context: vscode.ExtensionContext) {
 
                     if (executable) { return executable }
 
-                    const extConfig = config.getConfig()
-
-                    let path = extConfig.debugServer.path
-
-                    if (path && !fs.existsSync(path)) {
-                        log.warn(`[Debugger] Debug server "${path}" not found`)
-                        vscode.window.showWarningMessage(`Debug server "${path}" not found`)
-                    }
-
-                    if (!path || !fs.existsSync(path)) {
-                        path = extConfig.debugServer.defaultPath
-                    }
+                    const path = config.getConfig().debugServer.path
 
                     if (!fs.existsSync(path)) {
-                        log.error(`[Debugger] Default debug server "${path}" not found`)
-                        vscode.window.showErrorMessage(`Default debug server "${path}" not found`)
-                        return
+                        log.warn(`[Debugger] Debug server "${path}" not found`)
+                        vscode.window.showErrorMessage(`Debug server "${path}" not found`)
                     }
 
                     log.info('[Debugger] Describe debug adapter as external')
 
-                    return new vscode.DebugAdapterExecutable(path, ['--log', '/home/bb/Projects/BBLang/DebugServer/latest.log'])
+                    return new vscode.DebugAdapterExecutable(path)
                 }
             }()
             break
@@ -209,3 +197,7 @@ class ConfigurationProvider implements vscode.DebugConfigurationProvider {
         return config
     }
 }
+export function deactivate() {
+    
+}
+
